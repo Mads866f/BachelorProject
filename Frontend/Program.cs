@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Frontend.Components;
 using Frontend.Components.Account;
 using Frontend.Data;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// Setup MudBlazor
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
