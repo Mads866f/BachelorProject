@@ -1,0 +1,18 @@
+﻿services:
+  pb-framework:
+    image: pb-framework
+    build:
+      context: .
+      dockerfile: PB-Framework/Dockerfile
+
+  frontend:
+    image: frontend
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+
+  backend:
+    image: backend
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
