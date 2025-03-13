@@ -16,3 +16,9 @@
     build:
       context: .
       dockerfile: Backend/Dockerfile
+
+  pbengine:
+    image: pbengine
+    build:
+      context: .
+      dockerfile: pbEngine/dockerfile
