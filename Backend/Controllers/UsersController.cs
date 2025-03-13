@@ -4,7 +4,7 @@ namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersControllers : ControllerBase
+public class UsersController : ControllerBase
 {
 
     [HttpGet()]

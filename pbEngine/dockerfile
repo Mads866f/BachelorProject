@@ -2,11 +2,10 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-COPY pabutools_functions.py .
-COPY main.py .
+COPY pbEngine/requirements.txt .
+COPY pbEngine/pabutools_functions.py .
+COPY pbEngine/main.py .
 RUN pip install --upgrade pip
-RUN ls -lah && cat requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app

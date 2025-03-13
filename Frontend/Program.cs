@@ -6,9 +6,24 @@ using Frontend.Components;
 using Frontend.Components.Account;
 using Frontend.Data;
 using Frontend.Utilities;
+using Microsoft.AspNetCore.DataProtection;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Ensure the environment-specific config is loaded
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())  // Set base path if necessary
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+
+// Configure DataProtection to persist keys to a shared directory
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/dataProtectionKeys"))  // specify the directory
+    .SetApplicationName("YourAppName");  // optionally, set an application name for key isolation
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -71,4 +86,3 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
-

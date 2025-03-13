@@ -2,28 +2,26 @@ using Frontend.Utilities;
 
 namespace Frontend.Services.ApiService;
 
-public class UserApiService(IHttpClientFactory clientFactory) : IUserApiService
+public class TestApiService(IHttpClientFactory clientFactory): ITestApiService
 {
-    private readonly HttpClient _httpClient = clientFactory.CreateClient(Constants.Backend);
-
-    public async Task<string> GetUsersAsync()
+    private readonly HttpClient _httpClient =  clientFactory.CreateClient(Constants.Backend);
+    
+    public async Task<string> Test()
     {
-        var url = "api/User/";
+        var url = "api/Test";
         try
         {
             var response = await _httpClient.GetAsync(url);
-
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
 
-            return "";
+            return "DSADSADSA";
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return "FAILED";
         }
     }
 }

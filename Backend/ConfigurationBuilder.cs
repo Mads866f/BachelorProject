@@ -1,8 +1,8 @@
-using Frontend.Services;
-using Frontend.Services.ApiService;
-using Frontend.Utilities;
+using Backend.Services.ApiServices.PbEngine;
+using Backend.Services.Interfaces.PbEngine;
+using Backend.Utilities;
 
-namespace Frontend;
+namespace Backend;
 
 public static class ConfigurationBuilder
 {
@@ -12,23 +12,21 @@ public static class ConfigurationBuilder
         SetupServices(builder);
     }
     
-    // Setup http client for Backend
+    // Setup http client for PBengine
     private static void SetupHttpClient(WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient(Constants.Backend, client =>
+        builder.Services.AddHttpClient(Constants.PbEngine, client =>
         {
             //string connectionString = builder.Configuration.GetConnectionString("BackendAPI")
               //                        ?? throw new InvalidOperationException(
                 //                          "Connection string 'BackendAPI' not found.");
-            string connectionString =  "http://backend:8080";
+                string connectionString = "http://pbengine:8000";
             client.BaseAddress = new Uri(connectionString);
         });
     }
 
-    // Setup the frontend services
     private static void SetupServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<IUserApiService, UserApiService>();
-        builder.Services.AddScoped<TestApiService>();
+        builder.Services.AddScoped<IInitialtest, Initialtest>();
     }
 }

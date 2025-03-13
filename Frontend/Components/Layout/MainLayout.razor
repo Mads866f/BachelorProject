@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Frontend.Services.ApiService
+@inherits LayoutComponentBase
 
 @* Required *@
 <MudThemeProvider />
@@ -22,6 +23,7 @@
     </MudDrawer>
     <MudMainContent>
         @*Body*@
+        <div>Hello: <Tester></Tester></div>
     </MudMainContent>
 </MudLayout>
 
@@ -38,4 +40,5 @@
     {
         _drawerOpen = !_drawerOpen;
     }
+
 }
