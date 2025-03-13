@@ -1,9 +1,11 @@
+using Frontend;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Frontend.Components;
 using Frontend.Components.Account;
 using Frontend.Data;
+using Frontend.Utilities;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +42,9 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Setup MudBlazor
 builder.Services.AddMudServices();
 
+// Configure 
+builder.AddConfiguration();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -66,3 +71,4 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
+
