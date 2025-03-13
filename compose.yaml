@@ -10,12 +10,18 @@
     build:
       context: .
       dockerfile: Frontend/Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - backend
 
   backend:
     image: backend
     build:
       context: .
       dockerfile: Backend/Dockerfile
+    depends_on:
+      - pbengine
 
   pbengine:
     image: pbengine
