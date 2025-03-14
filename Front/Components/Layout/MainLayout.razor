@@ -12,13 +12,12 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
         <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
         </MudDrawerHeader>
         @*NavMenu*@
     </MudDrawer>
@@ -28,11 +27,14 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = true;
+    public bool _drawerOpen = false;
+    public string TextValue { get; set; }
 
-    void DrawerToggle()
-    {
+
+    public void DrawerToggle(){
+        Console.WriteLine(("CLICKED:"+_drawerOpen));
         _drawerOpen = !_drawerOpen;
+        StateHasChanged();
     }
 }
 

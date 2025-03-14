@@ -1,7 +1,30 @@
 ﻿@page "/"
 
 <PageTitle>Home</PageTitle>
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudGrid Spacing="3" Justify="Justify.Center">
+            <MudItem xs = "12"><MudText Typo="Typo.h2" Align="Align.Center">Welcome to the Participatory Budgetting page!</MudText></MudItem>
+            <MudItem xs = "12"><MudText Typo = "Typo.h3" Align="Align.Center">Choose An Option To Start</MudText></MudItem>
+            <MudItem xs = "12"></MudItem>
+            <MudItem xs = "12"></MudItem>
+            <MudItem xs="12" >
+                <MudButton Style="background-color:rebeccapurple;color: wheat" Class="full-width-btn" Size="Size.Large">
+                    Create Instance
+                </MudButton>
+            </MudItem>
+                <MudItem xs="6"><MudTextField @bind-Value="TextValue" Label="Join Code" Variant="Variant.Outlined"></MudTextField></MudItem>
+                <MudItem xs="6"><MudButton  Style="background-color: rebeccapurple; color: wheat" Class="full-width-btn">Join</MudButton></MudItem>
+            <MudItem xs = "12">
+            <MudButton Style="background-color: rebeccapurple;color: wheat" Class="full-width-btn" Size="Size.Large">
+                    See Previous Instances
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</div>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+@code
+{
+    public string TextValue;
+}
