@@ -18,6 +18,8 @@
     build:
       context: .
       dockerfile: Backend/Dockerfile
+    ports:
+       - "1234:8080"
     depends_on:
       - pbengine
       - db
@@ -33,13 +35,15 @@
     image: postgres:latest
     container_name: Postgres_db
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: Maagen
       POSTGRES_PASSWORD: Maagen
+      POSTGRES_DB: Maagen
     volumes:
       - postgres_data:/var/lib/postgresql/data
     
     
 volumes:
   postgres_data:
+    driver: local
