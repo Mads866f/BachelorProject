@@ -1,0 +1,41 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  backend:
+    build:
+      context: "/Users/madskastrupt.larsen/aarhusUni/PB-Framework"
+      dockerfile: "Backend/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/Backend.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "backend:dev"
+    ports: []
+    volumes:
+    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework/Backend:/app:rw"
+    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework:/src:rw"
+    - "/Users/madskastrupt.larsen/.nuget/packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  frontend:
+    build:
+      context: "/Users/madskastrupt.larsen/aarhusUni/PB-Framework"
+      dockerfile: "Frontend/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/Frontend.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/Frontend.staticwebassets.runtime.CT.json"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "frontend:dev"
+    ports: []
+    volumes:
+    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework/Frontend:/app:rw"
+    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework:/src:rw"
+    - "/Users/madskastrupt.larsen/.nuget/packages:/home/app/.nuget/packages"
+    working_dir: "/app"

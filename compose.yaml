@@ -1,9 +1,4 @@
 ﻿services:
-  pb-framework:
-    image: pb-framework
-    build:
-      context: .
-      dockerfile: PB-Framework/Dockerfile
 
   frontend:
     image: frontend
@@ -16,6 +11,7 @@
       - backend
     volumes:
       - ./dataProtectionKeys:/app/dataProtectionKeys  # Persist keys to the host machine 
+    
 
   backend:
     image: backend
@@ -24,6 +20,7 @@
       dockerfile: Backend/Dockerfile
     depends_on:
       - pbengine
+      - db
     volumes:
       - ./dataProtectionKeys:/app/dataProtectionKeys  # Persist keys to the host machine 
   pbengine:
@@ -31,3 +28,18 @@
     build:
       context: .
       dockerfile: pbEngine/dockerfile
+      
+  db:
+    image: postgres:latest
+    container_name: Postgres_db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: Maagen
+      POSTGRES_PASSWORD: Maagen
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+    
+volumes:
+  postgres_data:
