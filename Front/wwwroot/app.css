@@ -49,3 +49,9 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+.full-width-btn {
+    width: 100%;
+    font-size: 1.5rem;
+    padding: 16px;
+    min-height: 60px;
+}
