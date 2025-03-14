@@ -45,7 +45,6 @@ void EnsureDatabaseSetup(IDbConnection db)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-    Console.WriteLine("IM AM HERE");
     EnsureDatabaseSetup(db);
 }
 

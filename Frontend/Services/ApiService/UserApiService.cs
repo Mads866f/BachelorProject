@@ -1,6 +1,6 @@
-using Frontend.Utilities;
+using BlazorApp1.Utilities;
 
-namespace Frontend.Services.ApiService;
+namespace BlazorApp1.Services.ApiService;
 
 public class UserApiService(IHttpClientFactory clientFactory) : IUserApiService
 {
