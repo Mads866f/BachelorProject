@@ -1,6 +1,6 @@
-using BlazorApp1.Utilities;
+using Front.Utilities;
 
-namespace BlazorApp1.Services.ApiService;
+namespace Front.Services.ApiService;
 
 public class TestApiService(IHttpClientFactory clientFactory): ITestApiService
 {

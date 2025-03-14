@@ -22,20 +22,20 @@ services:
   frontend:
     build:
       context: "/Users/madskastrupt.larsen/aarhusUni/PB-Framework"
-      dockerfile: "Frontend/Dockerfile"
+      dockerfile: "Front/Dockerfile"
       target: "base"
     command: []
     entrypoint:
     - "dotnet"
-    - "/app/bin/Debug/net8.0/Frontend.dll"
+    - "/app/bin/Debug/net8.0/Front.dll"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/Frontend.staticwebassets.runtime.CT.json"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/Front.staticwebassets.runtime.CT.json"
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
-    image: "frontend:dev"
+    image: "front:dev"
     ports: []
     volumes:
-    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework/Frontend:/app:rw"
+    - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework/Front:/app:rw"
     - "/Users/madskastrupt.larsen/aarhusUni/PB-Framework:/src:rw"
     - "/Users/madskastrupt.larsen/.nuget/packages:/home/app/.nuget/packages"
     working_dir: "/app"

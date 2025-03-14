@@ -1,8 +1,8 @@
-using BlazorApp1.Services;
-using BlazorApp1.Services.ApiService;
-using BlazorApp1.Utilities;
+using Front.Services;
+using Front.Services.ApiService;
+using Front.Utilities;
 
-namespace Frontend;
+namespace Front;
 
 public static class ConfigurationBuilder
 {

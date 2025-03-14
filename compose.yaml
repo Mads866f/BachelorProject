@@ -1,16 +1,14 @@
 ﻿services:
 
   frontend:
-    image: frontend
+    image: front
     build:
       context: .
-      dockerfile: Frontend/Dockerfile
+      dockerfile: Front/Dockerfile
     ports:
       - "8081:8080"
     depends_on:
-      - backend
-    volumes:
-      - ./dataProtectionKeys:/app/dataProtectionKeys  # Persist keys to the host machine 
+      - backend 
     
 
   backend:
@@ -23,8 +21,7 @@
     depends_on:
       - pbengine
       - db
-    volumes:
-      - ./dataProtectionKeys:/app/dataProtectionKeys  # Persist keys to the host machine 
+      
   pbengine:
     image: pbengine
     build:

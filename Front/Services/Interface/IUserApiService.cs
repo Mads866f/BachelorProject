@@ -1,4 +1,4 @@
-namespace BlazorApp1.Services;
+namespace Front.Services;
 
 public interface IUserApiService
 {

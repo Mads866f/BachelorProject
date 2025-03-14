@@ -1,4 +1,4 @@
-namespace BlazorApp1.Utilities;
+namespace Front.Utilities;
 
 public class Constants
 {
