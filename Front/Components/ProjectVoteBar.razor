@@ -1,0 +1,15 @@
+
+
+<MudPaper>
+    <MudGrid>
+        <MudItem xs="4"><MudCheckBox T="bool" @bind-Value="Basic_CheckBox1"></MudCheckBox></MudItem>
+        <MudItem xs="4"><MudText T="string">This is The Project Title</MudText></MudItem>
+        <MudItem xs="4"><MudButton>Read More</MudButton></MudItem>
+    </MudGrid>
+</MudPaper>
+
+
+
+@code {
+    public bool Basic_CheckBox1 { get; set; } = true;
+}

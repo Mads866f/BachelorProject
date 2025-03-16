@@ -1,0 +1,24 @@
+@page "/vote"
+
+<PageTitle>Voting</PageTitle>
+
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudGrid Justify="Justify.Center" Spacing="6">
+        <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">Vote For Projects</MudText></MudItem>
+        <MudItem xs="12">
+            <MudStack>
+                <ProjectVoteBar></ProjectVoteBar>
+                <ProjectVoteBar></ProjectVoteBar>
+                <ProjectVoteBar></ProjectVoteBar>
+                <ProjectVoteBar></ProjectVoteBar>
+                <ProjectVoteBar></ProjectVoteBar>
+                <ProjectVoteBar></ProjectVoteBar>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    public bool Basic_CheckBox1 { get; set; } = true;
+}

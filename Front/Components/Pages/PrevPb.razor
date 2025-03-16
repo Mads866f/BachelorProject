@@ -1,0 +1,32 @@
+﻿@page "/prevpb"
+
+<PageTitle>Previous Instances</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h2"> Previous Instances</MudText>
+        </MudItem>
+        <MudItem>
+        <MudStack xs = "12" Spacing="12">
+            <InstanceListView></InstanceListView>
+            <InstanceListView></InstanceListView>
+            <InstanceListView></InstanceListView>
+            <InstanceListView></InstanceListView>
+            <InstanceListView></InstanceListView>
+        </MudStack>
+        </MudItem>
+        
+        
+        
+        
+    </MudGrid>
+    
+    
+    
+    
+</MudContainer>
+
+@code {
+    private string InstanceName = "My Voting Instance";
+}

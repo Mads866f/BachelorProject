@@ -1,41 +1,57 @@
-﻿@inherits LayoutComponentBase
-
-@* Required *@
-<MudThemeProvider />
-<MudPopoverProvider />
-
-@* Needed for dialogs *@
-<MudDialogProvider />
-
-@* Needed for snackbars *@
-<MudSnackbarProvider />
-
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudSpacer/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
-        </MudDrawerHeader>
-        @*NavMenu*@
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
-
-@code {
-    public bool _drawerOpen = false;
-    public string TextValue { get; set; }
-
-
-    public void DrawerToggle(){
-        Console.WriteLine(("CLICKED:"+_drawerOpen));
-        _drawerOpen = !_drawerOpen;
-        StateHasChanged();
+    @inherits LayoutComponentBase
+    
+    @* Required *@
+    <MudThemeProvider />
+    <MudPopoverProvider />
+    
+    @* Needed for dialogs *@
+    <MudDialogProvider />
+    
+    @* Needed for snackbars *@
+    <MudSnackbarProvider />
+    
+    <MudLayout>
+        <MudAppBar Elevation="1">
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudContainer>
+                        <MudText Typo="Typo.h5" Style="color: wheat">Participatory Budgeting Voting Page</MudText>
+                    </MudContainer>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudGrid>
+                    <MudItem xs ="4"><MudButton Style="color: wheat" Href="/"><MudText Typo="Typo.body1" Style="color: wheat " Align="Align.Center"> Home</MudText></MudButton></MudItem>
+                        <MudItem xs ="4"><MudButton Style="color: wheat" Href="/createInstance"><MudText Style="color: wheat" Typo="Typo.body1" Align="Align.Center"> Create Instance</MudText></MudButton></MudItem>
+                            <MudItem xs ="4"><MudButton Style="color: wheat" Href="/prevPb"><MudText Typo="Typo.body1" Style="color: wheat" Align="Align.Center"> Previous Elections</MudText></MudButton></MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudContainer>
+                        <MudGrid Justify="Justify.FlexEnd">
+                        <MudItem xs="2"><MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Dark" aria-label="github" href="https://www.github.com"/></MudItem>
+                       <MudItem xs="2"> <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Dark" aria-label="help" Href="/Doc"/></MudItem>
+                            <MudItem xs="2"><MudIconButton Icon="@Icons.Material.Filled.Login" Color="Color.Dark" aria-label="github"/></MudItem>
+                        </MudGrid>
+    
+                    </MudContainer>
+                </MudItem>
+            </MudGrid> 
+            
+        </MudAppBar>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+    
+    @code {
+        public bool _drawerOpen = true;
+        public string TextValue { get; set; }
+    
+    
+        public void DrawerToggle(){
+            Console.WriteLine(("CLICKED:"+_drawerOpen));
+            _drawerOpen = !_drawerOpen;
+            StateHasChanged();
+        }
     }
-}
-
+    

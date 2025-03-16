@@ -1,0 +1,273 @@
+@page "/analytics"
+
+<PageTitle>Analysis</PageTitle>
+<MudContainer MaxWidth="MaxWidth.Medium">
+   <MudGrid>
+      <MudItem xs = "12">
+         <MudText Typo="Typo.h2" Align="Align.Center"> AU Election</MudText>
+      </MudItem>
+      <MudItem xs="2">
+         <MudStack>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs = "12"><MudText Typo="Typo.h6">No Of Votes</MudText></MudItem>
+                  <MudItem xs = "12"><MudText Typo="Typo.body1">30000</MudText></MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudDivider/>
+
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs = "12"><MudText Typo="Typo.h6">Budget</MudText></MudItem>
+                  <MudItem xs = "12"><MudText Typo="Typo.body1">100.000</MudText></MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudDivider/>
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs = "12"><MudText Typo="Typo.h6">No Of Projects</MudText></MudItem>
+                  <MudItem xs = "12"><MudText Typo="Typo.body1">200</MudText></MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudDivider/>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs = "12"><MudText Typo="Typo.h6">Date Ended</MudText></MudItem>
+                  <MudItem xs = "12"><MudText Typo="Typo.body1">09-31-2025</MudText></MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudDivider/>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs = "12"><MudText Typo="Typo.h6">Method</MudText></MudItem>
+                  <MudItem xs = "12"><MudText Typo="Typo.body1">Greedy Utilitarian</MudText></MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudDivider/>
+            
+         </MudStack>
+      </MudItem>
+
+      
+      <MudItem xs="5">
+         <MudStack>
+            <MudPaper Class="pa-4">
+               <MudChart ChartType="ChartType.Donut" Height="30%"  Width="80%" InputData="@data" InputLabels="@labels"></MudChart>
+            </MudPaper> 
+            
+            <MudPaper>
+               <MudChart ChartType="ChartType.Bar" ChartSeries="@_series" XAxisLabels="@_xAxisLabels"  Height="30%" Width="80%"></MudChart> 
+
+            </MudPaper>
+               
+            
+         </MudStack> 
+         
+         
+      </MudItem>
+      
+      <MudItem xs="5">
+         <MudStack>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="6">
+                     <MudText Typo="Typo.h6"> Name</MudText>
+                  </MudItem>
+                  <MudItem xs="3">
+                     <MudText Typo="Typo.h6"> Cost</MudText>
+                  </MudItem>
+                  <MudItem xs="3">
+                     <MudText Typo="Typo.h6"> Status</MudText>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper> 
+            
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Clean Bathrooms</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 2000</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_CheckBox" Dense="true" Color="Color.Success"></MudCheckBox>
+                     </MudItem>
+               </MudGrid> 
+            </MudPaper>
+
+
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> More Monitors</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 10000</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_CheckBox" Dense="true" Color="Color.Success"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> New Office Building</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 50000</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            <MudPaper>
+               <MudGrid>
+                  <MudItem xs="8">
+                     <MudText Typo="Typo.body1"> Water Fountain</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudText Typo="Typo.body1"> 8500</MudText>
+                  </MudItem>
+                  <MudItem xs="2">
+                     <MudCheckBox @bind-Value="Dense_False" Dense="true" Color="Color.Error"></MudCheckBox>
+                  </MudItem>
+               </MudGrid>
+            </MudPaper>
+            
+         </MudStack>
+         
+      </MudItem>
+      
+   </MudGrid> 
+    
+    
+</MudContainer>
+
+
+
+
+
+
+
+@code
+{
+   public static double totalbudget = 100_000;
+   public static double spent = 86_000;
+   public double[] data = { spent,  totalbudget-spent};
+   public string[] labels = { "Spent", "Unspent" };
+   public bool Dense_CheckBox { get; set; } = true;
+   public bool Dense_False { get; set; } = true;
+
+   private int _index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+   
+   private List<ChartSeries> _series = new List<ChartSeries>()
+   {
+      
+      new ChartSeries() { Name = "Cost Satisfaction", Data = new double[] { 15000,8000,2000,20000,5000,2000,5000,6000,2000,5000} },
+   };
+   private string[] _xAxisLabels = { "Voter 1", "Voter 2", "Voter 3", "Voter 4","Voter 5", "Voter 6","Voter 7", "Voter 8","Voter 9", "Voter 10",}; 
+
+}
