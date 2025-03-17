@@ -1,14 +1,15 @@
 using System.Data;
 using Backend;
+using Backend.Database;
+using Backend.Repositories;
+using Backend.Services.DataServices;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Get Connection string
 var connectionString = builder.Configuration.GetConnectionString("Postgres_db");
-
-builder.Services.AddSingleton<IDbConnection>(sp => new NpgsqlConnection(connectionString));
-
+builder.Services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlDbConnectionFactory(connectionString!));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -29,24 +30,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
-// Ensure database and tables are set up
-void EnsureDatabaseSetup(IDbConnection db)
-{
-    db.Open();
-    using var cmd = db.CreateCommand();
-    cmd.CommandText = @"
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL
-        )";
-    cmd.ExecuteNonQuery();
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-    EnsureDatabaseSetup(db);
-}
+await app.ApplyDatabaseConfiguration();
 
 app.MapGet("/", () => "Dapper API is running!");
 
