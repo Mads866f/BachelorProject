@@ -1,5 +1,6 @@
 using Front;
 using Front.Components;
+using Microsoft.AspNetCore.DataProtection;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddMudServices();
 builder.AddConfiguration();
 
 builder.Services.AddRazorPages();
+
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/app/keys")).SetApplicationName("front");
 
 var app = builder.Build();
 

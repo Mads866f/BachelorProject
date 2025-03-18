@@ -3,9 +3,12 @@ using Backend;
 using Backend.Database;
 using Backend.Repositories;
 using Backend.Services.DataServices;
+using Microsoft.AspNetCore.DataProtection;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"keys"));
 
 // Get Connection string
 var connectionString = builder.Configuration.GetConnectionString("Postgres_db");

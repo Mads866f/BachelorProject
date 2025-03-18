@@ -11,6 +11,8 @@
       - backend 
     networks:
       - pb_network
+    volumes:
+      - ./keys:/app/keys 
     
 
   backend:
@@ -25,7 +27,9 @@
       - db
     networks:
       - pb_network
-      
+    volumes:
+      - ./keys:/app/keys
+  
   pbengine:
     image: pbengine
     build:
