@@ -41,6 +41,8 @@
       POSTGRES_USER: Maagen
       POSTGRES_PASSWORD: Maagen
       POSTGRES_DB: Maagen
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
