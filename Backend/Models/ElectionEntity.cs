@@ -8,5 +8,5 @@ public class ElectionEntity
     public string Model { get; set; }
     public string JoinCode { get; set; }
     public string BallotDesign { get; set; }
-    
+
 }

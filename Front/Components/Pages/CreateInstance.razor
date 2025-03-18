@@ -1,4 +1,6 @@
 @page "/createInstance"
+@rendermode InteractiveServer
+
 
 
 <PageTitle>Create A New Instance</PageTitle>
@@ -8,47 +10,25 @@
             <MudText Typo="Typo.h2" Align="Align.Center">Create A new Instance</MudText>
         </MudItem>
         <MudItem xs="12">
-            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Spacing="6">
-                <MudTextField T="string" Label="Election Name" Required="true" RequiredError="Election Name Is Requirred!" />
-                <div class="d-flex">
-                    <MudRadioGroup T="string" Required="true" RequiredError="Method type is required!">
-                        <MudRadio Value="@("Method Of Equal Shares")">Method Of Equal Shares</MudRadio>
-                        <MudRadio Value="@("Greedy")">Greedy Utilitarian</MudRadio>
-                        <MudRadio Value="@("Sequential Phragmen")">Sequential Phragmen</MudRadio>
-                    </MudRadioGroup>
-                </div>
-                <MudDivider/>
-                <MudTextField T = "int" Label = "No Of Projects" Required="true" RequiredError="Must Give Number of Projects!"></MudTextField>
-                <MudTextField T = "int" Label = "No Of Participants" Required="true" RequiredError="Must Give Number of Participants!"></MudTextField>
-                <MudTextField T = "int" Label = "Budget"Required="true" RequiredError="Must Give Budget!"></MudTextField>
-                <MudDatePicker Label="Basic example" @bind-Date="_date"/> 
-            </MudForm>
+            <CreateInstanceForm></CreateInstanceForm>
+        </MudItem>
+        <MudItem xs="12">
             <MudItem xs="12">
-                <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Get Join Codes</MudButton> 
+                <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Get Join Codes</MudButton>
             </MudItem>
             <MudItem xs="12">
                 <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Upload Projects</MudButton>
             </MudItem>
             <MudItem xs="12">
-                <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Create Instance</MudButton>
+
             </MudItem>
 
         </MudItem>
-        
-        
-        
+
+
+
     </MudGrid>
     
     
     
 </MudContainer>
-@code
-{
-    private DateTime? _date = DateTime.Today; 
-    bool success;
-    string[] errors = { };
-    MudTextField<string> pwField1;
-    MudForm form; 
-    
-    
-}
