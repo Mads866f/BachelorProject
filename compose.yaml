@@ -9,6 +9,8 @@
       - "8081:8080"
     depends_on:
       - backend 
+    networks:
+      - pb_network
     
 
   backend:
@@ -21,26 +23,35 @@
     depends_on:
       - pbengine
       - db
+    networks:
+      - pb_network
       
   pbengine:
     image: pbengine
     build:
       context: .
       dockerfile: pbEngine/dockerfile
+    networks:
+      - pb_network
       
   db:
     image: postgres:latest
     container_name: Postgres_db
-    ports:
-      - "5433:5432"
     environment:
       POSTGRES_USER: Maagen
       POSTGRES_PASSWORD: Maagen
       POSTGRES_DB: Maagen
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pb_network
     
     
 volumes:
   postgres_data:
     driver: local
+    
+networks:
+  pb_network:
+    driver: bridge
+    external: false
