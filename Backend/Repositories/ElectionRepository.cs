@@ -9,8 +9,12 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
 {
     public async Task<IEnumerable<ElectionEntity>> GetAllAsync()
     {
+        Console.WriteLine("Started Getting from database");
         using var db = await dbFactory.CreateConnectionAsync();
-        return await db.QueryAsync<ElectionEntity>("SELECT * FROM elections");
+        Console.WriteLine("Connnected to Database");
+        var result =  await db.QueryAsync<ElectionEntity>("SELECT * FROM elections");
+        Console.WriteLine("Result pulled from database"+result);
+        return result;
     }
 
     public async Task<ElectionEntity?> GetByIdAsync(Guid id)

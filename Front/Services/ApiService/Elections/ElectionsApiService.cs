@@ -41,12 +41,35 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         
         
     }
-    
-    
-    
-    public Task<List<Election>> GetElections()
+
+
+
+    public async Task<List<Election>> GetElections()
     {
-        throw new NotImplementedException();
+        Console.WriteLine("Get Elections Method Called");
+        const string url = "api/Election";
+        try
+        {
+
+            var response = await _client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Got Response From Backend");
+                var elections = await response.Content.ReadFromJsonAsync<List<Election>>();
+                return elections ?? new List<Election>();
+            }
+            else
+            {
+                Console.WriteLine("Error in received response");
+                return new List<Election>();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Got Some kind of error from getElections:");
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public Task<Election> GetElection(int id)

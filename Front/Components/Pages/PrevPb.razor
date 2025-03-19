@@ -1,4 +1,7 @@
 ﻿@page "/prevpb"
+@using System.ComponentModel.DataAnnotations
+@using DTO.Models
+@using Front.Services.ApiService.Elections
 
 <PageTitle>Previous Instances</PageTitle>
 
@@ -7,26 +10,38 @@
         <MudItem xs="12">
             <MudText Typo="Typo.h2"> Previous Instances</MudText>
         </MudItem>
-        <MudItem>
-        <MudStack xs = "12" Spacing="12">
-            <InstanceListView></InstanceListView>
-            <InstanceListView></InstanceListView>
-            <InstanceListView></InstanceListView>
-            <InstanceListView></InstanceListView>
-            <InstanceListView></InstanceListView>
-        </MudStack>
-        </MudItem>
-        
-        
-        
-        
+        @if (@elections == null)
+        {
+            <MudText Typo="Typo.h3">Loading Instances</MudText>
+        }
+        else if (@elections.Count == 0)
+        {
+            <MudText Typo="Typo.h3"> No Elections Stored</MudText>
+        }
+        else
+        {
+            <MudItem>
+                <MudStack xs="12" Spacing="12">
+                    @foreach (var election in elections)
+                    {
+                        <InstanceListView election="election"/>
+                    }
+                </MudStack>
+            </MudItem>
+        }
     </MudGrid>
-    
-    
-    
-    
 </MudContainer>
 
 @code {
-    private string InstanceName = "My Voting Instance";
+    [Inject] private ElectionsApiService ElectionsApiService { get; set; }
+
+    private List<Election> elections;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Ensure the async call is awaited and does not block the UI thread
+        elections = await ElectionsApiService.GetElections();
+        Console.WriteLine("Elections loaded: " + elections?.Count);
+        Console.WriteLine("First Election: "+ elections?.First());
+    }
 }

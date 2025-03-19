@@ -7,7 +7,12 @@ public class ElectionService(ElectionRepository repository)
 {
     private readonly ElectionRepository _repository = repository;
 
-    public Task<IEnumerable<ElectionEntity>> GetAllElectionsAsync() => _repository.GetAllAsync();
+    public Task<IEnumerable<ElectionEntity>> GetAllElectionsAsync()
+    {
+    var result = _repository.GetAllAsync();
+    Console.WriteLine("Election Service Got:" + result.Result);
+    return result;
+    }
 
     public Task<ElectionEntity> CreateElectionAsync(ElectionEntity election)
     {

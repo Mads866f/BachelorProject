@@ -11,8 +11,13 @@ public class ElectionController(ElectionService service) : ControllerBase
     private readonly ElectionService _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ElectionEntity>>> GetAll() => 
-        Ok(await _service.GetAllElectionsAsync());
+    public async Task<ActionResult<IEnumerable<ElectionEntity>>> GetAll()
+    {
+        Console.WriteLine("Backend Tries to get All From Database");
+        var result = Ok(await _service.GetAllElectionsAsync());
+        Console.WriteLine("Controller got:"+result);
+        return result;
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ElectionEntity election)
