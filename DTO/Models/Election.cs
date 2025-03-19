@@ -11,4 +11,14 @@ public class Election
     public string? JoinCode{ get; set; }
     public required string BallotDesign { get; set; }
 
+    public override string ToString()
+    {
+        return "Model:" +
+            id + ":" +
+            name + ":" +
+            TotalBudget + ":" +
+            model + ":" +
+            JoinCode + ":" +
+            BallotDesign;
+    }
 }

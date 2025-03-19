@@ -1,36 +1,39 @@
 @using DTO.Models
-<EditForm Model="@model" OnValidSubmit="CreateModel">
+@using Front.Services.ApiService.Elections
+<EditForm @bind-Model="model" OnValidSubmit="CreateModel" >
     <DataAnnotationsValidator/>
-    <MudTextField T="string" bind-Value="model.name" Label="Election Name" Required="true" RequiredError="Election Name Is Requirred!"/>
-    <MudSelect T="string" bind-Value="model.model" Label="Method" Placeholder="Please Select" Required="true">
+    <MudTextField T="string"  @bind-Value="model.name" Label="Election Name" Required="true" RequiredError="Election Name Is Required!" Immediate="true" />
+    <MudSelect T="string" @bind-Value="model.model" Label="Method" Placeholder="Please Select" Required="true">
         <MudSelectItem T ="string" Value="@("EqualShares")">Equal Shares</MudSelectItem>
         <MudSelectItem T ="string" Value="@("GreedyUtil")">Greedy Utilitarian</MudSelectItem>
         <MudSelectItem T ="string" Value="@("SeqPharg")">Sequential Phargmen</MudSelectItem>
     </MudSelect>
     <MudDivider/>
-    <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!" bind-Value="model.TotalBudget"></MudTextField>
-    <MudSelect  T="string" bind-Value="model.BallotDesign" Label="Ballot" Placeholder="Please Select" Required="true">
+    <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!" @bind-Value="model.TotalBudget"></MudTextField>
+    <MudSelect  T="string" @bind-Value="model.BallotDesign" Label="Ballot" Placeholder="Please Select" Required="true">
         <MudSelectItem T="string"  Value="@("1-Approval")">1-Approval</MudSelectItem>
         <MudSelectItem T="string"  Value="@("3-Approval")">3-Approval</MudSelectItem>
         <MudSelectItem   T="string" Value="@("Cardinal")">Cardinal</MudSelectItem>
     </MudSelect>
-    <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat" >Create Instance</MudButton>
+    <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat" ButtonType="ButtonType.Submit" >Create Instance</MudButton>
 </EditForm>
 @code {
-
+[Inject] ElectionsApiService _electionsApiService { get; set; }
 private bool success;
 private string[] errors = { };
-private MudTextField<string> pwField1;
+private string name { get; set; } = "Initial";
 private Election model = new Election
 {
-name = "",
-TotalBudget = 0,
-model = "",
-BallotDesign = ""
+    name = "",
+    TotalBudget = 0,
+    model = "",
+    BallotDesign = ""
 };
 
-public void CreateModel(EditContext editContext)
+private async Task CreateModel()
 {
-
+    StateHasChanged(); 
+    Console.WriteLine("Called The Create Model Wih Model: \n"+model.ToString());
+    await _electionsApiService.CreateElection(model);
 }
 }

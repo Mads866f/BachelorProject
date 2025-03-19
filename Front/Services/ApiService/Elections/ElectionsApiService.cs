@@ -13,13 +13,15 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
     public async Task<Election> CreateElection(Election election)
     {
         var url = "api/Election";
+        Console.Write("Election create Called with election: " + election.name);
         try
         {
             election.id = Guid.NewGuid();
-            election.JoinCode = "test";
-            var response = await _client.PostAsJsonAsync(url, election);
+            election.JoinCode = Guid.NewGuid().ToString().Substring(0,8);
+            var response = await _client.PostAsJsonAsync( url, election);
             if (response.IsSuccessStatusCode)
             {
+                Console.WriteLine(("Got Response From Backend"));
                 return await response.Content.ReadFromJsonAsync<Election>() ?? new Election
                 {
                     name = "",
@@ -38,7 +40,6 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         } 
         
         
-        throw new NotImplementedException();
     }
     
     

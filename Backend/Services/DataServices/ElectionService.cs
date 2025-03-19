@@ -11,6 +11,7 @@ public class ElectionService(ElectionRepository repository)
 
     public Task<ElectionEntity> CreateElectionAsync(ElectionEntity election)
     {
+        Console.WriteLine("Created Entrance In Database");
         election.Id = Guid.NewGuid();
         return _repository.CreateAsync(election);
     }

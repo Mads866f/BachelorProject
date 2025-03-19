@@ -1,5 +1,7 @@
 using Front.Services;
 using Front.Services.ApiService;
+using Front.Services.ApiService.Elections;
+using Front.Services.Elections;
 using Front.Utilities;
 
 namespace Front;
@@ -30,5 +32,6 @@ public static class ConfigurationBuilder
     {
         builder.Services.AddScoped<IUserApiService, UserApiService>();
         builder.Services.AddScoped<TestApiService>();
+        builder.Services.AddScoped<ElectionsApiService>();
     }
 }
