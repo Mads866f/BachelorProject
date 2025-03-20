@@ -1,16 +1,15 @@
-using Backend.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Backend.Services.Interfaces.PbEngine;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/[Controller]")]
-public class PbEngineController
+public class PbEngineController(IInitialtest apiService)
 {
     [HttpPost]
-    public async Task<IActionResult> TestElection()
+    public async Task TestElection()
     {
-        return null;
+        await apiService.TestElection();
     }
 }

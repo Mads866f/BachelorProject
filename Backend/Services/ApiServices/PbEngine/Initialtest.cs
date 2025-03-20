@@ -32,7 +32,7 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
 
     public async Task<List<PythonProjects>> TestElection()
     {
-        PythonElection Election = new PythonElection()
+        var election = new PythonElection()
         {
             TotalBudget = 10000,
             Projects =
@@ -47,7 +47,6 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
                     new("Project A", 3),
                     new("Project B", 2)
                 },
-
                 new List<KeyValuePair<string, int>>
                 {
                     new("Project A", 5),
@@ -56,17 +55,13 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             ]
         };
 
-        var url = "/getResult/";
+        // Append method and ballot_type as query parameters
+        var url = "/getResult/?method=equalShares&ballot_type=1-approval";
+
         try
         {
-            var requestBody = new
-            {
-                Method = "equalShares",  // Change this to your actual method value
-                Ballot_type = "1-approval", // Change this to your actual ballot type
-                Body = Election
-            };
-
-            var json = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var json = JsonSerializer.Serialize(election,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpsClient.PostAsync(url, content);
@@ -74,14 +69,24 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<List<PythonProjects>>(jsonString) ?? new List<PythonProjects>();
+
+                var projects = JsonSerializer.Deserialize<List<PythonProjects>>(jsonString, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? new List<PythonProjects>();
+
+                // Print received projects
+                projects.ForEach(x => Console.WriteLine($"Project: {x.name}, Cost: {x.cost}"));
+
+                return projects;
             }
 
+            Console.WriteLine($"Error: {response.StatusCode}");
             return new List<PythonProjects>();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine($"Error: {e.Message}");
             throw;
         }
     }

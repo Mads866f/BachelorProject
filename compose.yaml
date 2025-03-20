@@ -32,6 +32,8 @@
   
   pbengine:
     image: pbengine
+    ports:
+      - "8000:8000"
     build:
       context: .
       dockerfile: pbEngine/dockerfile
