@@ -12,7 +12,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
         Console.WriteLine("Started Getting from database");
         using var db = await dbFactory.CreateConnectionAsync();
         Console.WriteLine("Connnected to Database");
-        var result =  await db.QueryAsync<ElectionEntity>("SELECT * FROM elections");
+        var result =  await db.QueryAsync<ElectionEntity>("SELECT * FROM elections_table");
         Console.WriteLine("Result pulled from database"+result);
         return result;
     }
@@ -20,12 +20,15 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
     public async Task<ElectionEntity?> GetByIdAsync(Guid id)
     {
         using var db = await dbFactory.CreateConnectionAsync();
-        return db.QuerySingleOrDefault<ElectionEntity>(
+        
+        var a = db.QuerySingleOrDefault<ElectionEntity>(
             """
-            SELECT * 
-            FROM elections
+            SELECT id, id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+            FROM elections_table
             WHERE id = @id limit 1
             """, new { id });
+        Console.WriteLine(a.TotalBudget + "DIRECT FROM DB");
+        return a;
     }
 
 
@@ -34,8 +37,8 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
         using var db = await dbFactory.CreateConnectionAsync();
         await db.ExecuteAsync(
             """
-            INSERT INTO elections (id, name, total_budget, model, join_code, ballot_design)                 
-            Values (@Id, @Name, @TotalBudget, @Model, @JoinCode, @BallotDesign)
+            INSERT INTO elections_table (id, name, total_budget, model, ballot_design)                 
+            Values (@Id, @Name, @TotalBudget, @Model, @BallotDesign)
             """, election);
         return election;
     }
@@ -45,11 +48,10 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
         using var db = await dbFactory.CreateConnectionAsync();
         await db.ExecuteAsync(
             """
-            UPDATE elections 
+            UPDATE elections_table 
             SET name = @Name, 
                 total_budget = @TotalBudget, 
                 model = @Model, 
-                join_code = @JoinCode, 
                 ballot_design = @BallotDesign
             WHERE id = @Id
             """,
@@ -62,7 +64,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
         using var db = await dbFactory.CreateConnectionAsync();
         var rowsAffected = await db.ExecuteAsync(
             """
-            DELETE FROM elections 
+            DELETE FROM elections_table 
             WHERE id = @Id
             """, 
             new { Id = id });

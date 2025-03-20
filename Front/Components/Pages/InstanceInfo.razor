@@ -247,6 +247,7 @@
         {
             Console.WriteLine("Getting election");
             var election = await ElectionsApiService.GetElection(electionId);
+            Console.WriteLine(election.ToString());
             currentElection = election;
 
 

@@ -20,4 +20,8 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DTO\DTO.csproj" />
+    </ItemGroup>
+
 </Project>

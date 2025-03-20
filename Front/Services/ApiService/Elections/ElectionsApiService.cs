@@ -17,7 +17,6 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         try
         {
             election.id = Guid.NewGuid();
-            election.JoinCode = Guid.NewGuid().ToString().Substring(0,8);
             var response = await _client.PostAsJsonAsync( url, election);
             if (response.IsSuccessStatusCode)
             {
@@ -81,7 +80,7 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
                 var result = await response.Content.ReadFromJsonAsync<Election>();
                 return result ?? new Election
                 {
-                    name = "null",
+                    name = "asdas",
                     TotalBudget = 0,
                     model = "",
                     BallotDesign = ""
@@ -91,10 +90,9 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
             return new Election
             {
                 id = null,
-                name = "null",
+                name = "nasda",
                 TotalBudget = 0,
                 model = "null",
-                JoinCode = "null",
                 BallotDesign = "null"
             };
         }
