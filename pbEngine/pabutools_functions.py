@@ -1,11 +1,14 @@
 import collections as cl
 import pabutools.election as pbelec
 import pabutools.rules as pbrule
-#mport pabutools.visualisation as pbvis
-#import pabutools.analysis as pban
+from pydantic import BaseModel
 import random
 
 
+class Election(BaseModel):
+    total_budget: int
+    projects: list[tuple[str,int]]
+    votes: list[list[tuple[str,int]]]
 
 def initialTest():
     ##
@@ -66,5 +69,44 @@ def profile_vote_counter(profile):
         for project in list(ballot):
             project_votes[project] += 1
     return project_votes
+    
+    
+def select_method(method_string):
+    if(method_string == "equalShares"):
+        return pbrule.method_of_equal_shares
+    
+def create_ballot(ballot_type_string, votes_gained):
+    if(ballot_type_string == "1-approval"):
+        votes = []
+        print("her",votes)
+        for vote in votes_gained:
+            votes.append(vote[0])
+        return pbelec.ApprovalBallot(votes)
+    
+def calculate_result(election:Election,method,ballot_type):
+    method_to_use = select_method(method)
+    voting_instance = pbelec.Instance([],election.total_budget)
+    projects = election.projects
+    print(election)
+    for p in projects:
+        project = pbelec.Project(p[0],p[1])
+        voting_instance.add(project)
+    
+    ballots=[] 
+    votes = election.votes
+    print("lala",votes)
+    for voter in votes:
+        print(voter)
+        elected = create_ballot(ballot_type,voter)
+        print(elected)
+        ballots.append(create_ballot(ballot_type,voter))
+    
+    profile = pbelec.ApprovalProfile(ballots)
+    print(profile)
+    outcome = method_to_use(voting_instance,profile,sat_class=pbelec.Cost_Sat)
+    print(outcome)
+    return outcome
+    
+    
 
 

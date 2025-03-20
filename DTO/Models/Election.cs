@@ -21,4 +21,5 @@ public class Election
             JoinCode + ":" +
             BallotDesign;
     }
+    
 }

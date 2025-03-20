@@ -16,3 +16,9 @@ async def root():
     instance, profile, outcome = pb.initialTest()
     result = {"instance":instance,"profile":profile,"outcome":outcome}
     return result
+
+
+
+@app.post("/getResult/")
+async def root(election:pb.Election,method:str, ballot_type:str):
+    return pb.calculate_result(election,method,ballot_type)
