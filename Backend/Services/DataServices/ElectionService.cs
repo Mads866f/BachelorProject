@@ -20,4 +20,10 @@ public class ElectionService(ElectionRepository repository)
         election.Id = Guid.NewGuid();
         return _repository.CreateAsync(election);
     }
+
+    public Task<ElectionEntity?> GetElection(string id)
+    {
+        var result = _repository.GetByIdAsync(Guid.Parse(id));
+        return result;
+    }
 }

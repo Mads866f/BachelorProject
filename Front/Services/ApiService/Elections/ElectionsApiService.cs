@@ -8,11 +8,11 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
 {
    
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
+    private readonly string url = "api/Election";
     
     
     public async Task<Election> CreateElection(Election election)
     {
-        var url = "api/Election";
         Console.Write("Election create Called with election: " + election.name);
         try
         {
@@ -47,7 +47,6 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
     public async Task<List<Election>> GetElections()
     {
         Console.WriteLine("Get Elections Method Called");
-        const string url = "api/Election";
         try
         {
 
@@ -72,9 +71,38 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         }
     }
 
-    public Task<Election> GetElection(int id)
+    public async Task<Election> GetElection(string id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var response = await _client.GetAsync(url+"/"+id);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Election>();
+                return result ?? new Election
+                {
+                    name = "null",
+                    TotalBudget = 0,
+                    model = "",
+                    BallotDesign = ""
+                };
+            }
+
+            return new Election
+            {
+                id = null,
+                name = "null",
+                TotalBudget = 0,
+                model = "null",
+                JoinCode = "null",
+                BallotDesign = "null"
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        } 
     }
 
 
@@ -83,7 +111,7 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         throw new NotImplementedException();
     }
 
-    public Task DeleteElection(int id)
+    public Task DeleteElection(string id)
     {
         throw new NotImplementedException();
     }

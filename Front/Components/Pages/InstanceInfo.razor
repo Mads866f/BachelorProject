@@ -1,0 +1,255 @@
+@page "/electionInfo"
+@rendermode InteractiveServer
+@using DTO.Models
+@using Front.Services.ApiService.Elections
+
+<PageTitle>Election Info</PageTitle>
+
+<MudContainer>
+    @if (currentElection == null)
+    {
+        <MudGrid>
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2">Select Election To Modify</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value = "electionId" T="string" Label="Election Id"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudButton Class="full-width-btn" OnClick="LoadElection">Go To Election Page</MudButton>
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="4">
+                <MudStack>
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h6">Election Name</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body1">@currentElection.name</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h6">Budget</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body1">@currentElection.TotalBudget</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h6">Method</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body1">@currentElection.model</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h6">BallotDesign</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body1">@currentElection.BallotDesign</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudStack>
+                
+            </MudItem>
+            <MudItem xs="4">
+                <MudGrid>
+                    <MudItem xs = "12">
+                        <MudText Typo="Typo.h6">Voter Status</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudPaper>
+                            <MudGrid>
+                                <MudItem xs="10">
+                                    <MudText Typo="Typo.body1">TYZ-567-YIU</MudText>
+                                </MudItem>
+                                <MudItem xs = "2"> <MudIcon Icon = "@Icons.Material.Outlined.Circle" Color = "Color.Error" /></MudItem>
+                            </MudGrid>
+                        </MudPaper>
+                        <MudPaper>
+                            <MudGrid>
+                                <MudItem xs="10">
+                                    <MudText Typo="Typo.body1">XYZ-ABC-123</MudText>
+                                </MudItem>
+                                <MudItem xs = "2"> <MudIcon Icon = "@Icons.Material.Filled.CheckCircle" Color = "Color.Success" /></MudItem>
+                            </MudGrid>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="4">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudButton Class="full-width-btn">Add Project</MudButton>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton Class="full-width-btn">Add Voter</MudButton>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton Class="full-width-btn">End Election</MudButton>
+                    </MudItem>
+                </MudGrid>
+                
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudText Typo="Typo.h6">Projects</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudStack>
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="2">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.h6">votes</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.body1">5</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Project Name</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">New Monitors</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Cost</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">10.000</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="2">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.h6">votes</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.body1">5</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Project Name</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">New Monitors</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Cost</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">10.000</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="2">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.h6">votes</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo ="Typo.body1">5</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Project Name</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">New Monitors</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="5">
+                                <MudStack>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.h6">Cost</MudText>
+                                    </MudPaper>
+                                    <MudPaper>
+                                        <MudText Typo="Typo.body2">10.000</MudText>
+                                    </MudPaper>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                    
+                    
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+    }
+
+</MudContainer>
+
+
+@code
+{
+    [Inject] ElectionsApiService ElectionsApiService { get; set; }
+    private Election currentElection;
+    private string electionId = "";
+
+    private async Task LoadElection()
+    {
+        Console.WriteLine("Load Election Started");
+        if (electionId.Equals(""))
+        {
+            Console.WriteLine("ID empty");
+            return;
+        }
+        else
+        {
+            Console.WriteLine("Getting election");
+            var election = await ElectionsApiService.GetElection(electionId);
+            currentElection = election;
+
+
+        }
+    }
+}

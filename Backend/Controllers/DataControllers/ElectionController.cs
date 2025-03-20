@@ -19,6 +19,13 @@ public class ElectionController(ElectionService service) : ControllerBase
         return result;
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ElectionEntity>> Get(string id)
+    {
+        var result = Ok(await _service.GetElection(id));
+        return result;
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ElectionEntity election)
     {
