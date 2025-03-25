@@ -7,6 +7,9 @@ from pydantic import BaseModel
 class Project(BaseModel):
     name: str
     cost: int
+    categories: list[str]
+    target: list[str]
+
 
 class Voter(BaseModel):
     selectedProjects: list[str]

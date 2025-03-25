@@ -108,7 +108,7 @@ def calculate_result(election:Election,method,ballot_type):
     # Create and add projects to instance
     projects = election.projects
     for project in projects:
-        project_to_add = pbelec.Project(project.name,project.cost)
+        project_to_add = pbelec.Project(project.name,project.cost,project.categories,project.target)
         voting_instance.add(project_to_add)
 
     # Create and add ballots to Profile

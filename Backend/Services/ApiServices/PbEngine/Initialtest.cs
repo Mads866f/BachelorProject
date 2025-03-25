@@ -37,8 +37,8 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             TotalBudget = 10000,
             Projects =
             [
-                new PythonProject{Name = "Project A", Cost = 3000},
-                new PythonProject{Name = "Project B", Cost = 5000}
+                new PythonProject{Name = "Project A", Cost = 3000,Categories = [],Target = []},
+                new PythonProject{Name = "Project B", Cost = 5000, Categories = [],Target = []}
             ],
             Votes =
             [
@@ -48,7 +48,7 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
         };
 
         // Append method and ballot_type as query parameters
-        var url = "/getResult/?method=equalShares&ballot_type=1-approval";
+        var url = "/getResult/?method=1&ballot_type=1";
 
         try
         {
@@ -61,7 +61,7 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("RESPONSE:",jsonString);
+                Console.WriteLine("RESPONSE:\n" + jsonString);
 
                 var projects = JsonSerializer.Deserialize<List<PythonProjects>>(jsonString, new JsonSerializerOptions
                 {
