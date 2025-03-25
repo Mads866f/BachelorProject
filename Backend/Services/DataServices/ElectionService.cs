@@ -1,29 +1,52 @@
+using AutoMapper;
 using Backend.Models;
 using Backend.Repositories;
+using DTO.Models;
 
 namespace Backend.Services.DataServices;
 
-public class ElectionService(ElectionRepository repository)
+public class ElectionService
 {
-    private readonly ElectionRepository _repository = repository;
+    private readonly IMapper _mapper;
+    private readonly ElectionRepository _repository;
 
-    public Task<IEnumerable<ElectionEntity>> GetAllElectionsAsync()
+    public ElectionService(IMapper mapper, ElectionRepository repository)
     {
-    var result = _repository.GetAllAsync();
-    Console.WriteLine("Election Service Got:" + result.Result);
-    return result;
+        _mapper = mapper;
+        _repository = repository;
     }
 
-    public Task<ElectionEntity> CreateElectionAsync(ElectionEntity election)
+    public async Task<IEnumerable<Election>> GetAllElectionsAsync()
     {
-        Console.WriteLine("Created Entrance In Database");
-        election.Id = Guid.NewGuid();
-        return _repository.CreateAsync(election);
+    var result = await _repository.GetAllAsync();
+    var electionsDto = result
+        .Select(x => _mapper.Map<Election>(x)); 
+    return electionsDto;
+    }
+    
+    public async Task<Election?> GetElectionAsync(string id)
+    {
+        var electionEntity = await _repository.GetByIdAsync(Guid.Parse(id));
+        var electionDto = _mapper.Map<Election>(electionEntity);
+        return electionDto;
     }
 
-    public Task<ElectionEntity?> GetElection(string id)
+    public async Task<Election> CreateElectionAsync(CreateElectionModel election)
     {
-        var result = _repository.GetByIdAsync(Guid.Parse(id));
-        return result;
+        var electionEntity = await _repository.CreateAsync(election);
+        var electionDto = _mapper.Map<Election>(electionEntity);
+        return electionDto;
+    }
+
+    public async Task<Election?> UpdateElectionAsync(Election electionModel)
+    {
+        var electionEntity = _mapper.Map<ElectionEntity>(electionModel);
+        var result = await _repository.UpdateAsync(electionEntity);
+        return result is null ? _mapper.Map<Election>(result) : null;
+    }
+
+    public async Task<bool> DeleteByIdAsync(string id)
+    {
+        return await _repository.DeleteAsync(Guid.Parse(id));
     }
 }

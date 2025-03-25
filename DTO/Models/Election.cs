@@ -1,22 +1,20 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace DTO.Models;
 
 public class Election
 {
-    public Guid? id { get; set; }
-    public required string name { get; set; }
+    public Guid Id { get; set; }
+    public required string Name { get; set; }
     public  required  int TotalBudget { get; set; }
-    public required string model { get; set; }
+    public required string Model { get; set; }
     public required string BallotDesign { get; set; }
 
     public override string ToString()
     {
         return "Model:" +
-            id + ":" +
-            name + ":" +
+            Id + ":" +
+            Name + ":" +
             TotalBudget + ":" +
-            model + ":" +
+            Model + ":" +
             BallotDesign;
     }
     

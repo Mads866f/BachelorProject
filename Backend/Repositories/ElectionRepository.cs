@@ -1,6 +1,7 @@
 using Backend.Database;
 using Backend.Models;
 using Dapper;
+using DTO.Models;
 
 
 namespace Backend.Repositories;
@@ -9,11 +10,12 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
 {
     public async Task<IEnumerable<ElectionEntity>> GetAllAsync()
     {
-        Console.WriteLine("Started Getting from database");
         using var db = await dbFactory.CreateConnectionAsync();
-        Console.WriteLine("Connnected to Database");
-        var result =  await db.QueryAsync<ElectionEntity>("SELECT * FROM elections_table");
-        Console.WriteLine("Result pulled from database"+result);
+        var result =  await db.QueryAsync<ElectionEntity>(
+            """
+                SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+                FROM elections_table
+                """);
         return result;
     }
 
@@ -21,29 +23,37 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
     {
         using var db = await dbFactory.CreateConnectionAsync();
         
-        var a = db.QuerySingleOrDefault<ElectionEntity>(
+        return db.QuerySingleOrDefault<ElectionEntity>(
             """
-            SELECT id, id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
             FROM elections_table
             WHERE id = @id limit 1
             """, new { id });
-        Console.WriteLine(a.TotalBudget + "DIRECT FROM DB");
-        return a;
     }
 
 
-    public async Task<ElectionEntity> CreateAsync(ElectionEntity election)
+    public async Task<ElectionEntity> CreateAsync(CreateElectionModel election)
     {
         using var db = await dbFactory.CreateConnectionAsync();
-        await db.ExecuteAsync(
-            """
-            INSERT INTO elections_table (id, name, total_budget, model, ballot_design)                 
-            Values (@Id, @Name, @TotalBudget, @Model, @BallotDesign)
-            """, election);
-        return election;
+        
+        const string query = """
+                                 INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
+                                 VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
+                                 RETURNING id;
+                             """;
+        var electionId = await db.QuerySingleAsync<Guid>(query, election);
+
+        return new ElectionEntity
+        {
+            Id = electionId,
+            Name = election.Name,
+            TotalBudget = election.TotalBudget,
+            Model = election.Model,
+            BallotDesign = election.BallotDesign
+        };
     }
 
-    public async Task<ElectionEntity> UpdateAsync(ElectionEntity election)
+    public async Task<ElectionEntity?> UpdateAsync(ElectionEntity election)
     {
         using var db = await dbFactory.CreateConnectionAsync();
         await db.ExecuteAsync(
@@ -56,7 +66,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
             WHERE id = @Id
             """,
             election);
-        return election;
+        return await GetByIdAsync(election.Id) ?? null;
     }
 
     public async Task<bool> DeleteAsync(Guid id)
@@ -68,8 +78,12 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
             WHERE id = @Id
             """, 
             new { Id = id });
-
-        return rowsAffected > 0; // Returns true if at least one row was deleted
+        if (rowsAffected == 0)
+        {
+            Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}",id);
+            return false;
+        }
+        return true;
     }
 
 }
