@@ -4,6 +4,7 @@ import pabutools.rules as pbrule
 from typing import List, Tuple
 from Models import Election, Voter, Project
 import random
+from Constants import Rules,Ballot,TieBreaking,Satisfaction, number_to_Ballot,number_to_Rule, number_to_Satisfaction, number_to_tiebreak
 
 
 
@@ -68,19 +69,41 @@ def profile_vote_counter(profile):
     return project_votes
     
     
-def select_method(method_string):
-    if(method_string == "equalShares"):
-        return pbrule.method_of_equal_shares
-    
-def create_ballot(ballot_type_string, votes_gained: Voter):
-    
-    #1-Approval Voting. Only needs the list of the projects elected.
-    # Assumes that no project have degree 0.
-    if(ballot_type_string == "approval"):
-        return pbelec.ApprovalBallot(votes_gained.selectedProjects)
-    
+def select_method(rule):
+    rule_dictonary = {
+        Rules.Equal_shares: pbrule.method_of_equal_shares,
+        Rules.Greedy_Utilitarian: pbrule.greedy_utilitarian_welfare
+    }
+    try:
+        return rule_dictonary[number_to_Rule(rule)]
+    except  KeyError:
+        print("Rule Does Not Exist.")
+
+
+def create_ballot(ballot_type, votes_gained: Voter):
+    ballot_dictonary = {
+        Ballot.Approval: pbelec.ApprovalBallot(votes_gained.selectedProjects)
+    }
+
+    try:
+        return ballot_dictonary[number_to_Ballot(ballot_type)]
+    except KeyError:
+        print("Ballot does not exist")
+        
+
+def create_profile(ballot_type,ballots):
+    profile_dictonary = {
+        Ballot.Approval : pbelec.ApprovalProfile(ballots)
+    }
+
+    try:
+        return profile_dictonary[number_to_Ballot(ballot_type)]
+    except KeyError:
+        print("Profile Does Not Exist")
+
+
 def calculate_result(election:Election,method,ballot_type):
-    method_to_use = select_method(method)
+    method_to_use = select_method(int(method))
     voting_instance = pbelec.Instance([],election.totalBudget)
     # Create and add projects to instance
     projects = election.projects
@@ -92,10 +115,11 @@ def calculate_result(election:Election,method,ballot_type):
     ballots=[] 
     votes = election.votes
     for voter in votes:
-        elected = create_ballot(ballot_type,voter)
+        elected = create_ballot(int(ballot_type),voter)
         ballots.append(elected)
     
-    profile = pbelec.ApprovalProfile(ballots)
+
+    profile = create_profile(int(ballot_type),ballots)
 
     #Calculate Result
     outcome = method_to_use(voting_instance,profile,sat_class=pbelec.Cost_Sat)

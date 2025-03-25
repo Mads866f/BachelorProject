@@ -5,6 +5,7 @@ WORKDIR /app
 COPY pbEngine/requirements.txt .
 COPY pbEngine/pabutools_functions.py .
 COPY pbEngine/Models.py .
+COPY pbEngine/Constants.py .
 COPY pbEngine/main.py .
 
 RUN apt-get update && apt-get install -y \
