@@ -2,13 +2,14 @@ import collections as cl
 import pabutools.election as pbelec
 import pabutools.rules as pbrule
 from pydantic import BaseModel
+from typing import List, Tuple
 import random
 
 
 class Election(BaseModel):
     total_budget: int
-    projects: list[tuple[str,int]]
-    votes: list[list[tuple[str,int]]]
+    projects: List[Tuple[str,int]]
+    votes: List[List[Tuple[str,int]]]
 
 def initialTest():
     ##

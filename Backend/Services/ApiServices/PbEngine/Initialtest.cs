@@ -37,21 +37,19 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             TotalBudget = 10000,
             Projects =
             [
-                new KeyValuePair<string, int>("Project A", 3000),
-                new KeyValuePair<string, int>("Project B", 5000)
+                new List<string> {"Project A", "3000"},
+                new List<string> {"Project B", "5000"}
             ],
             Votes =
             [
-                new List<KeyValuePair<string, int>>
-                {
-                    new("Project A", 3),
-                    new("Project B", 2)
-                },
-                new List<KeyValuePair<string, int>>
-                {
-                    new("Project A", 5),
-                    new("Project B", 1)
-                }
+                [
+                    ["Project A", "3" ],
+                    ["Project B", "2"]
+                ],
+                [
+                    ["Project A", "5"],
+                    ["Project B", "1"]
+                ]
             ]
         };
 
@@ -62,6 +60,7 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
         {
             var json = JsonSerializer.Serialize(election,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpsClient.PostAsync(url, content);
