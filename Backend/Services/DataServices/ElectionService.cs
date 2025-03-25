@@ -1,16 +1,18 @@
 using AutoMapper;
 using Backend.Models;
 using Backend.Repositories;
+using Backend.Repositories.Interfaces;
+using Backend.Services.Interfaces;
 using DTO.Models;
 
 namespace Backend.Services.DataServices;
 
-public class ElectionService
+public class ElectionService : IElectionService
 {
     private readonly IMapper _mapper;
-    private readonly ElectionRepository _repository;
+    private readonly IElectionRepository _repository;
 
-    public ElectionService(IMapper mapper, ElectionRepository repository)
+    public ElectionService(IMapper mapper, IElectionRepository repository)
     {
         _mapper = mapper;
         _repository = repository;

@@ -39,16 +39,14 @@ public static class ConfigurationBuilder
     private static void SetupServices(WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IInitialtest, Initialtest>();
-        builder.Services.AddScoped<ElectionService>();
-        builder.Services.AddScoped<ProjectService>();
-
+        builder.Services.AddScoped<IElectionService, ElectionService>();
+        builder.Services.AddScoped<IVotersService, VoterService>();
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<ElectionRepository>();
-        builder.Services.AddScoped<ProjectRepository>();
-        
+        builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
+        builder.Services.AddScoped<IVotersRepository, VotersRepository>();
     }
 
 }

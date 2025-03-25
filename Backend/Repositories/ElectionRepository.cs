@@ -1,12 +1,14 @@
 using Backend.Database;
 using Backend.Models;
+using Backend.Repositories.Interfaces;
+using Backend.Services.Interfaces;
 using Dapper;
 using DTO.Models;
 
 
 namespace Backend.Repositories;
 
-public class ElectionRepository(IDbConnectionFactory dbFactory)
+public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepository
 {
     public async Task<IEnumerable<ElectionEntity>> GetAllAsync()
     {
@@ -27,8 +29,8 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
             """
             SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
             FROM elections_table
-            WHERE id = @id limit 1
-            """, new { id });
+            WHERE id = @id LIMIT 1
+            """);
     }
 
 
@@ -37,9 +39,9 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
         using var db = await dbFactory.CreateConnectionAsync();
         
         const string query = """
-                                 INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
-                                 VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
-                                 RETURNING id;
+                             INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
+                             VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
+                             RETURNING id;
                              """;
         var electionId = await db.QuerySingleAsync<Guid>(query, election);
 
@@ -78,12 +80,9 @@ public class ElectionRepository(IDbConnectionFactory dbFactory)
             WHERE id = @Id
             """, 
             new { Id = id });
-        if (rowsAffected == 0)
-        {
-            Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}",id);
-            return false;
-        }
-        return true;
+        if (rowsAffected != 0) return true;
+        Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}",id);
+        return false;
     }
 
 }
