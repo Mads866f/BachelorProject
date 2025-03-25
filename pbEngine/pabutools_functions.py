@@ -72,37 +72,33 @@ def select_method(method_string):
     if(method_string == "equalShares"):
         return pbrule.method_of_equal_shares
     
-def create_ballot(ballot_type_string, votes_gained):
-    if(ballot_type_string == "1-approval"):
-        votes = []
-        print("her",votes)
-        for vote in votes_gained:
-            votes.append(vote[0])
-        return pbelec.ApprovalBallot(votes)
+def create_ballot(ballot_type_string, votes_gained: Voter):
+    
+    #1-Approval Voting. Only needs the list of the projects elected.
+    # Assumes that no project have degree 0.
+    if(ballot_type_string == "approval"):
+        return pbelec.ApprovalBallot(votes_gained.selectedProjects)
     
 def calculate_result(election:Election,method,ballot_type):
-    return []
     method_to_use = select_method(method)
     voting_instance = pbelec.Instance([],election.totalBudget)
+    # Create and add projects to instance
     projects = election.projects
-    print(election)
-    for p in projects:
-        project = pbelec.Project(p[0],p[1])
-        voting_instance.add(project)
-    
+    for project in projects:
+        project_to_add = pbelec.Project(project.name,project.cost)
+        voting_instance.add(project_to_add)
+
+    # Create and add ballots to Profile
     ballots=[] 
     votes = election.votes
-    print("lala",votes)
     for voter in votes:
-        print(voter)
         elected = create_ballot(ballot_type,voter)
-        print(elected)
-        ballots.append(create_ballot(ballot_type,voter))
+        ballots.append(elected)
     
     profile = pbelec.ApprovalProfile(ballots)
-    print(profile)
+
+    #Calculate Result
     outcome = method_to_use(voting_instance,profile,sat_class=pbelec.Cost_Sat)
-    print(outcome)
     return outcome
     
     
