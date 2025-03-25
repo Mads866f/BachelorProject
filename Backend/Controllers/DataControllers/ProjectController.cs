@@ -18,4 +18,13 @@ public class ProjectController(ProjectService service) : ControllerBase
         var result = await _service.GetProjectsWithElectionId(id);
         return result is not null ? Ok(result) : NotFound();
     }
+
+    [HttpPost]
+    public async Task<ActionResult> CreateProject([FromBody] ProjectsEntity project)
+    {
+        Console.WriteLine("Creating Project - Backend(Controller)");
+        await _service.CreateProjectAsync(project);
+        return Ok();
+    }
+    
 }

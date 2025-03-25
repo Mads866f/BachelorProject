@@ -2,6 +2,7 @@ using Front.Services;
 using Front.Services.ApiService;
 using Front.Services.ApiService.Elections;
 using Front.Services.Elections;
+using Front.Services.Interface.Elections;
 using Front.Utilities;
 
 namespace Front;

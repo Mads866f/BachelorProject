@@ -1,5 +1,6 @@
 using DTO.Models;
 using Front.Services.Elections;
+using Front.Services.Interface.Elections;
 using Front.Utilities;
 
 namespace Front.Services.ApiService.Elections;
@@ -33,5 +34,27 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
             throw;
         }
         
+    }
+
+    public async Task CreateProject(Project projectToCreate)
+    {
+       Console.WriteLine("Creating Project - Frontend");
+       try
+       {
+           var response = await _client.PostAsJsonAsync(url, projectToCreate);
+           if (response.IsSuccessStatusCode)
+           {
+               Console.WriteLine("Created Project Success!");
+           }
+           else
+           {
+               Console.WriteLine("Error in received Response");
+           }
+       }
+       catch (Exception e)
+       {
+           Console.WriteLine(e);
+           throw;
+       }
     }
 }

@@ -6,7 +6,7 @@
     <MudSelect T="string" @bind-Value="model.Model" Label="Method" Placeholder="Please Select" Required="true">
         <MudSelectItem T ="string" Value="@("EqualShares")">Equal Shares</MudSelectItem>
         <MudSelectItem T ="string" Value="@("GreedyUtil")">Greedy Utilitarian</MudSelectItem>
-        <MudSelectItem T ="string" Value="@("SeqPharg")">Sequential Phargmen</MudSelectItem>
+        <MudSelectItem T ="string" Value="@("SeqPharg")">Sequential Phragmen</MudSelectItem>
     </MudSelect>
     <MudDivider/>
     <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!" @bind-Value="model.TotalBudget"></MudTextField>

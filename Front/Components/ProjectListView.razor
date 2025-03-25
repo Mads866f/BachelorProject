@@ -46,13 +46,13 @@
 {
     [Parameter]
     public string electionId { get; set; }
-    [Inject] private ProjectsApiService ProjectsApiService {get; set;}
+    [Inject] private ProjectsApiService projectsApiService {get; set;}
 
     private List<Project> projects = [];
 
 
     protected override async Task OnInitializedAsync()
     {
-        projects = await ProjectsApiService.GetProjectsWithProjectId(electionId);
+        projects = await projectsApiService.GetProjectsWithProjectId(electionId);
     }
 }
