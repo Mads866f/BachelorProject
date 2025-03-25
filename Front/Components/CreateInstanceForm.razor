@@ -2,8 +2,8 @@
 @using Front.Services.ApiService.Elections
 <EditForm @bind-Model="model" OnValidSubmit="CreateModel" >
     <DataAnnotationsValidator/>
-    <MudTextField T="string"  @bind-Value="model.name" Label="Election Name" Required="true" RequiredError="Election Name Is Required!" Immediate="true" />
-    <MudSelect T="string" @bind-Value="model.model" Label="Method" Placeholder="Please Select" Required="true">
+    <MudTextField T="string"  @bind-Value="model.Name" Label="Election Name" Required="true" RequiredError="Election Name Is Required!" Immediate="true" />
+    <MudSelect T="string" @bind-Value="model.Model" Label="Method" Placeholder="Please Select" Required="true">
         <MudSelectItem T ="string" Value="@("EqualShares")">Equal Shares</MudSelectItem>
         <MudSelectItem T ="string" Value="@("GreedyUtil")">Greedy Utilitarian</MudSelectItem>
         <MudSelectItem T ="string" Value="@("SeqPharg")">Sequential Phargmen</MudSelectItem>
@@ -24,9 +24,9 @@ private string[] errors = { };
 private string name { get; set; } = "Initial";
 private Election model = new Election
 {
-    name = "",
+    Name = "",
     TotalBudget = 0,
-    model = "",
+    Model = "",
     BallotDesign = ""
 };
 

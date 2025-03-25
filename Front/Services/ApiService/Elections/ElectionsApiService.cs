@@ -13,19 +13,19 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
     
     public async Task<Election> CreateElection(Election election)
     {
-        Console.Write("Election create Called with election: " + election.name);
+        Console.Write("Election create Called with election: " + election.Name);
         try
         {
-            election.id = Guid.NewGuid();
+            election.Id = Guid.NewGuid();
             var response = await _client.PostAsJsonAsync( url, election);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine(("Got Response From Backend"));
                 return await response.Content.ReadFromJsonAsync<Election>() ?? new Election
                 {
-                    name = "",
+                    Name = "",
                     TotalBudget = 0,
-                    model = "",
+                    Model = "",
                     BallotDesign = ""
                 };
             }
@@ -80,19 +80,19 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
                 var result = await response.Content.ReadFromJsonAsync<Election>();
                 return result ?? new Election
                 {
-                    name = "asdas",
+                    Name = "asdas",
                     TotalBudget = 0,
-                    model = "",
+                    Model = "",
                     BallotDesign = ""
                 };
             }
 
             return new Election
             {
-                id = null,
-                name = "nasda",
+                Id = null,
+                Name = "nasda",
                 TotalBudget = 0,
-                model = "null",
+                Model = "null",
                 BallotDesign = "null"
             };
         }
