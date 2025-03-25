@@ -30,8 +30,7 @@ public static class ConfigurationBuilder
     // Setup the frontend services
     private static void SetupServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<IUserApiService, UserApiService>();
-        builder.Services.AddScoped<TestApiService>();
         builder.Services.AddScoped<ElectionsApiService>();
+        builder.Services.AddScoped<ProjectsApiService>();
     }
 }

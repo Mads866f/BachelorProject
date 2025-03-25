@@ -40,12 +40,14 @@ public static class ConfigurationBuilder
     {
         builder.Services.AddScoped<IInitialtest, Initialtest>();
         builder.Services.AddScoped<ElectionService>();
+        builder.Services.AddScoped<ProjectService>();
 
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ElectionRepository>();
+        builder.Services.AddScoped<ProjectRepository>();
         
     }
 

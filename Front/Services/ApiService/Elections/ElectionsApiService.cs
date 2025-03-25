@@ -89,7 +89,7 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
 
             return new Election
             {
-                Id = null,
+                Id = Guid.Empty,
                 Name = "nasda",
                 TotalBudget = 0,
                 Model = "null",

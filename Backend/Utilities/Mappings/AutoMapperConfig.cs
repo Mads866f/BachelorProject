@@ -9,6 +9,7 @@ public static class AutoMapperConfig
         return new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<ElectionProfile>();
+            cfg.AddProfile<ProjectProfile>();
         });
     }
 }
