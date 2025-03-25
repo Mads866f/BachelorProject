@@ -1,15 +1,11 @@
 import collections as cl
 import pabutools.election as pbelec
 import pabutools.rules as pbrule
-from pydantic import BaseModel
 from typing import List, Tuple
+from Models import Election, Voter, Project
 import random
 
 
-class Election(BaseModel):
-    total_budget: int
-    projects: List[Tuple[str,int]]
-    votes: List[List[Tuple[str,int]]]
 
 def initialTest():
     ##
@@ -85,8 +81,9 @@ def create_ballot(ballot_type_string, votes_gained):
         return pbelec.ApprovalBallot(votes)
     
 def calculate_result(election:Election,method,ballot_type):
+    return []
     method_to_use = select_method(method)
-    voting_instance = pbelec.Instance([],election.total_budget)
+    voting_instance = pbelec.Instance([],election.totalBudget)
     projects = election.projects
     print(election)
     for p in projects:

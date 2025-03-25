@@ -37,19 +37,13 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             TotalBudget = 10000,
             Projects =
             [
-                new List<string> {"Project A", "3000"},
-                new List<string> {"Project B", "5000"}
+                new PythonProject{Name = "Project A", Cost = 3000},
+                new PythonProject{Name = "Project B", Cost = 5000}
             ],
             Votes =
             [
-                [
-                    ["Project A", "3" ],
-                    ["Project B", "2"]
-                ],
-                [
-                    ["Project A", "5"],
-                    ["Project B", "1"]
-                ]
+                new PythonVoter{SelectedProjects = ["Project B","Project A"], SelectedDegree = [2,3]},
+                new PythonVoter{SelectedProjects = ["Project A","Project B"], SelectedDegree = [1,2]}
             ]
         };
 
@@ -62,12 +56,12 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
             var response = await _httpsClient.PostAsync(url, content);
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("RESPONSE:",jsonString);
 
                 var projects = JsonSerializer.Deserialize<List<PythonProjects>>(jsonString, new JsonSerializerOptions
                 {
