@@ -23,3 +23,46 @@ async def root(election:Election,method:str, ballot_type:str):
     except Exception as e:
         print(e)
         return{"error":str(e)}
+
+@app.post("/analyze/avgSatisfaction")
+async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
+    try:
+        result = []
+        for sat in satisfactions:
+            sat_number = pb.calculate_satisfaction(election,outcome,sat)
+            result.append(sat_number)
+        return {"result":result}
+
+    except Exception as e:
+        print(e)
+        return{"error":str(e)}
+
+
+@app.post("/analyze/instanceAnalysis")
+async def root(election:Election,options:list[int]):
+    #Options is the constants "InstanceAnalysis"
+    try:
+        result = []
+        for option in options:
+            opt = pb.calculate_analyze_instance(election,option)
+            result.append(opt)
+        return {"result":result}
+    except Exception as e:
+        print(e)
+        return {"error":str(e)}
+
+@app.post("/analyze/instanceBallotAnalysis")
+async def root(election:Election,options:list[int]):
+    #options is the constants "InstanceBallotAnalysis"
+    try:
+        result = []
+        for option in options:
+            opt = pb.calculate_analyze_instance_ballot(election,option)
+            result.append(opt)
+        return {"result":result}
+    except Exception as e:
+        print(e)
+        return {"error":str(e)}
+
+    return
+
