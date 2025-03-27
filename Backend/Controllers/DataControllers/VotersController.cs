@@ -12,7 +12,7 @@ public class VotersController(IVotersService voterService) : ControllerBase
     public async Task<IActionResult> GetAllAsync()
     {
         var result = await voterService.GetAllVotersAsync();
-        return result.Count() > 1 ? Ok(result) : NotFound();
+        return result.Any() ? Ok(result) : NotFound();
     }
 
     [HttpGet("{id}")]

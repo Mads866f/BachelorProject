@@ -21,21 +21,28 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<VoteEntity?> GetByIdAsync(Guid id)
     {
+        Console.WriteLine("Getting Voter with id:" + id);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              SELECT id AS Id, election_id AS ElectionId
                              FROM voters_table
-                             WHERE id = @id LIMIT 1
+                             WHERE id = @idToFind LIMIT 1
                              """;
-        return db.QuerySingleOrDefault<VoteEntity>(query);
+        var result =db.QuerySingleOrDefault<VoteEntity>(query, new {idToFind = id});
+        if (result is not null)
+        {
+            Console.WriteLine("Found a result with id:" + result.Id);
+        }
+        return result;
     }
 
     public async Task<VoteEntity> CreateAsync(CreateVoter voter)
     {
+        Console.WriteLine("Creating voter for election: " + voter.ElectionId);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
-                             INSERT INTO voters_table (id, election_id)
-                             VALUES (@Id, @ElectionId)
+                             INSERT INTO voters_table (election_id)
+                             VALUES (@ElectionId)
                              RETURNING id;
                              """;
         var id = await db.QuerySingleAsync<Guid>(query, voter);
@@ -49,24 +56,28 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<VoteEntity?> UpdateAsync(VoteEntity voter)
     {
+        Console.WriteLine("Updating voter: " + voter.Id);
         using var db = await dbFactory.CreateConnectionAsync();
+    
         const string query = """
                              UPDATE voters_table
-                             SET id = @Id,
-                                 election_id = @ElectionId
+                             SET election_id = @ElectionId
+                             WHERE id = @Id
                              """;
         await db.ExecuteAsync(query, voter);
         return await GetByIdAsync(voter.Id) ?? null;
     }
 
+
     public async Task<bool> DeleteAsync(Guid id)
     {
+        Console.WriteLine("Deleting voter: " + id);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              DELETE FROM voters_table
-                             WHERE id = @id
+                             WHERE id = @Id
                              """;
-        var rowsAffected = await db.ExecuteAsync(query, id);
+        var rowsAffected = await db.ExecuteAsync(query, new {Id = id});
         if (rowsAffected != 0) return true;
         Console.WriteLine($"Warning: Attempted to delete non-existing voter with Id {id}",id);
         return false;

@@ -29,8 +29,8 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             """
             SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
             FROM elections_table
-            WHERE id = @id LIMIT 1
-            """);
+            WHERE id = @idToLookUp LIMIT 1
+            """, new {idToLookUp = id});
     }
 
 

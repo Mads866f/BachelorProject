@@ -19,9 +19,9 @@ public class VoterService : IVotersService
     public async Task<IEnumerable<Voter>> GetAllVotersAsync()
     {
         var result = await _repository.GetAllAsync();
-        var voterDto = result
+        var voterDtos = result
             .Select(x => _mapper.Map<Voter>(x));
-        return voterDto;
+        return voterDtos;
     }
 
     public async Task<Voter?> GetVotersAsync(string id)
@@ -42,7 +42,8 @@ public class VoterService : IVotersService
     {
         var voterEntity = _mapper.Map<VoteEntity>(voterModel);
         var result = await _repository.UpdateAsync(voterEntity);
-        return result is null ? _mapper.Map<Voter>(result) : null;
+        Console.WriteLine("Result: " + result.Id);
+        return result is not null ? _mapper.Map<Voter>(result) : null;
     }
 
     public async Task<bool> DeleteByIdAsync(string id)
