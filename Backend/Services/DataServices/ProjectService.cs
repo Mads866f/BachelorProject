@@ -11,7 +11,7 @@ namespace Backend.Services.DataServices;
 public class ProjectService(ProjectRepository repository)
 {
    private readonly ProjectRepository _repository = repository;
-   private IMapper _mapper;
+   private readonly IMapper _mapper;
 
    public Task<IEnumerable<ProjectsEntity>> GetProjectsWithElectionId(string id)
    {
@@ -21,5 +21,15 @@ public class ProjectService(ProjectRepository repository)
    public async Task CreateProjectAsync(ProjectsEntity project)
    {
       var projectEntity = await _repository.CreateAsync(project);
+   }
+
+   public async Task UpdateProjectAsync(ProjectsEntity project)
+   {
+      await _repository.UpdateAsync(project);
+   }
+
+   public async Task DeleteProjectAsync(Guid project_id)
+   {
+      await _repository.DeleteAsync(project_id);
    }
 }

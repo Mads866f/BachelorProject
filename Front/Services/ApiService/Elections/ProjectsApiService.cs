@@ -57,4 +57,47 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
            throw;
        }
     }
+
+    public async Task UpdateProject(Project projectToUpdate)
+    {
+        Console.WriteLine("Updating Project - Frontend");
+        try
+        {
+            var response = await _client.PutAsJsonAsync(url, projectToUpdate);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Updated Project Success!");
+            }
+            else
+            {
+                Console.WriteLine("Error in received Response");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("ERROR IN UPDATE:",e);
+        }
+    }
+
+    public async Task DeleteProject(Project projectToDelete)
+    {
+        Console.WriteLine("Deleting Project - Frontend");
+        try
+        {
+            var response = await _client.DeleteAsync(url+"/"+projectToDelete.Id);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Deleted Project Success!");
+            }
+            else
+            {
+                Console.WriteLine("Error in Deltion");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

@@ -12,6 +12,8 @@ app = FastAPI()
 async def root():
     return {"message": "Pbengine says Hello :-)"}
 
+
+
 @app.post("/getResult/")
 async def root(election:Election,method:str, ballot_type:str):
     try:

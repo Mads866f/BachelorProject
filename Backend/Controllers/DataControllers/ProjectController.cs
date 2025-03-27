@@ -26,5 +26,21 @@ public class ProjectController(ProjectService service) : ControllerBase
         await _service.CreateProjectAsync(project);
         return Ok();
     }
+
+    [HttpPut]
+    public async Task<ActionResult> UpdateProject([FromBody] ProjectsEntity project)
+    {
+        Console.WriteLine("Updating Project - Backend(Controller)");
+        await _service.UpdateProjectAsync(project);
+        return Ok();
+    }
+
+    [HttpDelete("{project_id}")]
+    public async Task<ActionResult> DeleteProject(Guid project_id)
+    {
+        await _service.DeleteProjectAsync(project_id);
+        return Ok();
+
+    }
     
 }
