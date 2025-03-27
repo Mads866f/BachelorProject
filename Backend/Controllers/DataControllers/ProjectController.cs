@@ -20,7 +20,7 @@ public class ProjectController(ProjectService service) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateProject([FromBody] ProjectsEntity project)
+    public async Task<ActionResult> CreateProject([FromBody] Project project)
     {
         Console.WriteLine("Creating Project - Backend(Controller)");
         await _service.CreateProjectAsync(project);

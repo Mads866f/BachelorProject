@@ -8,19 +8,25 @@ namespace Backend.Services.DataServices;
 
 
 
-public class ProjectService(ProjectRepository repository)
+public class ProjectService(ProjectRepository repository, IMapper mapper)
 {
    private readonly ProjectRepository _repository = repository;
-   private readonly IMapper _mapper;
+   private readonly IMapper _mapper = mapper;
 
-   public Task<IEnumerable<ProjectsEntity>> GetProjectsWithElectionId(string id)
+   public async Task<IEnumerable<Project>> GetProjectsWithElectionId(string id)
    {
-      return _repository.GetByElectionID(id);
+      var result = await _repository.GetByElectionID(id);
+      Console.WriteLine("RESULT IS null:"+result is null);
+      var dto = result.Select(x => { Console.WriteLine("X"+x.Name); return _mapper.Map<Project>(x); });
+      return dto;
    }
 
-   public async Task CreateProjectAsync(ProjectsEntity project)
+   public async Task<Project?> CreateProjectAsync(Project project_dto)
    {
+      var project = _mapper.Map<ProjectsEntity>(project_dto); 
       var projectEntity = await _repository.CreateAsync(project);
+      var dto =  _mapper.Map<Project>(projectEntity); 
+      return dto;
    }
 
    public async Task UpdateProjectAsync(ProjectsEntity project)
