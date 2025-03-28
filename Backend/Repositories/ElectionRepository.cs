@@ -13,36 +13,37 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
     public async Task<IEnumerable<ElectionEntity>> GetAllAsync()
     {
         using var db = await dbFactory.CreateConnectionAsync();
-        var result =  await db.QueryAsync<ElectionEntity>(
+        var result = await db.QueryAsync<ElectionEntity>(
             """
-                SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
-                FROM elections_table
-                """);
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+            FROM elections_table
+            """);
         return result;
     }
 
     public async Task<ElectionEntity?> GetByIdAsync(Guid id)
     {
         using var db = await dbFactory.CreateConnectionAsync();
-        
+
         return db.QuerySingleOrDefault<ElectionEntity>(
             """
             SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
             FROM elections_table
             WHERE id = @idToLookUp LIMIT 1
-            """, new {idToLookUp = id});
+            """, new { idToLookUp = id });
     }
 
 
     public async Task<ElectionEntity> CreateAsync(CreateElectionModel election)
     {
         using var db = await dbFactory.CreateConnectionAsync();
-        
-        const string query = """
-                             INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
-                             VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
-                             RETURNING id;
-                             """;
+
+        const string query =
+            """
+            INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
+            VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
+            RETURNING id;
+            """;
         var electionId = await db.QuerySingleAsync<Guid>(query, election);
 
         return new ElectionEntity
@@ -76,13 +77,13 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
         using var db = await dbFactory.CreateConnectionAsync();
         var rowsAffected = await db.ExecuteAsync(
             """
-            DELETE FROM elections_table 
+            DELETE 
+            FROM elections_table 
             WHERE id = @Id
-            """, 
+            """,
             new { Id = id });
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}",id);
+        Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}", id);
         return false;
     }
-
 }

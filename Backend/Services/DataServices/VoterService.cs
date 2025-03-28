@@ -10,44 +10,53 @@ public class VoterService : IVotersService
 {
     private readonly IMapper _mapper;
     private readonly IVotersRepository _repository;
+    private readonly IScoresService _scoresService;
 
-    public VoterService(IMapper mapper, IVotersRepository repository)
+    public VoterService(IMapper mapper, IVotersRepository repository, IScoresService scoresService)
     {
         _mapper = mapper;
         _repository = repository;
+        _scoresService = scoresService;
     }
     public async Task<IEnumerable<Voter>> GetAllVotersAsync()
     {
         var result = await _repository.GetAllAsync();
         var voterDtos = result
-            .Select(x => _mapper.Map<Voter>(x));
+            .Select(x => _mapper.Map<Voter>(x)).ToList();
+        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
         return voterDtos;
     }
 
-    public async Task<Voter?> GetVotersAsync(string id)
+    public async Task<Voter?> GetVoterAsync(string id)
     {
         var voterEntity = await _repository.GetByIdAsync(Guid.Parse(id));
         var voterDto = _mapper.Map<Voter>(voterEntity);
+        await AddScores(voterDto);
         return voterDto;
     }
 
-    public async Task<Voter> CreateVotersAsync(CreateVoter voterModel)
+    public async Task<Voter> CreateVoterAsync(CreateVoter voterModel)
     {
         var voterEntity = await _repository.CreateAsync(voterModel);
         var voterDto = _mapper.Map<Voter>(voterEntity);
         return voterDto;
     }
 
-    public async Task<Voter?> UpdateVotersAsync(Voter voterModel)
+    public async Task<Voter?> UpdateVoterAsync(Voter voterModel)
     {
         var voterEntity = _mapper.Map<VoteEntity>(voterModel);
         var result = await _repository.UpdateAsync(voterEntity);
-        Console.WriteLine("Result: " + result.Id);
         return result is not null ? _mapper.Map<Voter>(result) : null;
     }
 
     public async Task<bool> DeleteByIdAsync(string id)
     {
         return await _repository.DeleteAsync(Guid.Parse(id));
+    }
+
+    private async Task AddScores(Voter voter)
+    {
+        var scores = await _scoresService.GetScoresForVoterIdAsync(voter.Id.ToString());
+        voter.Votes = scores.ToList();
     }
 }

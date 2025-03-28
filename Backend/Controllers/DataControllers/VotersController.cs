@@ -18,21 +18,21 @@ public class VotersController(IVotersService voterService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Voter>> GetAsync(string id)
     {
-        var result = await voterService.GetVotersAsync(id);
+        var result = await voterService.GetVoterAsync(id);
         return result is not null ? Ok(result) : NotFound();
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateVoter voter)
     {
-        Voter createdVoter = await voterService.CreateVotersAsync(voter);
+        Voter createdVoter = await voterService.CreateVoterAsync(voter);
         return Ok(createdVoter);
     }
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] Voter voter)
     {
-        var result = await voterService.UpdateVotersAsync(voter);
+        var result = await voterService.UpdateVoterAsync(voter);
         return result is not null ? Ok(result) : NotFound();
     }
 

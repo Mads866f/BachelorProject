@@ -6,11 +6,11 @@ public interface IVotersService
 {
     Task<IEnumerable<Voter>> GetAllVotersAsync();
 
-    Task<Voter?> GetVotersAsync(string id);
+    Task<Voter?> GetVoterAsync(string id);
 
-    Task<Voter> CreateVotersAsync(CreateVoter voterModel);
+    Task<Voter> CreateVoterAsync(CreateVoter voterModel);
 
-    Task<Voter?> UpdateVotersAsync(Voter voterModel);
+    Task<Voter?> UpdateVoterAsync(Voter voterModel);
 
     Task<bool> DeleteByIdAsync(string id);
 }

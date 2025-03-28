@@ -44,7 +44,7 @@ public class ElectionService : IElectionService
     {
         var electionEntity = _mapper.Map<ElectionEntity>(electionModel);
         var result = await _repository.UpdateAsync(electionEntity);
-        return result is null ? _mapper.Map<Election>(result) : null;
+        return result is not null ? _mapper.Map<Election>(result) : null;
     }
 
     public async Task<bool> DeleteByIdAsync(string id)

@@ -1,6 +1,8 @@
 using Backend.Repositories;
+using Backend.Repositories.Interfaces;
 using Backend.Services.ApiServices.PbEngine;
 using Backend.Services.DataServices;
+using Backend.Services.Interfaces;
 using Backend.Services.Interfaces.PbEngine;
 using Backend.Utilities;
 using Backend.Utilities.Mappings;
@@ -41,12 +43,15 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IInitialtest, Initialtest>();
         builder.Services.AddScoped<IElectionService, ElectionService>();
         builder.Services.AddScoped<IVotersService, VoterService>();
+        builder.Services.AddScoped<IScoresService, ScoresService>();
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
         builder.Services.AddScoped<IVotersRepository, VotersRepository>();
+        builder.Services.AddScoped<IScoresRepository, ScoresRepository>();
+
     }
 
 }
