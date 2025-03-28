@@ -16,7 +16,7 @@ builder.AddConfiguration();
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/app/keys")).SetApplicationName("front");
+//builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/app/keys")).SetApplicationName("front");
 
 var app = builder.Build();
 

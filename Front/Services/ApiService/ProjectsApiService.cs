@@ -8,15 +8,15 @@ namespace Front.Services.ApiService.Elections;
 public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApiService
 {
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
-    private readonly string url = "api/Project";
+    private readonly string url = "api/Project/";
     
     
-    public async Task<List<Project>> GetProjectsWithProjectId(string id)
+    public async Task<List<Project>> GetProjectsWithElectionId(string id)
     {
         Console.WriteLine("Getting Projects - Frontend");
         try
         {
-            var response = await _client.GetAsync(url+"/"+id);
+            var response = await _client.GetAsync(url + id);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<List<Project>>();
@@ -33,7 +33,6 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
             Console.WriteLine("Error Getting Projects For Election:"+e);
             throw;
         }
-        
     }
 
     public async Task CreateProject(Project projectToCreate)
@@ -84,7 +83,7 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
         Console.WriteLine("Deleting Project - Frontend");
         try
         {
-            var response = await _client.DeleteAsync(url+"/"+projectToDelete.Id);
+            var response = await _client.DeleteAsync(url + projectToDelete.Id);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Deleted Project Success!");

@@ -4,6 +4,14 @@
 @rendermode InteractiveServer
 
 <MudStack>
+    @if (Election is null)
+    {
+        <MudPaper>
+            <MudText Typo="Typo.h4"> Select an election</MudText>
+        </MudPaper>
+    }
+    else
+    {
     @foreach (var project in projects)
     {
         <MudPaper>
@@ -41,12 +49,14 @@
             </MudGrid>
         </MudPaper>
     }
+    }
 </MudStack>
 
 @code
 {
-    [Parameter]
-    public string electionId { get; set; }
+    [CascadingParameter]
+    public Election Election { get; set; }
+    
     [Inject] private IProjectsApiService projectsApiService {get; set;}
 
     private List<Project> projects = [];
@@ -54,6 +64,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        projects = await projectsApiService.GetProjectsWithProjectId(electionId);
+        projects = await projectsApiService.GetProjectsWithElectionId(Election.Id.ToString());
     }
 }

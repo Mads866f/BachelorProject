@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers.DataControllers;
 
 [ApiController]
-[Route("api/Project")]
+[Route("api/[controller]")]
 public class ProjectController(IProjectService service) : ControllerBase
 {
     private readonly IProjectService _service = service;

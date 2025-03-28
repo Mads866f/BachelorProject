@@ -33,7 +33,9 @@ public static class ConfigurationBuilder
             //string connectionString = builder.Configuration.GetConnectionString("BackendAPI")
             //                        ?? throw new InvalidOperationException(
             //                          "Connection string 'BackendAPI' not found.");
-            string connectionString = "http://pbengine:8000";
+            // TODO CHANGE FOR DOCKER WHOLE PROJECT
+            //string connectionString = "http://pbengine:8000";
+            string connectionString = "http://localhost:8000";
             client.BaseAddress = new Uri(connectionString);
         });
     }

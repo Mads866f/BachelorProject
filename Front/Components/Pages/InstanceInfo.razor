@@ -1,28 +1,20 @@
 @page "/electionInfo"
 @rendermode InteractiveServer
 @using DTO.Models
-@using Front.Services.ApiService.Elections
+@using Front.Components.ElectionInfo.Dialogs
 @using Front.Services.Elections
+@using Front.Components.ElectionInfo
 
 <PageTitle>Election Info</PageTitle>
 
 <MudContainer>
-    @if (currentElection == null)
-    {
-        <MudGrid>
-            <MudItem xs="12">
-                <MudText Typo="Typo.h2">Select Election To Modify</MudText>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value = "electionId" T="string" Label="Election Id"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudButton Class="full-width-btn" OnClick="LoadElection">Go To Election Page</MudButton>
-            </MudItem>
-        </MudGrid>
-    }
-    else
-    {
+    <SelectElection
+        AllElections="allElections"
+        CurrentElection="currentElection"
+        UpdateElection="UpdateSelectedElection"></SelectElection>
+    
+    @if(currentElection is null) return;
+    <CascadingValue Value="currentElection">
         <MudGrid>
             <MudItem xs="4">
                 <MudStack>
@@ -67,11 +59,11 @@
                         </MudGrid>
                     </MudPaper>
                 </MudStack>
-                
+
             </MudItem>
             <MudItem xs="4">
                 <MudGrid>
-                    <MudItem xs = "12">
+                    <MudItem xs="12">
                         <MudText Typo="Typo.h6">Voter Status</MudText>
                     </MudItem>
                     <MudItem xs="12">
@@ -80,7 +72,9 @@
                                 <MudItem xs="10">
                                     <MudText Typo="Typo.body1">TYZ-567-YIU</MudText>
                                 </MudItem>
-                                <MudItem xs = "2"> <MudIcon Icon = "@Icons.Material.Outlined.Circle" Color = "Color.Error" /></MudItem>
+                                <MudItem xs="2">
+                                    <MudIcon Icon="@Icons.Material.Outlined.Circle" Color="Color.Error"/>
+                                </MudItem>
                             </MudGrid>
                         </MudPaper>
                         <MudPaper>
@@ -88,7 +82,9 @@
                                 <MudItem xs="10">
                                     <MudText Typo="Typo.body1">XYZ-ABC-123</MudText>
                                 </MudItem>
-                                <MudItem xs = "2"> <MudIcon Icon = "@Icons.Material.Filled.CheckCircle" Color = "Color.Success" /></MudItem>
+                                <MudItem xs="2">
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"/>
+                                </MudItem>
                             </MudGrid>
                         </MudPaper>
                     </MudItem>
@@ -100,15 +96,20 @@
                         <MudButton Class="full-width-btn" OnClick="e => openPopup()">Add Project</MudButton>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudButton Class="full-width-btn">Add Voter</MudButton>
+                        <MudButton
+                            Class="full-width-btn"
+                            Color="Color.Primary"
+                            OnClick="OpenVoterDialogAsync">
+                            Add Voter
+                        </MudButton>
                     </MudItem>
                     <MudItem xs="12">
                         <MudButton Class="full-width-btn">End Election</MudButton>
                     </MudItem>
                 </MudGrid>
-                
+
             </MudItem>
-            
+
             <MudItem xs="12">
                 <MudText Typo="Typo.h6">Projects</MudText>
             </MudItem>
@@ -121,32 +122,61 @@
             <MudItem xs="12">
                 @if (open == false)
                 {
-                    <ProjectListView electionId="@currentElection.Id.ToString()"></ProjectListView>
+                    <ProjectListView></ProjectListView>
                 }
                 else
                 {
-                    <ProjectListView electionId="@currentElection.Id.ToString()"></ProjectListView>
+                    <ProjectListView></ProjectListView>
                 }
             </MudItem>
         </MudGrid>
-    }
-
+    </CascadingValue>
 </MudContainer>
 
 
 @code
 {
+    [Inject] public required IDialogService DialogService { get; set; }
     [Inject] IElectionsApiService ElectionsApiService { get; set; }
+    private List<Election> allElections { get; set; }
     private Election currentElection;
     private string electionId = "";
     public bool open = false;
+
+    private Task OpenVoterDialogAsync()
+    {
+        return DialogService.ShowAsync<InputVoteDialog>("Input Votes");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchAllElections();
+    }
+
+    private async Task FetchAllElections()
+    {
+        try
+        {
+            allElections = await ElectionsApiService.GetElections();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching elections: {ex.Message}");
+        }
+    }
+
+
+    public void UpdateSelectedElection(Election newElection)
+    {
+        currentElection = newElection;
+    }
 
     private void openPopup()
     {
         open = !open;
         StateHasChanged();
     }
-    
+
     private async Task LoadElection()
     {
         Console.WriteLine("Load Election Started");
@@ -161,8 +191,6 @@
             var election = await ElectionsApiService.GetElection(electionId);
             Console.WriteLine(election.ToString());
             currentElection = election;
-
-
         }
     }
 }

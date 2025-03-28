@@ -21,7 +21,9 @@ public static class ConfigurationBuilder
             //string connectionString = builder.Configuration.GetConnectionString("BackendAPI")
               //                        ?? throw new InvalidOperationException(
                 //                          "Connection string 'BackendAPI' not found.");
-            string connectionString =  "http://backend:8080";
+            //TODO Change this to not use localhost if building entire project
+            //string connectionString = "http://backend:8080"; 
+            string connectionString = "http://localhost:5253";
             client.BaseAddress = new Uri(connectionString);
         });
     }

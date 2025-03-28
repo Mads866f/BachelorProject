@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"keys"));
 
 // Get Connection string
-var connectionString = builder.Configuration.GetConnectionString("Postgres_db");
+// TODO CHANGE CONNECTION STRING TO MAKE IT WORK IN DOCKER CONTAINER
+//var connectionString = builder.Configuration.GetConnectionString("Postgres_db");
+var connectionString = builder.Configuration.GetConnectionString("Local_Postgres_db");
 builder.Services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlDbConnectionFactory(connectionString!));
 
 // Add services to the container.

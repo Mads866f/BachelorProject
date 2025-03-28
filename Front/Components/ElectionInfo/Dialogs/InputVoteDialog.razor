@@ -1,0 +1,33 @@
+@using DTO.Models
+@using Front.Services.Interface.Elections
+
+<MudDialog>
+    <TitleContent>
+        Dialog Title
+    </TitleContent>
+    <DialogContent>
+        Dialog Content
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] 
+    public required IProjectsApiService ProjectsApiService { get; set; }
+
+    [CascadingParameter] 
+    public required Election Election { get; set; }
+    
+    [CascadingParameter]
+    public required IMudDialogInstance MudDialog { get; set; }
+    
+    private List<Project> _listOfProjects = [];
+    
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+
+}

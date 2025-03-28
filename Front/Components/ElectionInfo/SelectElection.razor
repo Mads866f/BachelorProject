@@ -1,0 +1,27 @@
+@using DTO.Models
+
+@if (AllElections is not null)
+{
+    <MudSelect T="Election" ValueChanged="OnValueChange">
+        @foreach (var election in AllElections)
+        {
+            <MudSelectItem Value="@election">@election.Name</MudSelectItem>
+        }
+    </MudSelect>
+}
+else
+{
+    <div>ERROR: fetching elections</div>
+}
+
+@code {
+
+    [Parameter] public required List<Election> AllElections { get; set; }
+    [Parameter] public required Election CurrentElection { get; set; }
+    [Parameter] public required EventCallback<Election> UpdateElection { get; set; }
+
+    private void OnValueChange(Election selected)
+    {
+        UpdateElection.InvokeAsync(selected);
+    }
+}

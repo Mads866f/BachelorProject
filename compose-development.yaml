@@ -1,0 +1,35 @@
+﻿services:
+  
+  pbengine:
+    image: pbengine
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+      dockerfile: pbEngine/dockerfile
+    networks:
+      - pb_network
+      
+  db:
+    image: postgres:latest
+    container_name: Postgres_db
+    environment:
+      POSTGRES_USER: Maagen
+      POSTGRES_PASSWORD: Maagen
+      POSTGRES_DB: Maagen
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pb_network
+    
+    
+volumes:
+  postgres_data:
+    driver: local
+    
+networks:
+  pb_network:
+    driver: bridge
+    external: false
