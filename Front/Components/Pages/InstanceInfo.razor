@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using DTO.Models
 @using Front.Services.ApiService.Elections
+@using Front.Services.Elections
 
 <PageTitle>Election Info</PageTitle>
 
@@ -135,7 +136,7 @@
 
 @code
 {
-    [Inject] ElectionsApiService ElectionsApiService { get; set; }
+    [Inject] IElectionsApiService ElectionsApiService { get; set; }
     private Election currentElection;
     private string electionId = "";
     public bool open = false;

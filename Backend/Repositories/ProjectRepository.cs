@@ -2,12 +2,13 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Backend.Database;
 using Backend.Models;
+using Backend.Repositories.Interfaces;
 using Dapper;
 using DTO.Models;
 
 namespace Backend.Repositories;
 
-public class ProjectRepository(IDbConnectionFactory dbFactory)
+public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsRepository
 {
    public async Task<IEnumerable<ProjectsEntity>> GetByElectionID(string electionID)
    {

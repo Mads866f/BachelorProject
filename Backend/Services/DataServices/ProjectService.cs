@@ -2,15 +2,17 @@ using System.Runtime.InteropServices;
 using AutoMapper;
 using Backend.Models;
 using Backend.Repositories;
+using Backend.Repositories.Interfaces;
+using Backend.Services.Interfaces;
 using DTO.Models;
 
 namespace Backend.Services.DataServices;
 
 
 
-public class ProjectService(ProjectRepository repository, IMapper mapper)
+public class ProjectService(IProjectsRepository repository, IMapper mapper) : IProjectService
 {
-   private readonly ProjectRepository _repository = repository;
+   private readonly IProjectsRepository _repository = repository;
    private readonly IMapper _mapper = mapper;
 
    public async Task<IEnumerable<Project>> GetProjectsWithElectionId(string id)

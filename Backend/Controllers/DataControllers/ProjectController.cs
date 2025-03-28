@@ -1,5 +1,6 @@
 using Backend.Models;
 using Backend.Services.DataServices;
+using Backend.Services.Interfaces;
 using DTO.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +8,9 @@ namespace Backend.Controllers.DataControllers;
 
 [ApiController]
 [Route("api/Project")]
-public class ProjectController(ProjectService service) : ControllerBase
+public class ProjectController(IProjectService service) : ControllerBase
 {
-    private readonly ProjectService _service = service;
+    private readonly IProjectService _service = service;
 
     [HttpGet ("{id}")]
     public async Task<ActionResult<IEnumerable<ProjectsEntity>>> GetByElectionID(string id)

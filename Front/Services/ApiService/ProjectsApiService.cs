@@ -48,7 +48,7 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
            }
            else
            {
-               Console.WriteLine("Error in received Response");
+               Console.WriteLine($"Error in received Response: {response.ReasonPhrase}");
            }
        }
        catch (Exception e)

@@ -1,10 +1,7 @@
-using System.Data;
 using Backend;
 using Backend.Database;
-using Backend.Repositories;
-using Backend.Services.DataServices;
 using Microsoft.AspNetCore.DataProtection;
-using Npgsql;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

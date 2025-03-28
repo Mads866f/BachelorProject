@@ -1,5 +1,6 @@
 @using DTO.Models
 @using Front.Services.ApiService.Elections
+@using Front.Services.Elections
 <EditForm @bind-Model="model" OnValidSubmit="CreateModel" >
     <DataAnnotationsValidator/>
     <MudTextField T="string"  @bind-Value="model.Name" Label="Election Name" Required="true" RequiredError="Election Name Is Required!" Immediate="true" />
@@ -18,7 +19,7 @@
     <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat" ButtonType="ButtonType.Submit" >Create Instance</MudButton>
 </EditForm>
 @code {
-[Inject] ElectionsApiService _electionsApiService { get; set; }
+[Inject] IElectionsApiService _electionsApiService { get; set; }
 private bool success;
 private string[] errors = { };
 private string name { get; set; } = "Initial";
