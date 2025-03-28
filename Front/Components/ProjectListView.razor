@@ -1,5 +1,6 @@
 @using DTO.Models
 @using Front.Services.ApiService.Elections
+@using Front.Services.Interface.Elections
 @rendermode InteractiveServer
 
 <MudStack>
@@ -46,7 +47,7 @@
 {
     [Parameter]
     public string electionId { get; set; }
-    [Inject] private ProjectsApiService projectsApiService {get; set;}
+    [Inject] private IProjectsApiService projectsApiService {get; set;}
 
     private List<Project> projects = [];
 

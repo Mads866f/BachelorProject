@@ -42,7 +42,7 @@
 @code
 {
 
-    [Inject] private ProjectsApiService _projectsApiService { get; set; }
+    [Inject] private IProjectsApiService _projectsApiService { get; set; }
     [Parameter] public Election election { get; set; }
     
     private Project _projectToCreate = new Project

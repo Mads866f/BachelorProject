@@ -1,5 +1,3 @@
-using Front.Services;
-using Front.Services.ApiService;
 using Front.Services.ApiService.Elections;
 using Front.Services.Elections;
 using Front.Services.Interface.Elections;
@@ -31,7 +29,7 @@ public static class ConfigurationBuilder
     // Setup the frontend services
     private static void SetupServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<ElectionsApiService>();
-        builder.Services.AddScoped<ProjectsApiService>();
+        builder.Services.AddScoped<IElectionsApiService, ElectionsApiService>();
+        builder.Services.AddScoped<IProjectsApiService, ProjectsApiService>();
     }
 }
