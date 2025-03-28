@@ -13,7 +13,7 @@ public class ProjectController(IProjectService service) : ControllerBase
     private readonly IProjectService _service = service;
 
     [HttpGet ("{id}")]
-    public async Task<ActionResult<IEnumerable<ProjectsEntity>>> GetByElectionID(string id)
+    public async Task<ActionResult<IEnumerable<ProjectsEntity>>> GetByElectionID(Guid id)
     {
         Console.WriteLine("Getting Projects - Backend(Controller)");
         var result = await _service.GetProjectsWithElectionId(id);

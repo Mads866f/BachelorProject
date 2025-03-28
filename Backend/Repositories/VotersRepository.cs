@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Backend.Database;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
@@ -8,6 +9,8 @@ namespace Backend.Repositories;
 
 public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepository
 {
+    private IVotersRepository _votersRepositoryImplementation;
+
     public async Task<IEnumerable<VoteEntity>> GetAllAsync()
     {
         using var db = await dbFactory.CreateConnectionAsync();
@@ -81,5 +84,23 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
         if (rowsAffected != 0) return true;
         Console.WriteLine($"Warning: Attempted to delete non-existing voter with Id {id}",id);
         return false;
+    }
+
+    public async Task<IEnumerable<VoteEntity>> GetByElectionIdAsync(Guid electionId)
+    {
+        using var db = await dbFactory.CreateConnectionAsync();
+        const string query = """
+                             SELECT id as Id, election_id as ElectionId 
+                             FROM voters_table
+                             Where election_id = @ElectionId
+                             """;
+        var result = await db.QueryAsync<VoteEntity>(query, new {ElectionId = electionId});
+        return result;
+        
+    }
+
+    public Task<IEnumerable<VoteEntity>> GetVotersByProjectIdAsync(int projectId)
+    {
+        throw new NotImplementedException();
     }
 }

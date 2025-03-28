@@ -14,4 +14,9 @@ public interface IVotersRepository
     Task<VoteEntity?> UpdateAsync(VoteEntity voter);
 
     Task<bool> DeleteAsync(Guid id);
+
+    Task<IEnumerable<VoteEntity>> GetByElectionIdAsync(Guid electionId);
+
+
+    Task<IEnumerable<VoteEntity>> GetVotersByProjectIdAsync(int projectId);
 }

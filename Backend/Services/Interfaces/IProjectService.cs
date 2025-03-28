@@ -5,7 +5,9 @@ namespace Backend.Services.Interfaces;
 
 public interface IProjectService
 {
-    Task<IEnumerable<Project>> GetProjectsWithElectionId(string id);
+    Task<IEnumerable<Project>> GetProjectsWithElectionId(Guid id);
+    
+    Task<Project> GetProjectsWithId(Guid id);
 
 
     Task<Project?> CreateProjectAsync(Project project_dto);

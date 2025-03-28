@@ -12,4 +12,12 @@ public class PythonProject
     public List<string> Target { get; set; }
     
     public PythonProject() { }
+
+    public PythonProject(string name, int cost, List<string> categories, List<string> target)
+    {
+        Name = name;
+        Cost = cost;
+        Categories = categories;
+        Target = target;
+    }
 }

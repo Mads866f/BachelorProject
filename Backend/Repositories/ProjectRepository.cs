@@ -10,18 +10,17 @@ namespace Backend.Repositories;
 
 public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsRepository
 {
-   public async Task<IEnumerable<ProjectsEntity>> GetByElectionID(string electionID)
+   public async Task<IEnumerable<ProjectsEntity>> GetByElectionID(Guid electionID)
    {
       Console.WriteLine("Getting Projects - Backend(Database)");
       using var db = await dbFactory.CreateConnectionAsync();
 
-      var idAsGuid = Guid.Parse(electionID);
       var query = await db.QueryAsync<ProjectsEntity>(new StringBuilder().Append(""" 
                                                            SELECT id as Id, name as Name, election_id as ElectionId, cost as Cost 
                                                            FROM projects_table as p 
                                                            WHERE p.election_id = @idAsGuid
                                                            """)
-         .ToString(),new {idAsGuid = idAsGuid});
+         .ToString(),new {idAsGuid = electionID});
       
       Console.WriteLine("PROJECTS PULLED FROM DB:"+query.ToString());
       
@@ -61,7 +60,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
                      WHERE id = @id
                      """,
         project);
-     return await GetByElectionID(project.ElectionID.ToString());
+     return await GetByElectionID(project.ElectionID);
    }
 
    public async Task<bool> DeleteAsync(Guid project_id)
@@ -78,5 +77,18 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
          return false;
       }
       return true;
+   }
+
+   public async Task<ProjectsEntity?> GetByIdAsync(Guid projectId)
+   {
+     Console.Write("Getting Projects - Backend(Database)");
+     using var db = await dbFactory.CreateConnectionAsync();
+     const string query = """
+                          SELECT id as ID , election_id as ElectionId, name as Name, cost as Cost
+                          FROM projects_table
+                          WHERE id = @project_id
+                          """;
+     var result = await db.QueryAsync<ProjectsEntity>(query, new {project_id = projectId});
+     return result.FirstOrDefault();
    }
 }

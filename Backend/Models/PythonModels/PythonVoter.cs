@@ -10,4 +10,10 @@ public class PythonVoter
         SelectedProjects = new List<string>();
         SelectedDegree = new List<int>();
     }
+
+    public PythonVoter(List<string> selectedProjects, List<int> selectedDegree)
+    {
+        SelectedProjects = selectedProjects;
+        SelectedDegree = selectedDegree;
+    }
 }

@@ -15,11 +15,17 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper) : IP
    private readonly IProjectsRepository _repository = repository;
    private readonly IMapper _mapper = mapper;
 
-   public async Task<IEnumerable<Project>> GetProjectsWithElectionId(string id)
+   public async Task<IEnumerable<Project>> GetProjectsWithElectionId(Guid id)
    {
       var result = await _repository.GetByElectionID(id);
-      Console.WriteLine("RESULT IS null:"+result is null);
-      var dto = result.Select(x => { Console.WriteLine("X"+x.Name); return _mapper.Map<Project>(x); });
+      var dto = result.Select(x => _mapper.Map<Project>(x));
+      return dto;
+   }
+
+   public async Task<Project> GetProjectsWithId(Guid id)
+   {
+      var result = await _repository.GetByIdAsync(id);
+      var dto = _mapper.Map<Project>(result);
       return dto;
    }
 

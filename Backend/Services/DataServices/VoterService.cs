@@ -27,12 +27,28 @@ public class VoterService : IVotersService
         return voterDtos;
     }
 
+    public async Task<IEnumerable<Voter>> GetVotersByElectionId(Guid electionId)
+    {
+        var result = await _repository.GetByElectionIdAsync(electionId);
+        var voterDtos = result.Select(x => _mapper.Map<Voter>(x)).ToList();
+        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
+        return voterDtos;
+    }
+
     public async Task<Voter?> GetVoterAsync(string id)
     {
         var voterEntity = await _repository.GetByIdAsync(Guid.Parse(id));
         var voterDto = _mapper.Map<Voter>(voterEntity);
         await AddScores(voterDto);
         return voterDto;
+    }
+
+    public async Task<IEnumerable<Voter>> GetVotersByProjectIdAsync(int projectId)
+    {
+        var result = await _repository.GetVotersByProjectIdAsync(projectId);
+        var voterDtos = result.Select(x => _mapper.Map<Voter>(x)).ToList();
+        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
+        return voterDtos;
     }
 
     public async Task<Voter> CreateVoterAsync(CreateVoter voterModel)

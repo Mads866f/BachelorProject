@@ -45,6 +45,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IVotersService, VoterService>();
         builder.Services.AddScoped<IScoresService, ScoresService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
+        builder.Services.AddScoped<IPbEngineService, PbEngineService>();
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
