@@ -55,7 +55,6 @@ class InstanceBallotAnalysis(Enum):
     Median_approval_score = 4
     Median_ballot_cost = 5
     Median_ballot_length = 6
-    Median_total_cost = 7
 
 
 
