@@ -1,5 +1,7 @@
+using Front.Services.ApiService;
 using Front.Services.ApiService.Elections;
 using Front.Services.Elections;
+using Front.Services.Interface;
 using Front.Services.Interface.Elections;
 using Front.Utilities;
 
@@ -33,5 +35,6 @@ public static class ConfigurationBuilder
     {
         builder.Services.AddScoped<IElectionsApiService, ElectionsApiService>();
         builder.Services.AddScoped<IProjectsApiService, ProjectsApiService>();
+        builder.Services.AddScoped<IVotersApiService,VotersApiService>();
     }
 }

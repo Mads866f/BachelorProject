@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers.DataControllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/voters")]
 public class VotersController(IVotersService voterService) : ControllerBase
 {
     [HttpGet]

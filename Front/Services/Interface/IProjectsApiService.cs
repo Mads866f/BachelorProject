@@ -11,4 +11,5 @@ public interface IProjectsApiService
     Task UpdateProject(Project projectToUpdate);
     
     Task DeleteProject(Project projectToDelete);
+    
 }

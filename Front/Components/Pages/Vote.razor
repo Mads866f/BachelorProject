@@ -1,4 +1,9 @@
-@page "/vote"
+@page "/vote/{JoinCode}"
+@rendermode InteractiveServer
+@using DTO.Models
+@using Front.Services.ApiService
+@using Front.Services.Interface
+@using Front.Services.Interface.Elections
 
 <PageTitle>Voting</PageTitle>
 
@@ -6,19 +11,64 @@
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Justify="Justify.Center" Spacing="6">
         <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">Vote For Projects</MudText></MudItem>
+        <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">VoterId: @JoinCode</MudText></MudItem>
+        <MudItem xs = "12"><MudButton ButtonType="ButtonType.Button" OnClick="SubmitVotes">Submit Vote</MudButton></MudItem>
         <MudItem xs="12">
             <MudStack>
-                <ProjectVoteBar></ProjectVoteBar>
-                <ProjectVoteBar></ProjectVoteBar>
-                <ProjectVoteBar></ProjectVoteBar>
-                <ProjectVoteBar></ProjectVoteBar>
-                <ProjectVoteBar></ProjectVoteBar>
-                <ProjectVoteBar></ProjectVoteBar>
+                @foreach (var project in _projects)
+                {
+                    <ProjectVoteBar AddProject ="AddProjectToVotes" RemoveProject="RemoveProjectFromVotes" project="@project"></ProjectVoteBar>
+                }
             </MudStack>
         </MudItem>
     </MudGrid>
 </MudContainer>
 
 @code {
-    public bool Basic_CheckBox1 { get; set; } = true;
+    [Parameter] public string? JoinCode { get; set; }
+    private List<Project> _projects = [];
+    [Inject] private IVotersApiService  _votersApiService { get; set; }
+    [Inject] private IProjectsApiService _projectsApiService { get; set; }
+    private List<Project> _votes = new List<Project>();
+    
+    private async Task GetProjects()
+    {
+        var voter = await _votersApiService.GetVoter(JoinCode?? "");
+        if (voter.ElectionId == Guid.Empty)
+        {
+            Console.WriteLine("NO VOTER WITH ID:"+ JoinCode);
+            return;
+        }
+        var electionId = voter.ElectionId;
+        _projects = await _projectsApiService.GetProjectsWithProjectId(electionId.ToString());
+        StateHasChanged();
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        _ = GetProjects();
+        return base.OnInitializedAsync();
+    }
+
+    private void SubmitVotes()
+    {
+        //COLLECT VOTE LIST AND SUBMIT TO DB
+        Console.WriteLine("SUbmitButton Clicked");
+        foreach (var project in _votes)
+        {
+            Console.WriteLine(project.Name);
+        }
+        return;
+    }
+
+    public void AddProjectToVotes(Project project)
+    {
+        _votes.Add(project);
+    }
+
+    public void RemoveProjectFromVotes(Project project)
+    {
+        _votes.Remove(project);
+    }
+
 }

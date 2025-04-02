@@ -1,15 +1,56 @@
+@using DTO.Models
 
+<MudCard Class="p-4">
+    <MudGrid Spacing="2" AlignItems="Center">
 
-<MudPaper>
-    <MudGrid>
-        <MudItem xs="4"><MudCheckBox T="bool" @bind-Value="Basic_CheckBox1"></MudCheckBox></MudItem>
-        <MudItem xs="4"><MudText T="string">This is The Project Title</MudText></MudItem>
-        <MudItem xs="4"><MudButton>Read More</MudButton></MudItem>
+        <!-- Vote Button -->
+        <MudItem xs="3">
+            <MudButton Color="@(_voted ? Color.Error : Color.Primary)"
+                       Variant="Variant.Filled"
+                       OnClick="@(_voted ? Remove : AddVote)">
+                @(@_voted ? "Remove Vote" : "Add Vote")
+            </MudButton>
+        </MudItem>
+
+        <!-- Project Name -->
+        <MudItem xs="3">
+            <MudText Typo="Typo.h6" Class="text-primary font-bold">@project.Name</MudText>
+        </MudItem>
+
+        <!-- Project Cost -->
+        <MudItem xs="3">
+            <MudText Typo="Typo.body1" Class="text-gray-600">Cost: @project.Cost $</MudText>
+        </MudItem>
+
+        <!-- Read More Button -->
+        <MudItem xs="3">
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined">
+                Read More
+            </MudButton>
+        </MudItem>
+
     </MudGrid>
-</MudPaper>
+</MudCard>
+
 
 
 
 @code {
-    public bool Basic_CheckBox1 { get; set; } = true;
+    [Parameter] public Project project { get; set; }
+    [Parameter] public EventCallback<Project> AddProject { get; set; }
+    [Parameter] public EventCallback<Project> RemoveProject { get; set; }
+    private bool _voted = false;
+
+    private void Remove()
+    {
+        RemoveProject.InvokeAsync(project);
+        _voted = !_voted;
+    }
+
+    private void AddVote()
+    {
+        AddProject.InvokeAsync(project);
+        _voted = !_voted;
+    }
+    
 }
