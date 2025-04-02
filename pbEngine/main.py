@@ -15,9 +15,10 @@ async def root():
 
 
 @app.post("/getResult/")
-async def root(election:Election,method:str, ballot_type:str):
+async def root(election:Election,method:int, ballot_type:int):
     try:
-        print(f"Received election data: {election}")
+        method = int(method)
+        ballot_type = int(ballot_type)
         print(f"Method: {method}, Ballot Type: {ballot_type}")
         return pb.calculate_result(election,method,ballot_type)
     except Exception as e:

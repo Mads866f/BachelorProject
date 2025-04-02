@@ -59,36 +59,17 @@
                         </MudGrid>
                     </MudPaper>
                 </MudStack>
-
+                
             </MudItem>
             <MudItem xs="4">
-                <MudGrid>
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.h6">Voter Status</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudPaper>
-                            <MudGrid>
-                                <MudItem xs="10">
-                                    <MudText Typo="Typo.body1">TYZ-567-YIU</MudText>
-                                </MudItem>
-                                <MudItem xs="2">
-                                    <MudIcon Icon="@Icons.Material.Outlined.Circle" Color="Color.Error"/>
-                                </MudItem>
-                            </MudGrid>
-                        </MudPaper>
-                        <MudPaper>
-                            <MudGrid>
-                                <MudItem xs="10">
-                                    <MudText Typo="Typo.body1">XYZ-ABC-123</MudText>
-                                </MudItem>
-                                <MudItem xs="2">
-                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"/>
-                                </MudItem>
-                            </MudGrid>
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
+                <MudStack>
+                @foreach (var voter in voters)
+                {
+                    <MudPaper>
+                        <MudText Typo="Typo.body2">@voter.Id</MudText>
+                    </MudPaper>
+                } 
+                </MudStack>
             </MudItem>
             <MudItem xs="4">
                 <MudGrid>
@@ -96,15 +77,10 @@
                         <MudButton Class="full-width-btn" OnClick="e => openPopup()">Add Project</MudButton>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudButton
-                            Class="full-width-btn"
-                            Color="Color.Primary"
-                            OnClick="OpenVoterDialogAsync">
-                            Add Voter
-                        </MudButton>
+                        <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" OnClick="AddVoter">Add Voter</MudButton>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudButton Class="full-width-btn">End Election</MudButton>
+                        <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" @onclick="EndElection">End Election</MudButton>
                     </MudItem>
                 </MudGrid>
 
@@ -138,10 +114,13 @@
 {
     [Inject] public required IDialogService DialogService { get; set; }
     [Inject] IElectionsApiService ElectionsApiService { get; set; }
+    [Inject] IPbEngineApiService PbEngineApiService { get; set; }
+    [Inject] IVotersApiService VotersApiService { get; set; }
     private List<Election> allElections { get; set; }
     private Election currentElection;
     private string electionId = "";
     public bool open = false;
+    private List<Voter> voters = new List<Voter>();
 
     private Task OpenVoterDialogAsync()
     {
@@ -191,8 +170,31 @@
             var election = await ElectionsApiService.GetElection(electionId);
             Console.WriteLine(election.ToString());
             currentElection = election;
-
-
         }
+        LoadVoters();
     }
+
+    private async void EndElection()
+    {
+        var result = await PbEngineApiService.CalculateElection(electionId);
+        Console.WriteLine("RESULT FROM ELECTION!");
+        foreach (var proj in result)
+        {
+            Console.WriteLine(proj.Name);
+        }
+        Console.WriteLine("____________");
+    }
+
+    private async void AddVoter()
+    {
+        await VotersApiService.CreateVoter(electionId);
+        LoadVoters();
+    }
+
+    private async void LoadVoters()
+    {
+        voters = await VotersApiService.GetVoters(electionId);
+        StateHasChanged();
+    }
+    
 }

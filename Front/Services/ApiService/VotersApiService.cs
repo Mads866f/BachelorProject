@@ -32,8 +32,54 @@ public class VotersApiService(IHttpClientFactory clientFactory) : IVotersApiServ
         }
     }
 
-    public Task<List<Voter>> GetVoters(string electionId)
+    public async Task<List<Voter>> GetVoters(string electionId)
     {
-        throw new NotImplementedException();
+        // TODO NEED TO MODIFY CONTROLLER FOR EASIER ACCESS TO SPECIFIC VOTER GROUPS
+        Console.WriteLine("Get Voters From Election (Frontend)");
+        try
+        {
+            var response = await _client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Get Voters From Election success (Frontend)");
+                var result =  await response.Content.ReadFromJsonAsync<List<Voter>>();
+                if (result != null) return result.Where(voter => voter.ElectionId.ToString() == electionId).ToList();
+            }
+            else
+            {
+                Console.WriteLine("Get Voters From Election Failed(Frontend)");
+                return new List<Voter>();
+            }
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        return new List<Voter>();
+    }
+
+    public async Task CreateVoter(string electionId)
+    {
+        Console.WriteLine("Create Voter (Frontend)");
+        try
+        {
+            var voter = new CreateVoter(){ElectionId = Guid.Parse(electionId)};
+            var response = await _client.PostAsJsonAsync(url,voter);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Voter Created SUCCESS");
+            }
+            else
+            {
+                Console.WriteLine("Voter Created FAILED");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

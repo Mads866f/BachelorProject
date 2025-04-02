@@ -13,7 +13,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         
     public async Task<List<PythonProjects>> CalculateElection(PythonElection election,int method,int ballotType)
     {
-        var url  = "/getResult/?method="+method+"&ballotType="+ballotType;
+        var url  = "/getResult/?method="+method+"&ballot_type="+ballotType;
         try
         {
             var json = JsonSerializer.Serialize(election,

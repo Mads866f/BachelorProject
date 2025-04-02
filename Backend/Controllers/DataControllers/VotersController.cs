@@ -21,7 +21,7 @@ public class VotersController(IVotersService voterService) : ControllerBase
         var result = await voterService.GetVoterAsync(id);
         return result is not null ? Ok(result) : NotFound();
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateVoter voter)
     {

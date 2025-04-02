@@ -60,14 +60,28 @@ class InstanceBallotAnalysis(Enum):
 
 def number_to_Rule(number):
     try:
-        return Rules(number)
+       rulesDictonary = {
+            1 : Rules.Equal_shares,
+            2 : Rules.Greedy_Utilitarian,
+            3 : Rules.Additive_Utilitarian,
+            4 : Rules.Sequential_Phragmen,
+            5 : Rules.Cumulative_Support_Transfer_Voting
+       } 
+       return rulesDictonary[number]
     except ValueError:
         print("ERROR CONVERTING ",number, "To Rule")
 
 
 def number_to_Ballot(number):
     try:
-        return Ballot(number)
+        ballotDictonary = {
+
+            1: Ballot.Approval,
+            2: Ballot.Cardinal,
+            3: Ballot.Cumulative,
+            4: Ballot.Ordinal
+        }
+        return ballotDictonary[number]
     except ValueError:
         print("ERROR CONVERTING ",number, "To Ballot")
 

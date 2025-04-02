@@ -70,7 +70,7 @@ def profile_vote_counter(profile):
     return project_votes
     
     
-def select_method(rule):
+def select_method(rule:int):
     rule_dictonary = {
         Rules.Equal_shares: pbrule.method_of_equal_shares,
         Rules.Greedy_Utilitarian: pbrule.greedy_utilitarian_welfare,
@@ -166,8 +166,9 @@ def profile_from_voter_list(votes:list[Voter],ballot_type,election):
     return profile
     
 
-def calculate_result(election:Election,method,ballot_type):
-    method_to_use = select_method(int(method))
+def calculate_result(election:Election,method:int,ballot_type:int):
+    method_to_use = select_method(method)
+    ballot_type = number_to_Ballot(ballot_type)
     voting_instance = pbelec.Instance([],election.totalBudget)
     # Create and add projects to instance
     projects = election.projects

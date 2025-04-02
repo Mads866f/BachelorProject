@@ -34,16 +34,16 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
     {
         var election = new PythonElection()
         {
-            TotalBudget = 10000,
-            Projects =
+            totalBudget = 10000,
+            projects =
             [
                 new PythonProject{Name = "Project A", Cost = 3000,Categories = [],Target = []},
                 new PythonProject{Name = "Project B", Cost = 5000, Categories = [],Target = []}
             ],
-            Votes =
+            votes =
             [
-                new PythonVoter{SelectedProjects = ["Project B","Project A"], SelectedDegree = [2,3]},
-                new PythonVoter{SelectedProjects = ["Project A","Project B"], SelectedDegree = [1,2]}
+                new PythonVoter{selectedProjects = ["Project B","Project A"], selectedDegree = [2,3]},
+                new PythonVoter{selectedProjects = ["Project A","Project B"], selectedDegree = [1,2]}
             ]
         };
 
