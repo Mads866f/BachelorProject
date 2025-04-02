@@ -30,7 +30,7 @@ public class PbEngineController(IElectionService _electionService, IProjectServi
 
         var pythonVoters = voters.Select(vot => new PythonVoter()
         {
-            SelectedProjects = vot.Votes.Select(v => v.ProjectId.ToString()).ToList(),
+            SelectedProjects = vot.Votes.Select(v => v.Project_Id.ToString()).ToList(),
             SelectedDegree = vot.Votes.Select(v => v.Grade).ToList(),
         }).ToList();
         

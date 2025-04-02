@@ -32,14 +32,14 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
       using var db = await dbFactory.CreateConnectionAsync();
       const string query = """
                            INSERT INTO projects_table (election_id, name, cost)
-                           Values (@ElectionID, @Name, @Cost)
+                           Values (@ElectionId, @Name, @Cost)
                            RETURNING id
                            """;
       var projectId = await db.QuerySingleAsync<Guid>(query, project);
       var toReturn =  new Project
       {
          Id = projectId,
-         ElectionId = project.ElectionID,
+         ElectionId = project.ElectionId,
          Name = project.Name,
          Cost = project.Cost,
          categories = [],
@@ -60,7 +60,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
                      WHERE id = @id
                      """,
         project);
-     return await GetByElectionID(project.ElectionID);
+     return await GetByElectionID(project.ElectionId);
    }
 
    public async Task<bool> DeleteAsync(Guid project_id)

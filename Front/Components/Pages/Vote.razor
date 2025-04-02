@@ -11,13 +11,13 @@
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Justify="Justify.Center" Spacing="6">
         <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">Vote For Projects</MudText></MudItem>
-        <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">VoterId: @JoinCode</MudText></MudItem>
+        <MudItem xs="12"><MudText Typo="Typo.h2" Align="Align.Center">VoterVoter_Id: @JoinCode</MudText></MudItem>
         <MudItem xs = "12"><MudButton ButtonType="ButtonType.Button" OnClick="SubmitVotes">Submit Vote</MudButton></MudItem>
         <MudItem xs="12">
             <MudStack>
                 @foreach (var project in _projects)
                 {
-                    <ProjectVoteBar AddProject ="AddProjectToVotes" RemoveProject="RemoveProjectFromVotes" project="@project"></ProjectVoteBar>
+                    <ProjectVoteBar AddProject ="AddProjectToVotesApproval" RemoveProject="RemoveProjectFromVotes" project="@project"></ProjectVoteBar>
                 }
             </MudStack>
         </MudItem>
@@ -29,7 +29,9 @@
     private List<Project> _projects = [];
     [Inject] private IVotersApiService  _votersApiService { get; set; }
     [Inject] private IProjectsApiService _projectsApiService { get; set; }
-    private List<Project> _votes = new List<Project>();
+    [Inject] private IScoresApiService _scoresApiService { get; set; }
+
+    private Dictionary<string, int> _votes = new Dictionary<string, int>();
     
     private async Task GetProjects()
     {
@@ -50,25 +52,24 @@
         return base.OnInitializedAsync();
     }
 
-    private void SubmitVotes()
+    private async void SubmitVotes()
     {
         //COLLECT VOTE LIST AND SUBMIT TO DB
-        Console.WriteLine("SUbmitButton Clicked");
-        foreach (var project in _votes)
-        {
-            Console.WriteLine(project.Name);
-        }
-        return;
+        Console.WriteLine("JOINCODE"+JoinCode);
+        await _scoresApiService.UpdateScores(JoinCode?? "", _votes); 
+        Console.WriteLine("Submitted Votes");
     }
 
-    public void AddProjectToVotes(Project project)
+    public void AddProjectToVotesApproval(Project project)
     {
-        _votes.Add(project);
+        
+        Console.WriteLine("PROJECT ID TO ADD: "+ project.Id +  " : "+project.Name);
+        _votes.Add(project.Id.ToString(),1);
     }
 
     public void RemoveProjectFromVotes(Project project)
     {
-        _votes.Remove(project);
+        _votes.Remove(project.Id.ToString());
     }
 
 }

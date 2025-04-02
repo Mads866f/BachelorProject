@@ -66,7 +66,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
                 total_budget = @TotalBudget, 
                 model = @Model, 
                 ballot_design = @BallotDesign
-            WHERE id = @Id
+            WHERE id = @Voter_Id
             """,
             election);
         return await GetByIdAsync(election.Id) ?? null;
@@ -79,11 +79,11 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             """
             DELETE 
             FROM elections_table 
-            WHERE id = @Id
+            WHERE id = @Voter_Id
             """,
             new { Id = id });
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing election with Id {id}", id);
+        Console.WriteLine($"Warning: Attempted to delete non-existing election with Voter_Id {id}", id);
         return false;
     }
 }

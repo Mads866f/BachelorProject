@@ -36,5 +36,6 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IElectionsApiService, ElectionsApiService>();
         builder.Services.AddScoped<IProjectsApiService, ProjectsApiService>();
         builder.Services.AddScoped<IVotersApiService,VotersApiService>();
+        builder.Services.AddScoped <IScoresApiService,ScoresApiService>();
     }
 }

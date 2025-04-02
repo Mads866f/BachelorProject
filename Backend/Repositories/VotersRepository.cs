@@ -15,7 +15,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
     {
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
-                             SELECT id AS Id, election_id AS ElectionId
+                             SELECT id AS Voter_Id, election_id AS ElectionId
                              FROM voters_table
                              """;
         var result = await db.QueryAsync<VoteEntity>(query);
@@ -27,7 +27,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
         Console.WriteLine("Getting Voter with id:" + id);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
-                             SELECT id AS Id, election_id AS ElectionId
+                             SELECT id AS Voter_Id, election_id AS ElectionId
                              FROM voters_table
                              WHERE id = @idToFind LIMIT 1
                              """;
@@ -65,7 +65,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
         const string query = """
                              UPDATE voters_table
                              SET election_id = @ElectionId
-                             WHERE id = @Id
+                             WHERE id = @Voter_Id
                              """;
         await db.ExecuteAsync(query, voter);
         return await GetByIdAsync(voter.Id) ?? null;
@@ -78,11 +78,11 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              DELETE FROM voters_table
-                             WHERE id = @Id
+                             WHERE id = @Voter_Id
                              """;
         var rowsAffected = await db.ExecuteAsync(query, new {Id = id});
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing voter with Id {id}",id);
+        Console.WriteLine($"Warning: Attempted to delete non-existing voter with Voter_Id {id}",id);
         return false;
     }
 
@@ -90,7 +90,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
     {
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
-                             SELECT id as Id, election_id as ElectionId 
+                             SELECT id as Voter_Id, election_id as ElectionId 
                              FROM voters_table
                              Where election_id = @ElectionId
                              """;
