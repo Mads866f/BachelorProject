@@ -42,7 +42,7 @@
             return;
         }
         var electionId = voter.ElectionId;
-        _projects = await _projectsApiService.GetProjectsWithProjectId(electionId.ToString());
+        _projects = await _projectsApiService.GetProjectsWithElectionId(electionId.ToString());
         StateHasChanged();
     }
 

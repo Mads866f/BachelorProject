@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using DTO.Models;
 using Front.Utilities;
 using Front.Services.Interface;
@@ -65,6 +66,7 @@ public class VotersApiService(IHttpClientFactory clientFactory) : IVotersApiServ
         Console.WriteLine("Create Voter (Frontend)");
         try
         {
+            Console.WriteLine($"ElectionID Causing the problem: {electionId}" );
             var voter = new CreateVoter(){ElectionId = Guid.Parse(electionId)};
             var response = await _client.PostAsJsonAsync(url,voter);
             if (response.IsSuccessStatusCode)
