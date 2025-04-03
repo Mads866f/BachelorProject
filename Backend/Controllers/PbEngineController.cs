@@ -50,10 +50,10 @@ public class PbEngineController(IElectionService _electionService, IProjectServi
             {
                 var new_p = new Project
                 {
-                    Id = Guid.Parse(p.name),
+                    Id = Guid.Parse(p.Name),
                     ElectionId = electionId,
-                    Name = projects.Where(proj => proj.Id.ToString() == p.name).First().Name,
-                    Cost = p.cost,
+                    Name = projects.Where(proj => proj.Id.ToString() == p.Name).First().Name,
+                    Cost = p.Cost,
                 };
                 return new_p;
             }).ToList();

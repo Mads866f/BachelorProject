@@ -69,7 +69,7 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
                 }) ?? new List<PythonProjects>();
 
                 // Print received projects
-                projects.ForEach(x => Console.WriteLine($"Project: {x.name}, Cost: {x.cost}"));
+                projects.ForEach(x => Console.WriteLine($"Project: {x.Name}, Cost: {x.Cost}"));
 
                 return projects;
             }

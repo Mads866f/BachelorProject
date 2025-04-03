@@ -2,14 +2,14 @@ namespace Backend.Models;
 
 public class PythonProjects
 {
-    public required string name { get; set; }
-    public required int cost { get; set; }
-    public List<string>? categories { get; set; }
-    public List<string>? targets { get; set; }
+    public required string Name { get; set; }
+    public required int Cost { get; set; }
+    public List<string>? Categories { get; set; }
+    public List<string>? Targets { get; set; }
 
     public PythonProjects()
     {
-        name = "";
-        cost = 0;
+        Name = "";
+        Cost = 0;
     }
 }

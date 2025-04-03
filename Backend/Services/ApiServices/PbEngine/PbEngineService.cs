@@ -33,7 +33,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
                 }) ?? new List<PythonProjects>();
 
                 // Print received projects
-                projects.ForEach(x => Console.WriteLine($"Project: {x.name}, Cost: {x.cost}"));
+                projects.ForEach(x => Console.WriteLine($"Project: {x.Name}, Cost: {x.Cost}"));
 
                 return projects;
             }
