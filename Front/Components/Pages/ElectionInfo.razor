@@ -22,7 +22,8 @@
 
     @if (_currentElection is null) return;
     
-    <CascadingValue Value="_currentElection">
+    <CascadingValue Value="_currentElection" >
+        
         <MudGrid>
             <!-- Election Info - Left side-->
             <ElectionInfoPanel/>
@@ -35,16 +36,9 @@
                 EndElection="EndElection"
                 CreateProject="CreateProject"
                 OpenCreateProjectDialog="OpenProjectDialogAsync"/>
-
-            <MudItem xs="12">
-                <MudText Typo="Typo.h6">Projects</MudText>
-            </MudItem>
-            <MudItem xs="12">
-            </MudItem>
-            <MudItem xs="12">
-                <ProjectListView
-                    Projects="_projects"/>
-            </MudItem>
+            <!--Project List View - Bottom -->
+            <ProjectListView
+                Projects="_projects"/>
         </MudGrid>
     </CascadingValue>
 </MudContainer>
@@ -57,19 +51,16 @@
     [Inject] public required IPbEngineApiService PbEngineApiService { get; set; }
     [Inject] public required IVotersApiService VotersApiService { get; set; }
     [Inject] public required IProjectsApiService ProjectsApiService { get; set; }
+    [Inject] public required NavigationManager NavigationManager { get; set; }
     
     [Parameter] public string? ElectionId { get; set; }
     
     private List<Election> allElections { get; set; }
     private Election _currentElection;
-    public bool open = false;
     private List<Voter> _voters = [];
     private List<Project> _projects = [];
 
-    private Task OpenVoterDialogAsync()
-    {
-        return DialogService.ShowAsync<InputVoteDialog>("Input Votes");
-    }
+
 
     private Task OpenProjectDialogAsync()
     {
@@ -114,11 +105,6 @@
         await LoadElection();
     }
 
-    private void OpenPopup()
-    {
-        open = !open;
-        StateHasChanged();
-    }
 
     private async Task LoadElection()
     {
@@ -169,5 +155,7 @@
         await LoadProjects();
         StateHasChanged();
     }
+
+
     
 }

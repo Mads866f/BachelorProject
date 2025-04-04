@@ -4,6 +4,7 @@ using Front.Services.Elections;
 using Front.Services.Interface;
 using Front.Services.Interface.Elections;
 using Front.Utilities;
+using Microsoft.JSInterop;
 
 namespace Front;
 

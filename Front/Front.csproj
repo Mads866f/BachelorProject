@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="14.0.0" />
+      <PackageReference Include="Microsoft.JSInterop" Version="8.0.14" />
       <PackageReference Include="MudBlazor" Version="8.3.0" />
     </ItemGroup>
 
@@ -24,6 +25,12 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\InstanceInfo\ElectionInfoPanel.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\ElectionInfo\ProjectListView.razor" />
+      <AdditionalFiles Include="Components\PrevPb\InstanceListView.razor" />
+      <AdditionalFiles Include="Components\Voter\ProjectVoteBar.razor" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,52 @@
+@using DTO.Models
+@using Front.Services.ApiService.Elections
+@using Front.Services.Interface.Elections
+@rendermode InteractiveServer
+
+
+<MudItem xs="12">
+    <MudText Typo="Typo.h6">Projects</MudText>
+</MudItem>
+<MudItem xs="12">
+</MudItem>
+<MudItem xs="12">
+<MudStack>
+    @foreach (var project in Projects)
+    {
+        <MudPaper Elevation="3" Class="p-6 m-4 rounded-xl">
+            <MudGrid GutterSize="3" AlignItems="Center">
+
+                <!-- Votes -->
+                <MudItem xs="12" sm="2">
+                    <MudCard Elevation="1" Class="p-4 rounded-lg text-center">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Votes</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mt-1 font-semibold">XXX</MudText>
+                    </MudCard>
+                </MudItem>
+
+                <!-- Project Name -->
+                <MudItem xs="12" sm="5">
+                    <MudCard Elevation="1" Class="p-4 rounded-lg">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Project Name</MudText>
+                        <MudText Typo="Typo.h6" Class="mt-1">@project.Name</MudText>
+                    </MudCard>
+                </MudItem>
+
+                <!-- Cost -->
+                <MudItem xs="12" sm="5">
+                    <MudCard Elevation="1" Class="p-4 rounded-lg">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Cost</MudText>
+                        <MudText Typo="Typo.h6" Class="mt-1">@project.Cost</MudText>
+                    </MudCard>
+                </MudItem>
+
+            </MudGrid>
+        </MudPaper>
+    }
+</MudStack>
+</MudItem>
+
+@code
+{
+    [Parameter] public required List<Project> Projects { get; set; }
+}
