@@ -21,7 +21,7 @@ public class ProjectController(IProjectService service) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateProject([FromBody] Project project)
+    public async Task<ActionResult> CreateProject([FromBody] CreateProjectModel project)
     {
         Console.WriteLine("Creating Project - Backend(Controller)");
         await _service.CreateProjectAsync(project);

@@ -1,0 +1,23 @@
+@using DTO.Models
+<MudItem xs="4">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudButton Class="full-width-btn" OnClick="e => OpenCreateProjectDialog.InvokeAsync()">Add Project</MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" OnClick="AddVoter">Add Voter</MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" @onclick="EndElection">End Election</MudButton>
+        </MudItem>
+    </MudGrid>
+
+</MudItem>
+
+@code {
+    [Parameter] public required EventCallback AddVoter { get; set; }
+    [Parameter] public required EventCallback EndElection { get; set; }
+    [Parameter] public required EventCallback<CreateProjectModel> CreateProject { get; set; }
+    [Parameter] public required EventCallback OpenCreateProjectDialog { get; set; }
+
+}

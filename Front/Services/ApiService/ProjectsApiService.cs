@@ -35,7 +35,7 @@ public class ProjectsApiService(IHttpClientFactory clientFactory) : IProjectsApi
         }
     }
 
-    public async Task CreateProject(Project projectToCreate)
+    public async Task CreateProject(CreateProjectModel projectToCreate)
     {
        Console.WriteLine("Creating Project - Frontend");
        try

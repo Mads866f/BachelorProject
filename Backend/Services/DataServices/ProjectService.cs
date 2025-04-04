@@ -29,9 +29,9 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper) : IP
       return dto;
    }
 
-   public async Task<Project?> CreateProjectAsync(Project project_dto)
+   public async Task<Project?> CreateProjectAsync(CreateProjectModel createProjectModel)
    {
-      var project = _mapper.Map<ProjectsEntity>(project_dto); 
+      var project = _mapper.Map<ProjectsEntity>(createProjectModel); 
       var projectEntity = await _repository.CreateAsync(project);
       var dto =  _mapper.Map<Project>(projectEntity); 
       return dto;

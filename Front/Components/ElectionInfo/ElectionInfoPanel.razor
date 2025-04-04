@@ -1,0 +1,51 @@
+@using DTO.Models
+<MudItem xs="4">
+    <MudStack>
+        <MudPaper>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">Election Name</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@Election.Name</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+        <MudPaper>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">Budget</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@Election.TotalBudget</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+        <MudPaper>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">Method</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@Election.Model</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+        <MudPaper>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">BallotDesign</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@Election.BallotDesign</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudStack>
+
+</MudItem>
+
+@code {
+    [CascadingParameter] public required Election Election { get; set; }
+    
+}

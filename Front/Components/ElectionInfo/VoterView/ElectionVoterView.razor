@@ -1,0 +1,13 @@
+@using DTO.Models
+<MudItem xs="4">
+    <MudStack>
+        @foreach (var voter in Voters)
+        {
+            <SingleVoterView
+                Voter="voter"/>
+        }
+    </MudStack>
+</MudItem>
+@code {
+    [Parameter] public required List<Voter> Voters { get; set; }
+}

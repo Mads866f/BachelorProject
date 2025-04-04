@@ -12,7 +12,7 @@ public class VotersApiService(IHttpClientFactory clientFactory) : IVotersApiServ
 {
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
     private readonly string url = "api/voters";
-    public async Task<Voter> GetVoter(string id)
+    public async Task<Voter?> GetVoter(string id)
     {
         Console.WriteLine("Get Voter (Frontend)");
         try
@@ -21,10 +21,10 @@ public class VotersApiService(IHttpClientFactory clientFactory) : IVotersApiServ
             if (response.IsSuccessStatusCode)
             {
                var result = await response.Content.ReadFromJsonAsync<Voter>();
-               return result ?? new Voter();
+               return result ?? null;
             }
 
-            return new Voter();
+            return null;
         }
         catch (Exception e)
         {

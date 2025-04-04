@@ -6,7 +6,7 @@ public interface IProjectsApiService
 {
     Task<List<Project>> GetProjectsWithElectionId(string id);
     
-    Task CreateProject(Project projectToCreate);
+    Task CreateProject(CreateProjectModel projectToCreate);
     
     Task UpdateProject(Project projectToUpdate);
     

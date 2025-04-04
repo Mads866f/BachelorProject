@@ -1,0 +1,51 @@
+@using DTO.Models
+@using Front.Services.Elections
+
+<EditForm @bind-Model="_model" OnValidSubmit="CreateModel">
+    <DataAnnotationsValidator/>
+    <MudTextField T="string" @bind-Value="_model.Name" Label="Election Name" Required="true"
+                  RequiredError="Election Name Is Required!" Immediate="true"/>
+    <MudSelect T="string" @bind-Value="_model.Model" Label="Method" Placeholder="Please Select" Required="true">
+        <MudSelectItem T="string" Value="@("EqualShares")">Equal Shares</MudSelectItem>
+        <MudSelectItem T="string" Value="@("GreedyUtil")">Greedy Utilitarian</MudSelectItem>
+        <MudSelectItem T="string" Value="@("SeqPharg")">Sequential Phragmen</MudSelectItem>
+    </MudSelect>
+    <MudDivider/>
+    <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!"
+                  @bind-Value="_model.TotalBudget"></MudTextField>
+    <MudSelect T="string" @bind-Value="_model.BallotDesign" Label="Ballot" Placeholder="Please Select" Required="true">
+        <MudSelectItem T="string" Value="@("1-Approval")">1-Approval</MudSelectItem>
+        <MudSelectItem T="string" Value="@("3-Approval")">3-Approval</MudSelectItem>
+        <MudSelectItem T="string" Value="@("Cardinal")">Cardinal</MudSelectItem>
+    </MudSelect>
+    <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat"
+               ButtonType="ButtonType.Submit">Create Instance
+    </MudButton>
+</EditForm>
+
+@code {
+
+    /// <see cref="IElectionsApiService"/>
+    [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
+    [Inject] public required NavigationManager NavigationManager { get; set; }
+    
+    private bool _success;
+    private string[] _errors = [];
+    private string Name { get; set; } = "Initial";
+
+    private Election _model = new()
+    {
+        Name = "",
+        TotalBudget = 0,
+        Model = "",
+        BallotDesign = ""
+    };
+
+    private async Task CreateModel()
+    {
+        var election = await ElectionsApiService.CreateElection(_model);
+        NavigationManager.NavigateTo($"/electionInfo/{election.Id.ToString()}");
+        
+    }
+
+}

@@ -38,5 +38,6 @@ public class ElectionServiceTest
         result = result.ToList();
         Assert.Single(result);
         Assert.Equal(result.First().Name, listToReturn.First().Name);
+        Assert.IsType<List<Election>>(result);
     }
 }

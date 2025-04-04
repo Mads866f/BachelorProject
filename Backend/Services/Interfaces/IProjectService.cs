@@ -10,7 +10,7 @@ public interface IProjectService
     Task<Project> GetProjectsWithId(Guid id);
 
 
-    Task<Project?> CreateProjectAsync(Project project_dto);
+    Task<Project?> CreateProjectAsync(CreateProjectModel createProjectModel);
 
 
     Task UpdateProjectAsync(ProjectsEntity project);

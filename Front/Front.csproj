@@ -22,4 +22,8 @@
       <ProjectReference Include="..\DTO\DTO.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\InstanceInfo\ElectionInfoPanel.razor" />
+    </ItemGroup>
+
 </Project>

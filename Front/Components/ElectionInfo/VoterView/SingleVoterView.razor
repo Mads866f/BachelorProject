@@ -1,0 +1,8 @@
+@using DTO.Models
+<MudPaper>
+    <MudText Typo="Typo.body2">@Voter.Id</MudText>
+</MudPaper>
+
+@code {
+    [Parameter] public required Voter Voter { get; set; }
+}

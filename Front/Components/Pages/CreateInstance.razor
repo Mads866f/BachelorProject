@@ -1,4 +1,5 @@
 @page "/createInstance"
+@using Front.Components.CreateInstance
 @rendermode InteractiveServer
 
 
@@ -7,22 +8,12 @@
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudGrid Spacing="12">
         <MudItem xs="12">
-            <MudText Typo="Typo.h2" Align="Align.Center">Create A new Instance</MudText>
+            <MudText Typo="Typo.h2" Align="Align.Center">Create new Instance</MudText>
         </MudItem>
         <MudItem xs="12">
             <CreateInstanceForm></CreateInstanceForm>
         </MudItem>
         <MudItem xs="12">
-            <MudItem xs="12">
-                <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Get Join Codes</MudButton>
-            </MudItem>
-            <MudItem xs="12">
-                <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat">Upload Projects</MudButton>
-            </MudItem>
-            <MudItem xs="12">
-
-            </MudItem>
-
         </MudItem>
 
 

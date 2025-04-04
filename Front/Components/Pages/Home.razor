@@ -1,23 +1,43 @@
 ﻿@page "/"
+@using Front.Services.Interface
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
     <MudContainer MaxWidth="MaxWidth.Medium">
         <MudGrid Spacing="3" Justify="Justify.Center">
-            <MudItem xs = "12"><MudText Typo="Typo.h2" Align="Align.Center">Welcome to the Participatory Budgetting page!</MudText></MudItem>
+            <MudItem xs = "12"><MudText Typo="Typo.h2" Align="Align.Center">Welcome to the Participatory Budgeting page!</MudText></MudItem>
             <MudItem xs = "12"><MudText Typo = "Typo.h3" Align="Align.Center">Choose An Option To Start</MudText></MudItem>
             <MudItem xs = "12"></MudItem>
             <MudItem xs = "12"></MudItem>
             <MudItem xs="12" >
-                <MudButton Style="background-color:rebeccapurple;color: wheat" Class="full-width-btn" Size="Size.Large" Href="/createInstance">
+                <MudButton Style="background-color:rebeccapurple;color: wheat"
+                           Class="full-width-btn" 
+                           Size="Size.Large" 
+                           OnClick="NavigateToCreateInstance">
                     Create Instance
                 </MudButton>
             </MudItem>
-            <MudItem xs="6"><MudTextField T="string" Value="@_textValue" Label="Join Code" Variant="Variant.Outlined" ValueChanged="@(value => UpdateTextValue(value))" ></MudTextField></MudItem>
-            <MudItem xs="6"><MudButton  Style="background-color: rebeccapurple; color: wheat" Class="full-width-btn" Href="@($"/vote/{_textValue}")" Disabled="@(string.IsNullOrWhiteSpace(_textValue))" >Join</MudButton></MudItem>
+            <MudItem xs="6">
+                <MudTextField T="string"
+                              Value="@_joinId"
+                              Label="Join Code"
+                              Variant="Variant.Outlined"
+                              ValueChanged="@(value => UpdateTextValue(value))">
+                </MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudButton Style="background-color: rebeccapurple; color: wheat"
+                           Class="full-width-btn"
+                           OnClick="NavigateToVotePage">
+                    Join
+                </MudButton>
+            </MudItem>
             <MudItem xs = "12">
-                <MudButton Style="background-color: rebeccapurple;color: wheat" Class="full-width-btn" Size="Size.Large" Href="/prevPb">
+                <MudButton Style="background-color: rebeccapurple;color: wheat" 
+                           Class="full-width-btn" 
+                           Size="Size.Large" 
+                           OnClick="NavigateToPrevPb">
                     See Previous Instances
                 </MudButton>
             </MudItem>
@@ -28,12 +48,54 @@
 
 @code
 {
-    private string _textValue="";
+    [Inject] public required NavigationManager NavigationManager { get; set; }
+    [Inject] public required IVotersApiService VotersApiService { get; set; }
+    [Inject] public required ISnackbar Snackbar { get; set; }
+    
+    
+    
+    private string _joinId="";
 
+    private async Task NavigateToVotePage()
+    {
+        var valid =  await ValidateJoinId(_joinId);
+        if (valid)
+        {
+            NavigationManager.NavigateTo($"/vote/{_joinId}");
+        }
+    }
+
+    private async Task<bool> ValidateJoinId(string joinId)
+    {
+        if (!Guid.TryParse(joinId, out _))
+        {
+            Snackbar.Add($"Invalid format: '{joinId}' is not a valid Join code format.", Severity.Error);
+            return false;
+        }
+
+        var voter = await VotersApiService.GetVoter(joinId);
+    
+        if (voter is null)
+        {
+            Snackbar.Add($"No voter has join code: {joinId}", Severity.Error);
+            return false;
+        }
+        return true;
+    }
+
+    private void NavigateToCreateInstance()
+    {
+        NavigationManager.NavigateTo($"/createInstance");
+    }
+    
+    private void NavigateToPrevPb()
+    {
+        NavigationManager.NavigateTo($"/prevPb");
+    }
 
     private void UpdateTextValue(string value)
     {
-        _textValue = value;
+        _joinId = value;
         StateHasChanged();
     }
 }
