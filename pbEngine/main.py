@@ -6,8 +6,6 @@ from Models import Election, Voter, Project
 app = FastAPI()
 
 
-
-
 @app.get("/")
 async def root():
     return {"message": "Pbengine says Hello :-)"}
