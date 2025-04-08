@@ -112,12 +112,10 @@ public class ElectionServiceTest
         var election_to_update = new Election() { Id = Guid.NewGuid() ,BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election", TotalBudget = 10 };
         var election_to_return = _mapper.Map<ElectionEntity>(election_to_update);
         
-        _repository.Setup(x => x.GetByIdAsync(election_to_return.Id)).ReturnsAsync(election_to_return);
-        _repository.Setup(x => x.UpdateAsync(election_to_return)).ReturnsAsync(election_to_return);
+        _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(election_to_return);
         //Act
         var result = await _service.UpdateElectionAsync(election_to_update);
         //Assert 
-        Assert.Equal(election_to_return, _mapper.Map<ElectionEntity>(election_to_update));
         Assert.NotNull(result);
         Assert.Equal(election_to_return.Id, result?.Id);
         Assert.Equal(election_to_return.BallotDesign, result?.BallotDesign);

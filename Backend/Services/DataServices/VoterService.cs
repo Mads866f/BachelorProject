@@ -72,7 +72,7 @@ public class VoterService : IVotersService
 
     private async Task AddScores(Voter voter)
     {
-        var scores = await _scoresService.GetScoresForVoterIdAsync(voter.Id.ToString());
+        var scores = await _scoresService.GetScoresForVoterIdAsync(voter.Id);
         voter.Votes = scores.ToList();
     }
 }
