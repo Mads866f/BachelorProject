@@ -9,11 +9,14 @@ namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/pbengine")]
-public class PbEngineController(IElectionService _electionService, IProjectService _projectService, IVotersService _votersService, IPbEngineService _service)
+public class PbEngineController(IElectionService _electionService,
+    IProjectService _projectService,
+    IVotersService _votersService,
+    IPbEngineService _service)
 {
 
     [HttpGet("{id}")]
-    public async Task<List<Project>> CalculateElection(string id)
+    public async Task<List<Project>> CalculateElection(Guid id)
     {
         var electionEntity = await _electionService.GetElectionAsync(id);
         var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;

@@ -26,9 +26,9 @@ public class ElectionService : IElectionService
     return electionsDto;
     }
     
-    public async Task<Election?> GetElectionAsync(string id)
+    public async Task<Election?> GetElectionAsync(Guid id)
     {
-        var electionEntity = await _repository.GetByIdAsync(Guid.Parse(id));
+        var electionEntity = await _repository.GetByIdAsync(id);
         var electionDto = _mapper.Map<Election>(electionEntity);
         return electionDto;
     }
@@ -47,8 +47,8 @@ public class ElectionService : IElectionService
         return result is not null ? _mapper.Map<Election>(result) : null;
     }
 
-    public async Task<bool> DeleteByIdAsync(string id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
-        return await _repository.DeleteAsync(Guid.Parse(id));
+        return await _repository.DeleteAsync(id);
     }
 }
