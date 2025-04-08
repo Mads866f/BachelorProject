@@ -7,7 +7,7 @@ public interface IProjectService
 {
     Task<IEnumerable<Project>> GetProjectsWithElectionId(Guid id);
     
-    Task<Project> GetProjectsWithId(Guid id);
+    Task<Project?> GetProjectByIdAsync(Guid id);
 
 
     Task<Project?> CreateProjectAsync(CreateProjectModel createProjectModel);
@@ -16,6 +16,6 @@ public interface IProjectService
     Task UpdateProjectAsync(ProjectsEntity project);
 
 
-    Task DeleteProjectAsync(Guid project_id);
+    Task DeleteProjectAsync(Guid projectId);
 
 }

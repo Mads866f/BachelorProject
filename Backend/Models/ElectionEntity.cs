@@ -10,6 +10,19 @@ namespace Backend.Models
         public string Model { get; set; }
         public string BallotDesign { get; set; }
         public ElectionEntity() { }
+        
+        protected bool Equals(ElectionEntity other)
+        {
+            return Id.Equals(other.Id) 
+                   && Name == other.Name 
+                   && TotalBudget == other.TotalBudget 
+                   && Model == other.Model 
+                   && BallotDesign == other.BallotDesign;
+        }
 
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, TotalBudget, Model, BallotDesign);
+        }
     }
 }
