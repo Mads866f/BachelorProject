@@ -9,7 +9,7 @@ public interface IElectionRepository
 
     Task<ElectionEntity?> GetByIdAsync(Guid id);
 
-    Task<ElectionEntity> CreateAsync(CreateElectionModel election);
+    Task<ElectionEntity> CreateAsync(Election election);
 
     Task<ElectionEntity?> UpdateAsync(ElectionEntity election);
 

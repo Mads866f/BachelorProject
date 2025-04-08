@@ -1,24 +1,45 @@
 using System.Data;
 using Backend.Database;
+using Backend.Repositories.Interfaces;
 using Dapper;
+using Microsoft.Data.Sqlite;
 
-namespace Backend;
+namespace TestsBackend.Database;
 
-public static class DatabaseConfigurationBuilder
+public class SqliteDbFactory : IDbConnectionFactory
 {
-    public static async Task ApplyDatabaseConfiguration(this WebApplication app)
+    private  SqliteConnection _connection;
+    private readonly SqliteConnection _keeperConnection;
+    private readonly string _connectionString = "Data Source=file:memdb1?mode=memory&cache=shared";
+
+    public SqliteDbFactory()
     {
-        using var scope = app.Services.CreateScope();
-        var connectionFactory = scope.ServiceProvider.GetRequiredService<IDbConnectionFactory>();
-        using var db = await connectionFactory.CreateConnectionAsync();
-        SqlMapper.AddTypeMap(typeof(Guid),DbType.String);
-        EnsureDatabaseSetup(db);
+        _keeperConnection = new SqliteConnection(_connectionString);
+        _keeperConnection.Open();
+        InitializeDatabase();
+    }
+    public Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
+    {
+        _connection = new SqliteConnection(_connectionString);
+        return Task.FromResult((IDbConnection) _connection);
     }
 
-    private static void EnsureDatabaseSetup(IDbConnection db)
+    public void CloseAll()
     {
-        // Specify the table's to add
+        _keeperConnection.Dispose();
+        _keeperConnection.Close();
+    }
+    public void InitializeDatabase()
+    {
         var tables = new List<string>{ 
+            "DROP TABLE IF EXISTS elections_table;",
+            "DROP TABLE IF EXISTS projects_table;",
+            "DROP TABLE IF EXISTS voters_table;",
+            "DROP TABLE IF EXISTS scores_table;",
+            "DROP TABLE IF EXISTS categories_table;",
+            "DROP TABLE IF EXISTS project_categories_table;",
+            "DROP TABLE IF EXISTS targets_table;",
+            "DROP TABLE IF EXISTS project_targets_table;",
             """
             CREATE TABLE IF NOT EXISTS elections_table (
                 id TEXT PRIMARY KEY ,
@@ -74,10 +95,11 @@ public static class DatabaseConfigurationBuilder
             )
             """
         };
-        // Add the table's to the database
         foreach (var table in tables)
         {
-            db.Execute(table);
+           using var command = _keeperConnection.CreateCommand();
+           command.CommandText = table;
+           command.ExecuteNonQuery();
         }
     }
 }

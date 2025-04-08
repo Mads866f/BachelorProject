@@ -1,5 +1,7 @@
 using Backend;
 using Backend.Database;
+using Backend.Utilities.TypeHandlers;
+using Dapper;
 using Microsoft.AspNetCore.DataProtection;
 
 
@@ -17,6 +19,8 @@ builder.Services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlDbConnectionF
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+SqlMapper.AddTypeHandler(new GuidTypeHandler());
 
 builder.AddConfiguration();
 builder.Services.AddControllers();

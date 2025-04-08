@@ -13,7 +13,7 @@ public class PbEngineController(IElectionService _electionService, IProjectServi
 {
 
     [HttpGet("{id}")]
-    public async Task<List<Project>> CalculateElection(string id)
+    public async Task<List<Project>> CalculateElection(Guid id)
     {
         var electionEntity = await _electionService.GetElectionAsync(id);
         var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;

@@ -18,14 +18,14 @@ public class ElectionController(IElectionService service) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Election>> Get(string id)
+    public async Task<ActionResult<Election>> Get(Guid id)
     {
         var result = await service.GetElectionAsync(id);
         return result is not null? Ok(result) : NotFound();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateElectionModel election)
+    public async Task<IActionResult> Create([FromBody] Election election)
     {
         Election createdElection = await service.CreateElectionAsync(election);
         return Ok(createdElection);
@@ -39,7 +39,7 @@ public class ElectionController(IElectionService service) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteByIdAsync(string id)
+    public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
         var result = await service.DeleteByIdAsync(id);
         return result ? Ok() : NotFound();

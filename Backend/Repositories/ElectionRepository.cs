@@ -34,21 +34,19 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
     }
 
 
-    public async Task<ElectionEntity> CreateAsync(CreateElectionModel election)
+    public async Task<ElectionEntity> CreateAsync(Election election)
     {
         using var db = await dbFactory.CreateConnectionAsync();
-
+        election.Id = Guid.NewGuid();
         const string query =
             """
-            INSERT INTO elections_table (name, total_budget, model, ballot_design)                 
-            VALUES (@Name, @TotalBudget, @Model, @BallotDesign)
-            RETURNING id;
+            INSERT INTO elections_table (id, name, total_budget, model, ballot_design)                 
+            VALUES (@Id, @Name, @TotalBudget, @Model, @BallotDesign)
             """;
-        var electionId = await db.QuerySingleAsync<Guid>(query, election);
-
+       db.Execute(query, election); 
         return new ElectionEntity
         {
-            Id = electionId,
+            Id = election.Id,
             Name = election.Name,
             TotalBudget = election.TotalBudget,
             Model = election.Model,
@@ -63,6 +61,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             """
             UPDATE elections_table 
             SET name = @Name, 
+                id = @Id,
                 total_budget = @TotalBudget, 
                 model = @Model, 
                 ballot_design = @BallotDesign

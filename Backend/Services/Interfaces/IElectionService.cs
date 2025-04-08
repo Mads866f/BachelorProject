@@ -6,11 +6,11 @@ public interface IElectionService
 {
     Task<IEnumerable<Election>> GetAllElectionsAsync();
 
-    Task<Election?> GetElectionAsync(string id);
+    Task<Election?> GetElectionAsync(Guid id);
 
-    Task<Election> CreateElectionAsync(CreateElectionModel election);
+    Task<Election> CreateElectionAsync(Election election);
 
     Task<Election?> UpdateElectionAsync(Election electionModel);
 
-    Task<bool> DeleteByIdAsync(string id);
+    Task<bool> DeleteByIdAsync(Guid id);
 }
