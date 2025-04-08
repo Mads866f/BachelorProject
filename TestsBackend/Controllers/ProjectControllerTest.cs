@@ -35,7 +35,7 @@ namespace TestsBackend.Controllers
             var result = await _controller.GetByElectionId(electionId);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<ProjectsEntity>>>(result);
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<Project>>>(result);
             var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             Assert.Equal(mockProjects, okResult.Value);
         }
@@ -52,7 +52,7 @@ namespace TestsBackend.Controllers
             var result = await _controller.GetByElectionId(electionId);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<ProjectsEntity>>>(result);
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<Project>>>(result);
             Assert.IsType<NotFoundResult>(actionResult.Result);
         }
 
@@ -176,7 +176,7 @@ namespace TestsBackend.Controllers
             var result = await _controller.GetByElectionId(electionId);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<ProjectsEntity>>>(result);
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<Project>>>(result);
             Assert.IsType<ObjectResult>(actionResult.Result);
             var objectResult = (ObjectResult)actionResult.Result;
             Assert.Equal(500, objectResult.StatusCode);

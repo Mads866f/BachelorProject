@@ -6,7 +6,7 @@ public interface IVotersService
 {
     Task<IEnumerable<Voter>> GetAllVotersAsync();
 
-    Task<Voter?> GetVoterAsync(string id);
+    Task<Voter?> GetVoterAsync(Guid id);
     
     Task<IEnumerable<Voter>> GetVotersByProjectIdAsync(int projectId);
 
@@ -14,6 +14,6 @@ public interface IVotersService
 
     Task<Voter?> UpdateVoterAsync(Voter voterModel);
 
-    Task<bool> DeleteByIdAsync(string id);
+    Task<bool> DeleteByIdAsync(Guid id);
     Task<IEnumerable<Voter>> GetVotersByElectionId(Guid electionId);
 }
