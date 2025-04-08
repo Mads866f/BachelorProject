@@ -35,9 +35,9 @@ public class VoterService : IVotersService
         return voterDtos;
     }
 
-    public async Task<Voter?> GetVoterAsync(string id)
+    public async Task<Voter?> GetVoterAsync(Guid id)
     {
-        var voterEntity = await _repository.GetByIdAsync(Guid.Parse(id));
+        var voterEntity = await _repository.GetByIdAsync(id);
         var voterDto = _mapper.Map<Voter>(voterEntity);
         await AddScores(voterDto);
         return voterDto;
@@ -65,9 +65,9 @@ public class VoterService : IVotersService
         return result is not null ? _mapper.Map<Voter>(result) : null;
     }
 
-    public async Task<bool> DeleteByIdAsync(string id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
-        return await _repository.DeleteAsync(Guid.Parse(id));
+        return await _repository.DeleteAsync(id);
     }
 
     private async Task AddScores(Voter voter)

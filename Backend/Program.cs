@@ -16,7 +16,11 @@ builder.Services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlDbConnectionF
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // This ensures that summary and response type information is included in Swagger UI
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Backend.xml"));
+});
 
 builder.AddConfiguration();
 builder.Services.AddControllers();
