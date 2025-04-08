@@ -16,6 +16,7 @@ public class ElectionServiceTest
     private readonly IElectionService _service;
     private readonly Mock<IElectionRepository> _repository;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<ElectionService>> _logger;
 
     public ElectionServiceTest()
     {
@@ -24,14 +25,15 @@ public class ElectionServiceTest
         _repository = new Mock<IElectionRepository>();
         var mapperConfig = AutoMapperConfig.ConfigureMappings();
         _mapper = mapperConfig.CreateMapper();
-        _service = new ElectionService(_mapper,_repository.Object);
+        _logger = new Mock<ILogger<ElectionService>>();
+        _service = new ElectionService(_mapper,_repository.Object, _logger.Object);
     }
 
     [Fact]
     public async Task GetAllElectionsAsync_NoParameter_ReturnListOfElections()
     {
         //Arrange
-        List<ElectionEntity> listToReturn = [new() { Name = "SOME-NAME" , BallotDesign = "1-approval",Id = new Guid(), Model = "EqualShares", TotalBudget = 10}];
+        List<ElectionEntity> listToReturn = [new() { Name = "SOME-NAME" , BallotDesign = "1-approval",Id = Guid.Empty, Model = "EqualShares", TotalBudget = 10}];
         _repository.Setup(x => x.GetAllAsync()).ReturnsAsync(listToReturn);
         //Act
         var result = await _service.GetAllElectionsAsync();
@@ -112,7 +114,7 @@ public class ElectionServiceTest
         var electionToReturn = _mapper.Map<ElectionEntity>(electionToUpdate);
         _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(electionToReturn);
         
-        _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(election_to_return);
+        _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(electionToReturn);
         //Act
         var result = await _service.UpdateElectionAsync(electionToUpdate);
         
