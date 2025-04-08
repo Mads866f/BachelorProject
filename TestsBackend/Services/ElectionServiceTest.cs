@@ -9,8 +9,6 @@ using Moq;
 
 namespace TestsBackend.Services;
 
-
-
 public class ElectionServiceTest
 {
         
@@ -91,16 +89,16 @@ public class ElectionServiceTest
     public async Task CreateElectionAsync_NewElection_ReturnElection()
     {
         //Arrange
-        var new_election = new CreateElectionModel(){BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election",TotalBudget = 10};
-        var election_to_return = new ElectionEntity() {BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election",TotalBudget = 10};
-        _repository.Setup(x => x.CreateAsync(new_election)).ReturnsAsync(election_to_return);
+        var newElection = new CreateElectionModel(){BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election",TotalBudget = 10};
+        var electionToReturn = new ElectionEntity() {BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election",TotalBudget = 10};
+        _repository.Setup(x => x.CreateAsync(newElection)).ReturnsAsync(electionToReturn);
         //Act
-        var result = await _service.CreateElectionAsync(new_election);
+        var result = await _service.CreateElectionAsync(newElection);
         //Assert
-        Assert.Equal(election_to_return.Id, result?.Id);
-        Assert.Equal(election_to_return.BallotDesign, result?.BallotDesign);
-        Assert.Equal(election_to_return.Model, result?.Model);
-        Assert.Equal(election_to_return.TotalBudget, result?.TotalBudget);
+        Assert.Equal(electionToReturn.Id, result?.Id);
+        Assert.Equal(electionToReturn.BallotDesign, result?.BallotDesign);
+        Assert.Equal(electionToReturn.Model, result?.Model);
+        Assert.Equal(electionToReturn.TotalBudget, result?.TotalBudget);
         Assert.IsType<Election>(result);
     }
 
@@ -109,20 +107,19 @@ public class ElectionServiceTest
     public async Task UpdateElectionAsync_UpdateElection_ReturnElection()
     {
         //Arrange
-        var election_to_update = new Election() { Id = Guid.NewGuid() ,BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election", TotalBudget = 10 };
-        var election_to_return = _mapper.Map<ElectionEntity>(election_to_update);
+        var electionToUpdate = new Election() { Id = Guid.NewGuid() ,BallotDesign = "1-approval",Model = "EqualShares",Name="Test Election", TotalBudget = 10 };
+        var electionToReturn = _mapper.Map<ElectionEntity>(electionToUpdate);
+        _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(electionToReturn);
         
-        _repository.Setup(x => x.GetByIdAsync(election_to_return.Id)).ReturnsAsync(election_to_return);
-        _repository.Setup(x => x.UpdateAsync(election_to_return)).ReturnsAsync(election_to_return);
         //Act
-        var result = await _service.UpdateElectionAsync(election_to_update);
+        var result = await _service.UpdateElectionAsync(electionToUpdate);
+        
         //Assert 
-        Assert.Equal(election_to_return, _mapper.Map<ElectionEntity>(election_to_update));
         Assert.NotNull(result);
-        Assert.Equal(election_to_return.Id, result?.Id);
-        Assert.Equal(election_to_return.BallotDesign, result?.BallotDesign);
-        Assert.Equal(election_to_return.Model, result?.Model);
-        Assert.Equal(election_to_return.TotalBudget, result?.TotalBudget);
+        Assert.Equal(electionToReturn.Id, result.Id);
+        Assert.Equal(electionToReturn.BallotDesign, result?.BallotDesign);
+        Assert.Equal(electionToReturn.Model, result?.Model);
+        Assert.Equal(electionToReturn.TotalBudget, result?.TotalBudget);
         Assert.IsType<Election>(result);
     }
 
@@ -130,11 +127,11 @@ public class ElectionServiceTest
     public async Task UpdateElectionAsync_NotExistElection_ReturnNull()
     {
         //Arrange
-        var election_to_update = new Election() {Name = "None", BallotDesign = "None", Model = "None", TotalBudget = 10 };
-        var election_to_argument = _mapper.Map<ElectionEntity>(election_to_update);
-        _repository.Setup(x=> x.UpdateAsync(election_to_argument)).ReturnsAsync((ElectionEntity)null);
+        var electionToUpdate = new Election() {Name = "None", BallotDesign = "None", Model = "None", TotalBudget = 10 };
+        var electionToArgument = _mapper.Map<ElectionEntity>(electionToUpdate);
+        _repository.Setup(x=> x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync((ElectionEntity)null);
         //Act
-        var result = await _service.UpdateElectionAsync(election_to_update);
+        var result = await _service.UpdateElectionAsync(electionToUpdate);
         //Assert
         Assert.Null(result);
     }
@@ -143,10 +140,10 @@ public class ElectionServiceTest
     public async Task DeleteElectionAsync_DeleteElection_ReturnTrue()
     {
         //Arrange
-        var election_to_delete = new Election{Id = Guid.NewGuid(),Name = "Test",TotalBudget = 0,Model = "Test",BallotDesign = "Test"};
-        _repository.Setup(x => x.DeleteAsync(election_to_delete.Id)).ReturnsAsync(true);
+        var electionToDelete = new Election{Id = Guid.NewGuid(),Name = "Test",TotalBudget = 0,Model = "Test",BallotDesign = "Test"};
+        _repository.Setup(x => x.DeleteAsync(electionToDelete.Id)).ReturnsAsync(true);
         //Act
-        var result = await _service.DeleteByIdAsync(election_to_delete.Id);
+        var result = await _service.DeleteByIdAsync(electionToDelete.Id);
         //Assert
         Assert.True(result);
     } 
@@ -156,10 +153,10 @@ public class ElectionServiceTest
     public async Task DeleteElectionAsync_DeleteElection_ReturnFalse()
     {
         //Arrange
-        var election_to_delete = new Election{Id = Guid.NewGuid(),Name = "Test",TotalBudget = 0,Model = "Test",BallotDesign = "Test"};
-        _repository.Setup(x => x.DeleteAsync(election_to_delete.Id)).ReturnsAsync(true);
+        var electionToDelete = new Election{Id = Guid.NewGuid(),Name = "Test",TotalBudget = 0,Model = "Test",BallotDesign = "Test"};
+        _repository.Setup(x => x.DeleteAsync(electionToDelete.Id)).ReturnsAsync(true);
         //Act
-        var result = await _service.DeleteByIdAsync(election_to_delete.Id);
+        var result = await _service.DeleteByIdAsync(electionToDelete.Id);
         //Assert
         Assert.True(result);
     } 

@@ -22,7 +22,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper) : IP
       return dto;
    }
 
-   public async Task<Project> GetProjectsWithId(Guid id)
+   public async Task<Project?> GetProjectByIdAsync(Guid id)
    {
       var result = await _repository.GetByIdAsync(id);
       var dto = _mapper.Map<Project>(result);
@@ -42,8 +42,8 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper) : IP
       await _repository.UpdateAsync(project);
    }
 
-   public async Task DeleteProjectAsync(Guid project_id)
+   public async Task DeleteProjectAsync(Guid projectId)
    {
-      await _repository.DeleteAsync(project_id);
+      await _repository.DeleteAsync(projectId);
    }
 }
