@@ -112,6 +112,7 @@ public class ElectionServiceTest
         var electionToReturn = _mapper.Map<ElectionEntity>(electionToUpdate);
         _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(electionToReturn);
         
+        _repository.Setup(x => x.UpdateAsync(It.IsAny<ElectionEntity>())).ReturnsAsync(election_to_return);
         //Act
         var result = await _service.UpdateElectionAsync(electionToUpdate);
         
