@@ -25,7 +25,7 @@
 </MudContainer>
 
 @code {
-    [Parameter] public string? JoinCode { get; set; }
+    [Parameter] public Guid? JoinCode { get; set; }
     private List<Project> _projects = [];
     [Inject] private IVotersApiService  _votersApiService { get; set; }
     [Inject] private IProjectsApiService _projectsApiService { get; set; }
@@ -35,7 +35,7 @@
     
     private async Task GetProjects()
     {
-        var voter = await _votersApiService.GetVoter(JoinCode?? "");
+        var voter = await _votersApiService.GetVoterById(JoinCode?? Guid.Empty);
         if (voter.ElectionId == Guid.Empty)
         {
             Console.WriteLine("NO VOTER WITH ID:"+ JoinCode);
@@ -56,7 +56,7 @@
     {
         //COLLECT VOTE LIST AND SUBMIT TO DB
         Console.WriteLine("JOINCODE"+JoinCode);
-        await _scoresApiService.UpdateScores(JoinCode?? "", _votes); 
+        await _scoresApiService.UpdateScores(JoinCode?? Guid.Empty, _votes); 
         Console.WriteLine("Submitted Votes");
     }
 

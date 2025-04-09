@@ -4,8 +4,8 @@ namespace Front.Services.Interface;
 
 public interface IVotersApiService
 {
-    Task<Voter?> GetVoter(string id);
+    Task<Voter> GetVoterById(Guid id);
     
-    Task<List<Voter>> GetVoters(string electionId);
-    Task CreateVoter(string electionId);
+    Task<List<Voter>> GetVotersByElectionId(Guid electionId);
+    Task<int> CreateVoter(Guid electionId);
 }

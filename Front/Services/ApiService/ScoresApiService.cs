@@ -1,35 +1,37 @@
 using DTO.Models;
 using Front.Services.Interface;
+using Front.Utilities.Errors;
 using Microsoft.VisualBasic;
 using Constants = Front.Utilities.Constants;
 
 namespace Front.Services.ApiService;
 
-public class ScoresApiService(IHttpClientFactory clientFactory) : IScoresApiService
+public class ScoresApiService(IHttpClientFactory clientFactory, ILogger<ScoresApiService> _logger) : IScoresApiService
 {
     
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
     private readonly string url = "api/scores";
     
-    public async Task UpdateScores(string voterId, Dictionary<string, int> votes)
+    public async Task<int> UpdateScores(Guid voterId, Dictionary<string, int> votes)
     {
-        Console.WriteLine("Updating scores (Frontend)");
-        Console.WriteLine("VoterId: " + voterId);
+        _logger.LogInformation("UpdateScores for voter: " +  voterId);
         try
         {
             var response = await _client.PostAsJsonAsync(url+ "/"+voterId , votes);
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Successfully updated scores (Frontend)");
+                return StatusCodes.Status200OK;
             }
             else
             {
-                Console.WriteLine("Failed to update scores (Frontend)");
+                var exception = new InternalServerErrorException("Internal server error - UpdateScores");
+                _logger.LogError(exception, "Internal server error - UpdateScores");
+                throw exception;
             } 
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while updating scores");
             throw;
         }
     }

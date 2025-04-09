@@ -1,34 +1,57 @@
 using DTO.Models;
 using Front.Services.Interface;
 using Front.Utilities;
+using Front.Utilities.Errors;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Front.Services.ApiService;
 
-public class PbEngineApiService(IHttpClientFactory clientFactory) : IPbEngineApiService
+public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngineApiService> _logger) : IPbEngineApiService
 {
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
     private readonly string url = "api/pbengine";
 
-    public async Task<List<Project>> CalculateElection(string electionId)
+    /// <summary>
+    /// Request the PbEngine to calculate the result of an election
+    /// </summary>
+    /// <param name="electionId">
+    /// The Id Of the election which result should be calculated for.
+    /// </param>
+    /// <returns>
+    /// List of projects, signifying which projects are chosen for the election.
+    /// </returns>
+    /// <exception cref="NotFoundError"></exception>
+    /// <exception cref="InternalServerErrorException"></exception>
+    public async Task<List<Project>> CalculateElection(Guid electionId)
     {
-        Console.WriteLine("Calculating election (Frontend)");
+        _logger.LogInformation("Calculating election with id: "+ electionId);
         try
         {
             var response = await _client.GetAsync(url+"/"+electionId);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<List<Project>>();
-                return result ?? new List<Project>();
+                if (result is not null)
+                {
+                    return result;
+                }
+                else
+                {
+                    var exception = new NotFoundError("Election with Id not found: " +  electionId);
+                    _logger.LogError(exception,"Election Id Not Found: "+electionId + " - CaclulateElection");
+                    throw exception;
+                }
             }
             else
             {
-                Console.WriteLine("Error in received Response Calculate Election (Frontend)");
-                return new List<Project>();
+                var exception = new InternalServerErrorException("Internal Server Error - Create Election");
+                _logger.LogError(exception,"Election Id Not Found: "+electionId);
+                throw exception;
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,"Error Calculating Election");
             throw;
         }
     }

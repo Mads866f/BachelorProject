@@ -4,5 +4,5 @@ namespace Front.Services.Interface;
 
 public interface IPbEngineApiService
 {
-    Task<List<Project>> CalculateElection(string electionId);
+    Task<List<Project>> CalculateElection(Guid electionId);
 }

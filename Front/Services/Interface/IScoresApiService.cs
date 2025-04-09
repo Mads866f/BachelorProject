@@ -1,8 +1,9 @@
 using DTO.Models;
+using MudBlazor;
 
 namespace Front.Services.Interface;
 
 public interface IScoresApiService
 {
-    Task UpdateScores(string voterId, Dictionary<string, int> votes);
+    Task<int> UpdateScores(Guid voterId, Dictionary<string, int> votes);
 }

@@ -127,7 +127,7 @@
 
     private async Task EndElection()
     {
-        var result = await PbEngineApiService.CalculateElection(_currentElection.Id.ToString());
+        var result = await PbEngineApiService.CalculateElection(_currentElection.Id);
         Console.WriteLine("RESULT FROM ELECTION!");
         foreach (var proj in result)
         {
@@ -138,13 +138,13 @@
 
     private async Task AddVoter()
     {
-        await VotersApiService.CreateVoter(_currentElection.Id.ToString());
+        await VotersApiService.CreateVoter(_currentElection.Id);
         await LoadVoters();
     }
 
     private async Task LoadVoters()
     {
-        _voters = await VotersApiService.GetVoters(_currentElection.Id.ToString());
+        _voters = await VotersApiService.GetVotersByElectionId(_currentElection.Id);
         StateHasChanged();
     }
     

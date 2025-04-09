@@ -67,13 +67,14 @@
 
     private async Task<bool> ValidateJoinId(string joinId)
     {
-        if (!Guid.TryParse(joinId, out _))
+        Guid parsedJoinId;
+        if (!Guid.TryParse(joinId, out parsedJoinId))
         {
             Snackbar.Add($"Invalid format: '{joinId}' is not a valid Join code format.", Severity.Error);
             return false;
         }
 
-        var voter = await VotersApiService.GetVoter(joinId);
+        var voter = await VotersApiService.GetVoterById(parsedJoinId);
     
         if (voter is null)
         {
