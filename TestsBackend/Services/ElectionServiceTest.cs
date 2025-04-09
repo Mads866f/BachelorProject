@@ -5,6 +5,7 @@ using Backend.Services.DataServices;
 using Backend.Services.Interfaces;
 using Backend.Utilities.Mappings;
 using DTO.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace TestsBackend.Services;

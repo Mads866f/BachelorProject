@@ -1,15 +1,16 @@
 using DTO.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Front.Services.Interface.Elections;
 
 public interface IProjectsApiService
 {
-    Task<List<Project>> GetProjectsWithElectionId(string id);
+    Task<List<Project>> GetProjectsWithElectionId(Guid id);
     
-    Task CreateProject(CreateProjectModel projectToCreate);
+    Task<int> CreateProject(CreateProjectModel projectToCreate);
     
-    Task UpdateProject(Project projectToUpdate);
+    Task<int> UpdateProject(Project projectToUpdate);
     
-    Task DeleteProject(Project projectToDelete);
+    Task<int> DeleteProject(Project projectToDelete);
     
 }

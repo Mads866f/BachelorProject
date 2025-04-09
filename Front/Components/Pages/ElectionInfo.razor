@@ -94,7 +94,7 @@
 
     private async Task LoadProjects()
     {
-        _projects = await ProjectsApiService.GetProjectsWithElectionId(_currentElection.Id.ToString());
+        _projects = await ProjectsApiService.GetProjectsWithElectionId(_currentElection.Id);
     }
 
 
