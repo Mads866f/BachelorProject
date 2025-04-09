@@ -1,40 +1,59 @@
 using DTO.Models;
 using Front.Services.Elections;
 using Front.Utilities;
+using Front.Utilities.Errors;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Front.Services.ApiService.Elections;
 
-public class ElectionsApiService (IHttpClientFactory clientFactory) : IElectionsApiService
+public class ElectionsApiService (IHttpClientFactory clientFactory, ILogger<ElectionsApiService> _logger) : IElectionsApiService
 {
    
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
     private readonly string url = "api/Election";
     
-    
+   /// <summary>
+   ///  Requests to create a new election within the database
+   /// </summary>
+   /// <param name="election">
+   /// The Election To be created
+   /// </param>
+   /// <returns>
+   /// Returns the Election if it is created
+   /// </returns>
+   /// <exception cref="CreationException"></exception>
+   /// <exception cref="InternalServerErrorException"></exception>>
     public async Task<Election> CreateElection(Election election)
     {
-        Console.Write("Election create Called with election: " + election.Name);
+        _logger.LogInformation("Creating Election with id: {id}",election.Id); 
         try
         {
-            election.Id = Guid.NewGuid();
+            election.Id = Guid.NewGuid();//TODO CHECK IF THIS IS NEEDED
             var response = await _client.PostAsJsonAsync( url, election);
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine(("Got Response From Backend"));
-                return await response.Content.ReadFromJsonAsync<Election>() ?? new Election
+                var result = await response.Content.ReadFromJsonAsync<Election>();
+                if (result is not null)
                 {
-                    Name = "",
-                    TotalBudget = 0,
-                    Model = "",
-                    BallotDesign = ""
-                };
+                    return result;
+                }
+                else
+                {
+                    var exception = new CreationException("Failed to create Election");
+                    _logger.LogError(exception, "Create Exception");
+                    throw exception;
+                }
             }
-            
-            return election;
+
+            else
+            {
+                _logger.LogError("Failed to create Election - Internal Server Error");
+                throw new InternalServerErrorException("Internal server error - Create Election");
+            }
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error Adding Instance \n"+e);
+            _logger.LogError(e, "Failed to create Election");
             throw;
         } 
         
@@ -42,63 +61,68 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
     }
 
 
-
-    public async Task<List<Election>> GetElections()
+/// <summary>
+///  Requests all elections from the database through backend
+/// </summary>
+/// <returns>
+/// A List of the elections.
+/// </returns>
+/// <exception cref="InternalServerErrorException"></exception>
+    public async Task<List<Election>> GetElections() 
     {
-        Console.WriteLine("Get Elections Method Called");
+        _logger.LogInformation("Getting Elections");
         try
         {
 
             var response = await _client.GetAsync(url);
+            Console.WriteLine(("Got Response From Backend" +  response.StatusCode));
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Got Response From Backend");
                 var elections = await response.Content.ReadFromJsonAsync<List<Election>>();
                 return elections ?? new List<Election>();
             }
             else
             {
-                Console.WriteLine("Error in received response");
-                return new List<Election>();
+                _logger.LogError("Error getting Elections - Internal Server Error");
+                throw new InternalServerErrorException("Error getting Elections from client");
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("Got Some kind of error from getElections:");
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error getting Elections");
             throw;
         }
     }
-
-    public async Task<Election> GetElection(string id)
+/// <summary>
+///  Requests a specific election based on the Id from the database
+/// </summary>
+/// <param name="id">
+///The Guid that represents the id of the election
+/// </param>
+/// <returns>
+/// An Election if found, otherwise null
+/// </returns>
+/// <exception cref="InternalServerErrorException"></exception>
+    public async Task<Election?> GetElection(Guid id)
     {
+        _logger.LogInformation("Getting Election Called with id: " + id);
         try
         {
             var response = await _client.GetAsync(url+"/"+id);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Election>();
-                return result ?? new Election
-                {
-                    Name = "asdas",
-                    TotalBudget = 0,
-                    Model = "",
-                    BallotDesign = ""
-                };
+                return result ?? throw new NotFoundError(($"Election Not Found With Id: " + id));
             }
-
-            return new Election
+            else
             {
-                Id = Guid.Empty,
-                Name = "nasda",
-                TotalBudget = 0,
-                Model = "null",
-                BallotDesign = "null"
-            };
+                _logger.LogError("Error getting Election - Internal Server Error - Internal Server Error");
+                throw new InternalServerErrorException(("Error getting Election with id: " + id));
+            }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error getting Election");
             throw;
         } 
     }
@@ -109,7 +133,7 @@ public class ElectionsApiService (IHttpClientFactory clientFactory) : IElections
         throw new NotImplementedException();
     }
 
-    public Task DeleteElection(string id)
+    public Task DeleteElection(Guid id)
     {
         throw new NotImplementedException();
     }

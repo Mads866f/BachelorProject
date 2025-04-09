@@ -6,12 +6,12 @@ public interface IElectionsApiService
 {
    Task<List<Election>> GetElections();
    
-   Task<Election> GetElection(string id);
+   Task<Election?> GetElection(Guid id);
    
    Task<Election> CreateElection(Election election);
    
    Task<Election> UpdateElection(Election election);
    
-   Task DeleteElection(string id);
+   Task DeleteElection(Guid id);
    
 }

@@ -117,7 +117,7 @@
         else
         {
             Console.WriteLine("Getting election");
-            var election = await ElectionsApiService.GetElection(_currentElection.Id.ToString());
+            var election = await ElectionsApiService.GetElection(_currentElection.Id);
             Console.WriteLine(election.ToString());
             _currentElection = election;
         }
