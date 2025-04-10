@@ -2,6 +2,7 @@ using Backend.Database;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
 using Dapper;
+using DTO.Models;
 
 namespace Backend.Repositories;
 
@@ -58,5 +59,40 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
             projects.Add(p);
         }
         return projects;
+    }
+/// <summary>
+///  Method for adding results of an Election to the database
+/// </summary>
+/// <param name="result">
+///  The Election result to be created
+/// </param>
+/// <returns>
+/// The ElectionResult as Created within the database
+/// </returns>
+    public async Task<ElectionResult> AddElectionResult(ElectionResult result)
+    {
+        _logger.LogInformation("Adding Election Result to database with Id: "+ result.ElectionId);
+        
+        //Add the result
+        using var db = await dbFactory.CreateConnectionAsync();
+        var query = """
+                    INSERT INTO result_table (election_id, method_used, ballot_used)
+                    VALUES (@ElectionId, @UsedMethod, @UsedBallot)
+                    RETURNING id
+                    """;
+        var resultId = await db.QuerySingleAsync<Guid>(query,result);
+        result.ElectionId = resultId;
+       
+        // Add the projects
+        foreach (var project in result.ElectedProjects)
+        {
+            using var db2 =  await dbFactory.CreateConnectionAsync();
+            const string query2 = """
+                               INSERT INTO elected_projects_table(result_id, project_id) 
+                               VALUES (@id, @project_id)
+                               """;
+            await db.QueryAsync(query2, new { id = result.ElectionId, project_id = project.Id });
+        }
+        return result;
     }
 }

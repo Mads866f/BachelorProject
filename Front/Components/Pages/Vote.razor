@@ -25,17 +25,17 @@
 </MudContainer>
 
 @code {
-    [Parameter] public Guid? JoinCode { get; set; }
-    private List<Project> _projects = [];
+    [Parameter] public string? JoinCode { get; set; }
     [Inject] private IVotersApiService  _votersApiService { get; set; }
     [Inject] private IProjectsApiService _projectsApiService { get; set; }
     [Inject] private IScoresApiService _scoresApiService { get; set; }
-
+    
+    private List<Project> _projects = [];
     private Dictionary<string, int> _votes = new Dictionary<string, int>();
     
     private async Task GetProjects()
     {
-        var voter = await _votersApiService.GetVoterById(JoinCode?? Guid.Empty);
+        var voter = await _votersApiService.GetVoterById(Guid.Parse(JoinCode));
         if (voter.ElectionId == Guid.Empty)
         {
             Console.WriteLine("NO VOTER WITH ID:"+ JoinCode);
@@ -56,7 +56,7 @@
     {
         //COLLECT VOTE LIST AND SUBMIT TO DB
         Console.WriteLine("JOINCODE"+JoinCode);
-        await _scoresApiService.UpdateScores(JoinCode?? Guid.Empty, _votes); 
+        await _scoresApiService.UpdateScores(Guid.Parse(JoinCode), _votes); 
         Console.WriteLine("Submitted Votes");
     }
 

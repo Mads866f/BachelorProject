@@ -48,6 +48,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IScoresService, ScoresService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
         builder.Services.AddScoped<IPbEngineService, PbEngineService>();
+        builder.Services.AddScoped<ElectionResultService>(); //TODO ADD INTERFACE
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
@@ -56,6 +57,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IVotersRepository, VotersRepository>();
         builder.Services.AddScoped<IScoresRepository, ScoresRepository>();
         builder.Services.AddScoped<IProjectsRepository, ProjectRepository>();
+        builder.Services.AddScoped<IElectionResultRepository, ElectionResultRepository>();
 
     }
 

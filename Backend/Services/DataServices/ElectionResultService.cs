@@ -27,4 +27,12 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
         }
         return result;
     }
+
+
+    public async Task<ElectionResult> AddElectionResult(ElectionResult result)
+    {
+        _logger.LogInformation("Adding new election result with ElectionId: " + result.ElectionId);
+        var resultFromDb = await repository.AddElectionResult(result);
+        return resultFromDb;
+    } 
 }

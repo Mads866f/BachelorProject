@@ -52,7 +52,7 @@ public class ScoresService : IScoresService
     {
         var voterExists = await _votersRepository.GetByIdAsync(voterModel.Voter_Id) is null;
         var projectExists = await _projectsRepository.GetByIdAsync(voterModel.Project_Id) is null;
-        if (!voterExists || !projectExists)
+        if (voterExists || projectExists)
         {
             return null;
         }
