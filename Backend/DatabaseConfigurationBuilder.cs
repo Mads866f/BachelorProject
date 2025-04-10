@@ -71,6 +71,20 @@ public static class DatabaseConfigurationBuilder
                 project_id UUID REFERENCES projects_table(id),
                 target_id UUID REFERENCES targets_table(id)
             )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS result_table(
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                election_id UUID REFERENCES elections_table(id),
+                method_used TEXT NOT NULL,
+                ballot_used TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS elected_projects_table(
+                result_id UUID REFERENCES result_table(id),
+                project_id UUID REFERENCES projects_table(id)
+            )
             """
         };
         // Add the table's to the database
