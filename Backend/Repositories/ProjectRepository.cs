@@ -8,11 +8,11 @@ using DTO.Models;
 
 namespace Backend.Repositories;
 
-public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsRepository
+public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRepository> _logger) : IProjectsRepository
 {
    public async Task<IEnumerable<ProjectsEntity>> GetByElectionID(Guid electionID)
    {
-      Console.WriteLine("Getting Projects - Backend(Database)");
+      _logger.LogInformation("Getting projects from database for election with id: " + electionID);
       using var db = await dbFactory.CreateConnectionAsync();
 
       var query = await db.QueryAsync<ProjectsEntity>(
@@ -22,8 +22,6 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
             WHERE p.election_id = @idAsGuid
             """,
             new {idAsGuid = electionID});
-      
-      Console.WriteLine("PROJECTS PULLED FROM DB:"+query);
       
       return query;
    }
@@ -82,7 +80,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
 
    public async Task<ProjectsEntity?> GetByIdAsync(Guid projectId)
    {
-     Console.Write("Getting Projects - Backend(Database)");
+      _logger.LogInformation("Getting Project with projectId: "+projectId);
      using var db = await dbFactory.CreateConnectionAsync();
      const string query = """
                           SELECT id as ID , election_id as ElectionId, name as Name, cost as Cost

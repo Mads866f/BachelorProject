@@ -1,5 +1,7 @@
 using Backend.Models;
+using Backend.Repositories.Interfaces;
 using Backend.Services.ApiServices.PbEngine;
+using Backend.Services.DataServices;
 using Backend.Services.Interfaces;
 using Backend.Services.Interfaces.PbEngine;
 using DTO.Models;
@@ -12,7 +14,9 @@ namespace Backend.Controllers;
 public class PbEngineController(IElectionService _electionService,
     IProjectService _projectService,
     IVotersService _votersService,
-    IPbEngineService _service)
+    IPbEngineService _service,
+    ElectionResultService _resultService
+    )
 {
 
     [HttpGet("{id}")]
@@ -60,7 +64,11 @@ public class PbEngineController(IElectionService _electionService,
                 };
                 return new_p;
             }).ToList();
-            
+        
+        var electionResult = new ElectionResult()
+            {ElectionId = id, ElectedProjects = result_PythonProjects_project, UsedBallot = ballotDesign.ToString(), UsedMethod = method.ToString(),  SubmittedProjects = projects.ToList()};
+        await _resultService.AddElectionResult(electionResult); 
+       
         return result_PythonProjects_project;
     }
 }
