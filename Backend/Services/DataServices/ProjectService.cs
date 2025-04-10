@@ -12,10 +12,11 @@ namespace Backend.Services.DataServices;
 /// Provides operations for managing projects, including creation, retrieval, update, and deletion.
 /// Uses AutoMapper for DTO/entity conversions and delegates data access to the repository layer.
 /// </summary>
-public class ProjectService(IProjectsRepository repository, IMapper mapper) : IProjectService
+public class ProjectService(IProjectsRepository repository, IMapper mapper, ILogger<IProjectService> logger) : IProjectService
 {
     private readonly IProjectsRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger<IProjectService> _logger = logger;
 
     /// <summary>
     /// Retrieves all projects associated with a given election ID.

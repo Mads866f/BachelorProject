@@ -15,14 +15,15 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
       Console.WriteLine("Getting Projects - Backend(Database)");
       using var db = await dbFactory.CreateConnectionAsync();
 
-      var query = await db.QueryAsync<ProjectsEntity>(new StringBuilder().Append(""" 
-                                                           SELECT id as Id, name as Name, election_id as ElectionId, cost as Cost 
-                                                           FROM projects_table as p 
-                                                           WHERE p.election_id = @idAsGuid
-                                                           """)
-         .ToString(),new {idAsGuid = electionID});
+      var query = await db.QueryAsync<ProjectsEntity>(
+            """ 
+            SELECT id as Id, name as Name, election_id as ElectionId, cost as Cost 
+            FROM projects_table as p 
+            WHERE p.election_id = @idAsGuid
+            """,
+            new {idAsGuid = electionID});
       
-      Console.WriteLine("PROJECTS PULLED FROM DB:"+query.ToString());
+      Console.WriteLine("PROJECTS PULLED FROM DB:"+query);
       
       return query;
    }
@@ -63,14 +64,14 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
      return await GetByElectionID(project.ElectionId);
    }
 
-   public async Task<bool> DeleteAsync(Guid project_id)
+   public async Task<bool> DeleteAsync(Guid projectId)
    {
       Console.WriteLine("Deleting Projects - Backend(Database)");
       using var db = await dbFactory.CreateConnectionAsync();
       var query = await db.ExecuteAsync("""
                                         DELETE FROM projects_table
                                         WHERE id = @project_id
-                                        """,new {project_id = project_id});
+                                        """,new {project_id = projectId});
       if (query != 0)
       {
          Console.WriteLine("Nothing was deleted");
