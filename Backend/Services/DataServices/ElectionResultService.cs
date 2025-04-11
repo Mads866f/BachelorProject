@@ -15,6 +15,7 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
         foreach (var electionResult in ElectionResults)
         {
            var electionres = new ElectionResult();
+           electionres.Id = electionResult.Id;
            electionres.ElectionId = electionResult.ElectionId;
            electionres.UsedBallot = electionResult.BallotUsed;
            electionres.UsedMethod = electionres.UsedMethod;
