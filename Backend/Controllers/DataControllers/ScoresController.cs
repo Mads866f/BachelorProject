@@ -58,7 +58,7 @@ public class ScoresController(IScoresService service, ILogger<ScoresController> 
                 var score = new Scores()
                     { Grade = scores[project], Voter_Id = voterId, Project_Id = Guid.ParseExact(project, "D") };
                 var created = await _service.CreateVotersAsync(score);
-                var createdSuccess = true;//created is not null;
+                var createdSuccess = created is not null;//created is not null;
                 if (!createdSuccess)
                 {
                     //Creation were unsuccessful
