@@ -20,42 +20,6 @@ public class ElectionResultsApiService(
             " for election with ID: {electionId}", electionId);
         try
         {
-            //TODO DUMMY RESPONSE
-            var dummyElectionId = Guid.NewGuid();
-            return
-            [
-                new ElectionResult()
-                {
-                    Id = Guid.NewGuid(),
-                    ElectionId = dummyElectionId,
-                    SubmittedProjects = [
-                    new Project
-                    {
-                        ElectionId = dummyElectionId,
-                        Name = "Project 1",
-                        Cost = 100
-                    },
-                    new Project
-                    {
-                        ElectionId = dummyElectionId,
-                        Name = "Project 2",
-                        Cost = 200
-                    }
-                    ],
-                    ElectedProjects = [
-                    new Project
-                    {
-                        ElectionId = dummyElectionId,
-                        Name = "Project 1",
-                        Cost = 100
-                    }
-                    ],
-                    UsedBallot = "",
-                    UsedMethod = ""
-                }
-            ];
-            // TODO end of dummy
-            
             var response = await _client.GetAsync(Url + electionId);
             if (!response.IsSuccessStatusCode) return null;
             var result = await response.Content.ReadFromJsonAsync<List<ElectionResult>>();

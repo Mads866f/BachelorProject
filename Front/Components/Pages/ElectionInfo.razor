@@ -128,12 +128,11 @@
     private async Task EndElection()
     {
         var result = await PbEngineApiService.CalculateElection(_currentElection.Id);
-        Console.WriteLine("RESULT FROM ELECTION!");
         foreach (var proj in result)
         {
             Console.WriteLine(proj.Name);
         }
-        Console.WriteLine("____________");
+        NavigationManager.NavigateTo("/electionResult/"+ _currentElection.Id);
     }
 
     private async Task AddVoter()
