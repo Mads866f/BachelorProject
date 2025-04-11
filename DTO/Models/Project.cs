@@ -6,6 +6,6 @@ public class Project
     public required Guid ElectionId { get; set; }
     public required  string Name { get; set; }
     public required  int Cost { get; set; }
-    public List<Category>? categories { get; set; }
-    public List<Target>? targets { get; set; }
+    public List<Category>? Categories { get; set; }
+    public List<Target>? Targets { get; set; }
 }

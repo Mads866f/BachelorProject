@@ -1,0 +1,61 @@
+@page "/electionResult/{ElectionId?}"
+@using Front.Services.Interface
+@using DTO.Models
+@using Front.Services.Elections
+@using Front.Components.ElectionInfo
+
+<PageTitle>Election Results</PageTitle>
+
+@if (_currentElection is null) return;
+
+<CascadingValue Value="_currentElection">
+    <MudGrid>
+        <!-- Election Info - Left side-->
+        <ElectionInfoPanel/>
+        <!--Elected Project List View - Bottom -->
+        <MudItem>
+            <div>Elected Projects</div>
+        </MudItem>
+        <ProjectListView
+            Projects="_currentElectionResult.ElectedProjects"/>
+        <!--Submitted Project List View - Bottom -->
+        <MudItem>
+            <div>All submitted projects</div>
+        </MudItem>
+        <ProjectListView
+            Projects="_currentElectionResult.SubmittedProjects"/>
+    </MudGrid>
+</CascadingValue>
+
+@code {
+
+    [Inject] public required IElectionResultsApiService ResultsApiService { get; set; }
+    [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
+
+    [Parameter] public string? ElectionId { get; set; }
+
+    private Election _currentElection { get; set; }
+    private ElectionResult _currentElectionResult { get; set; }
+
+    private List<ElectionResult> _electionResults = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ElectionId is not null)
+        {
+            var election = await ElectionsApiService.GetElection(Guid.Parse(ElectionId));
+            if (election is not null)
+            {
+                _currentElection = election;
+            }
+
+            _electionResults = await ResultsApiService.GetResultsByElectionId(_currentElection.Id) ?? [];
+            if (_electionResults.Any())
+            {
+                // TODO change how this works maby
+                _currentElectionResult = _electionResults.First();
+            }
+        }
+    }
+
+}

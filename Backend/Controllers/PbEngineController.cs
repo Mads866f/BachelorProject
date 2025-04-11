@@ -28,8 +28,8 @@ public class PbEngineController(IElectionService _electionService,
         
         var pythonProjects = projects.Select(p => 
             new PythonProject(p.Id.ToString(),p.Cost,
-                p.categories is not null? p.categories.Select(c => c.Name).ToList():new List<string>(),
-                p.targets is not null? p.targets.Select(t => t.Name).ToList():new List<string>())).ToList();
+                p.Categories is not null? p.Categories.Select(c => c.Name).ToList():new List<string>(),
+                p.Targets is not null? p.Targets.Select(t => t.Name).ToList():new List<string>())).ToList();
 
         var pythonVoters = voters.Select(vot => new PythonVoter()
         {

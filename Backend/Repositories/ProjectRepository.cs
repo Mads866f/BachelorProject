@@ -43,8 +43,8 @@ public class ProjectRepository(IDbConnectionFactory dbFactory) : IProjectsReposi
          ElectionId = project.ElectionId,
          Name = project.Name,
          Cost = project.Cost,
-         categories = [],
-         targets = []
+         Categories = [],
+         Targets = []
       };
       Console.WriteLine(toReturn.Name);
       return toReturn;

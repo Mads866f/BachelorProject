@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Front.Services.ApiService.Elections;
 
-public class ElectionsApiService (IHttpClientFactory clientFactory, ILogger<ElectionsApiService> _logger) : IElectionsApiService
+public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<ElectionsApiService> _logger) : IElectionsApiService
 {
    
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
