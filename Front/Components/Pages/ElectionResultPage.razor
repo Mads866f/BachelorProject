@@ -6,56 +6,75 @@
 
 <PageTitle>Election Results</PageTitle>
 
-@if (_currentElection is null) return;
+@if (_isLoading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_hasError)
+{
+    <MudAlert Severity="Severity.Error">Invalid or missing election ID.</MudAlert>
+}
+else if (_currentElectionResult is not null)
+{
+    <CascadingValue Value="_currentElection">
+        <MudGrid>
+            <!-- Election Info - Left side -->
+            <ElectionInfoPanel/>
 
-<CascadingValue Value="_currentElection">
-    <MudGrid>
-        <!-- Election Info - Left side-->
-        <ElectionInfoPanel/>
-        <!--Elected Project List View - Bottom -->
-        <MudItem>
-            <div>Elected Projects</div>
-        </MudItem>
-        <ProjectListView
-            Projects="_currentElectionResult.ElectedProjects"/>
-        <!--Submitted Project List View - Bottom -->
-        <MudItem>
-            <div>All submitted projects</div>
-        </MudItem>
-        <ProjectListView
-            Projects="_currentElectionResult.SubmittedProjects"/>
-    </MudGrid>
-</CascadingValue>
+            <!-- Elected Project List View -->
+            <MudItem>
+                <div>Elected Projects</div>
+            </MudItem>
+            <ProjectListView Projects="_currentElectionResult.ElectedProjects" />
+
+            <!-- Submitted Project List View -->
+            <MudItem>
+                <div>All submitted projects</div>
+            </MudItem>
+            <ProjectListView Projects="_currentElectionResult.SubmittedProjects" />
+        </MudGrid>
+    </CascadingValue>
+}
+else
+{
+    <MudAlert Severity="Severity.Info">No results available for this election.</MudAlert>
+}
 
 @code {
-
     [Inject] public required IElectionResultsApiService ResultsApiService { get; set; }
     [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
 
     [Parameter] public string? ElectionId { get; set; }
 
-    private Election _currentElection { get; set; }
-    private ElectionResult _currentElectionResult { get; set; }
+    private Election? _currentElection;
+    private ElectionResult? _currentElectionResult;
+    private List<ElectionResult> _electionResults = [];
 
-    private List<ElectionResult> _electionResults = null!;
+    private bool _isLoading = true;
+    private bool _hasError = false;
 
     protected override async Task OnInitializedAsync()
     {
-        if (ElectionId is not null)
+        if (string.IsNullOrWhiteSpace(ElectionId) || !Guid.TryParse(ElectionId, out var electionGuid))
         {
-            var election = await ElectionsApiService.GetElection(Guid.Parse(ElectionId));
-            if (election is not null)
-            {
-                _currentElection = election;
-            }
-
-            _electionResults = await ResultsApiService.GetResultsByElectionId(_currentElection.Id) ?? [];
-            if (_electionResults.Any())
-            {
-                // TODO change how this works maby
-                _currentElectionResult = _electionResults.First();
-            }
+            _hasError = true;
+            _isLoading = false;
+            return;
         }
-    }
 
+        var election = await ElectionsApiService.GetElection(electionGuid);
+        if (election is null)
+        {
+            _hasError = true;
+            _isLoading = false;
+            return;
+        }
+
+        _currentElection = election;
+
+        _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
+        _currentElectionResult = _electionResults.FirstOrDefault();
+
+        _isLoading = false;
+    }
 }

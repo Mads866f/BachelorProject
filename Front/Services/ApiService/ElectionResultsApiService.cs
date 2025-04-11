@@ -10,7 +10,7 @@ public class ElectionResultsApiService(
     ) : IElectionResultsApiService
 {
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
-    private const string Url = "api/ElectionResultController/";
+    private const string Url = "api/ElectionResult/";
 
     /// <inheritdoc/>"/>
     public async Task<List<ElectionResult>?> GetResultsByElectionId(Guid electionId)
