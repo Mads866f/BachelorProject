@@ -49,7 +49,7 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
                     Where ep.result_id = @resultId
                     """;
         var projectIds = await db.QueryAsync<Guid>(query, new { resultId = resultId });
-       
+         
         //Query for getting Projects
         var projects = new List<ProjectsEntity>();
         foreach (var projectId in projectIds)

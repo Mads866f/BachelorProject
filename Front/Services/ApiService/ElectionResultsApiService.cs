@@ -23,6 +23,8 @@ public class ElectionResultsApiService(
             var response = await _client.GetAsync(Url + electionId);
             if (!response.IsSuccessStatusCode) return null;
             var result = await response.Content.ReadFromJsonAsync<List<ElectionResult>>();
+            logger.LogInformation("Got "+result.Count+" election results");
+            logger.LogInformation(result.First().ToString());
             return result;
         }
         catch (Exception e)

@@ -18,4 +18,8 @@ public class ElectionResult
     public string UsedMethod { get; set; } = "";
     public string UsedBallot { get; set; } = "";
 
+    public override string ToString()
+    {
+        return $"Id:{Id}\n ElectionId: {ElectionId}\n SubmittedProjects: {SubmittedProjects.Count}\n ElectedProjects: {ElectedProjects.Count} \n UsedMethod: {UsedMethod}\n UsedBallot: {UsedBallot}";
+    }
 }
