@@ -13,7 +13,7 @@ class Project(BaseModel):
 
 class Voter(BaseModel):
     selectedProjects: list[str]
-    selectedDegree: list[int]
+    selectedDegree: list[float]
 
 class Election(BaseModel):
     totalBudget: int

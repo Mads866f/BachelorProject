@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import pabutools_functions as pb
 import pabutools.election as pbelec
 from Models import Election, Voter, Project
+from pathlib import Path
 
 app = FastAPI()
 
@@ -65,3 +66,9 @@ async def root(election:Election,options:list[int]):
 
     return
 
+@app.get("/realElections")
+async def root(file_name:str):
+    filepath = Path(__file__).resolve().parent.parent /"real-elections"/str(file_name)
+    instance  = pb.real_election_converter(filepath)
+    return instance
+    

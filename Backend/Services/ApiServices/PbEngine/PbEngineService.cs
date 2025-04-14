@@ -47,4 +47,19 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
             throw;
         }
     }
+
+    public async Task<string> convert_real_election(string filepath)
+    {
+        var url = "realElections/"+filepath;
+        try
+        {
+            var response = await _httpsClient.GetAsync(url);
+            return response.Content.ReadAsStringAsync().Result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

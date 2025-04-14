@@ -207,3 +207,84 @@ def calculate_analyze_instance_ballot(election:Election,option:int):
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #FIX SO BALLOT TYPE IS NOT HARDCODED
     analysis_to_perform = determine_instance_ballot_analysis(option)
     return float(analysis_to_perform(voter_instance,profile))
+
+def convert_profile_mpq_to_float(profile: pbelec.Profile):
+
+    voters = []
+    for voter in profile:
+        project_ids = voter.keys()
+        project_degree = [float(voter[k]) for k in project_ids]
+        selectedProjects = [str(k) for k in project_ids]
+        voter_model = Voter(selectedProjects=selectedProjects,selectedDegree=project_degree)
+        voters.append(voter_model)
+    return voters
+
+def get_projects_from_real_instance(instance: pbelec.Instance):
+    project_list = []
+    for p_id in instance.project_meta.keys():
+        project = instance.project_meta[p_id]
+        name =project["name"] if "name" in project else str(p_id)
+        new_project = Project(name = name, cost = float(project["cost"]),categories= [], target = [])
+        project_list.append(new_project)
+    return project_list
+
+def id_to_names_dictonary(instance):
+    ids_to_names = {}
+    for k in instance.project_meta.keys():
+        id = instance.project_meta[k]["project_id"]
+        name = instance.project_meta[k]["name"] if "name" in instance.project_meta[k] else str(id)
+        ids_to_names[id] = name
+    return ids_to_names
+
+def voterlist_approval(instance,profile):
+    ids_to_names = id_to_names_dictonary(instance)
+    voters = []
+    for ballot in profile:
+        names = [ids_to_names.get(b) for b in ballot]
+        degree = [1 for _ in ballot]
+        voter_model = Voter(selectedProjects=names,selectedDegree=degree)
+        voters.append(voter_model)
+    return voters
+
+def voterlist_cummulative(instance,profile):
+    ids_to_names = id_to_names_dictonary(instance)
+    voters = convert_profile_mpq_to_float(profile)
+    for voter in voters:
+        ids = voter.selectedProjects
+        names = [
+            ids_to_names.get(k) for k in ids       
+        ]
+        voter.selectedProjects = names
+    return voters
+
+def voterlist_ordinal(instance,profile):
+    ids_to_names = id_to_names_dictonary(instance)
+    voters = []
+    for ballot in profile:
+        names = [ids_to_names.get(b) for b in ballot]
+        degree = [i+1 for i in range(0,len(names))]
+        voter_model = Voter(selectedProjects=names,selectedDegree=degree)
+        voters.append(voter_model)
+    return voters
+
+def voterlist_from_real_instance(instance,profile):
+    vote_type = instance.meta["vote_type"]
+    voters = []
+    if(vote_type in ["choose-1","approval"]):
+        voters = voterlist_approval(instance,profile)
+
+    if(vote_type == "cumulative"):
+        voters = voterlist_cummulative(instance,profile)
+
+    if(vote_type == "ordinal"):
+        voters = voterlist_ordinal(instance,profile)
+
+    return voters
+
+
+def real_election_converter(filepath:str):
+    instance, profile = pbelec.parse_pabulib(filepath)
+    projects = get_projects_from_real_instance(instance)
+    voters = voterlist_from_real_instance(instance,profile)
+    election = Election(totalBudget=int(instance.budget_limit),projects=projects, votes = voters)
+    return election

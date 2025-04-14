@@ -71,4 +71,28 @@ public class PbEngineController(IElectionService _electionService,
        
         return result_PythonProjects_project;
     }
+
+    /// <summary>
+    ///  Simple method for getting list of files of elections within "real-elections" folder
+    /// </summary>
+    /// <returns>
+    /// List of file paths as strings
+    /// </returns>
+    [HttpGet("/realElections")]
+    public List<string> GetRealElections()
+    {
+        var folder = "../real-elections";
+        string[] files = Directory.GetFiles(folder);
+        Console.WriteLine(files[0]);
+        return files.ToList();
+    }
+
+    [HttpGet("/realElections/{filepath}")]
+    public async Task<(Election, List<Voter>)> GetRealElections(string filepath)
+    {
+        var result = await _service.convert_real_election(filepath);
+        Console.WriteLine(result);
+
+        return (null,null);
+    }
 }
