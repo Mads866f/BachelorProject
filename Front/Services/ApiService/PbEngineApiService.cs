@@ -55,4 +55,58 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
             throw;
         }
     }
+
+    public async Task<List<string>> GetRealElectionsNames()
+    {
+        _logger.LogInformation("Getting real elections names");
+        try
+        {
+            Console.WriteLine(url+"/realElections");
+            var response = await _client.GetAsync("/realElections");
+            Console.WriteLine("RESPONSE: " + response);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<List<string>>();
+                Console.WriteLine(result);
+                return result ?? new List<string>();
+            }  
+            else
+            {
+                var exception = new InternalServerErrorException("Internal Server Error - Getting real elections names");
+                _logger.LogError(exception,exception.Message);
+                throw exception;
+            } 
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"Error Retrieving Real Elections");
+            throw;
+        }
+    }
+
+    public async Task<Election> DownloadRealElection(string nameOfElection)
+    {
+        _logger.LogInformation("Downloading real election " + nameOfElection);
+        try
+        {
+           var response = await _client.GetAsync("/realElections/"+nameOfElection);
+           if (response.IsSuccessStatusCode)
+           {
+               var result = await response.Content.ReadFromJsonAsync<Election>();
+               return result;
+           }
+           else
+           {
+               var exception = new InternalServerErrorException("Internal Server Error - Downloading real election");
+               _logger.LogError(exception,exception.Message);
+               throw exception;
+           } 
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"Error Calculating Election");
+            throw;
+        }
+           
+    }
 }

@@ -1,6 +1,6 @@
 @using DTO.Models
 <MudItem xs="4">
-    <MudStack>
+    <MudStack Style ="max-height: 500px; overflow-y: auto">
         @foreach (var voter in Voters)
         {
             <SingleVoterView

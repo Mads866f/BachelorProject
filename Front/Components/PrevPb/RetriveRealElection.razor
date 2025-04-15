@@ -1,0 +1,33 @@
+@rendermode InteractiveServer
+@if (elections is not null)
+{
+    <MudGrid>
+        <MudItem xs = "9">
+            <MudAutocomplete T = "string" @bind-Value="selectedElection" Label="Download a real election" SearchFunc="Search">
+            </MudAutocomplete>
+        </MudItem>
+        <MudItem xs="3">
+            <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" OnClick="() => retrieveFunction.InvokeAsync(selectedElection)">Download Election</MudButton>
+        </MudItem>
+    </MudGrid>}
+else
+{
+    <div>Loading Real Elections ...</div>
+}
+@code {
+    [CascadingParameter] public required List<string> elections { get; set; }
+    [Parameter] public required EventCallback<string> retrieveFunction { get; set; }
+    private string selectedElection = "";
+
+
+    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+    {
+        await Task.Delay(1, token);
+        
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return elections;
+        return elections.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    
+}

@@ -2,38 +2,49 @@
 @using DTO.Models
 @using Front.Services.Elections
 @using Front.Components.PrevPb
+@using Front.Services.Interface
+@rendermode InteractiveServer
 
 <PageTitle>Previous Instances</PageTitle>
-
-<MudContainer MaxWidth="MaxWidth.Medium">
-    <MudGrid>
-        <MudItem xs="12">
-            <MudText Typo="Typo.h2"> Previous Instances</MudText>
-        </MudItem>
-        @if (@elections == null)
-        {
-            <MudText Typo="Typo.h3">Loading Instances</MudText>
-        }
-        else if (@elections.Count == 0)
-        {
-            <MudText Typo="Typo.h3"> No Elections Stored</MudText>
-        }
-        else
-        {
-            <MudItem>
-                <MudStack xs="12" Spacing="12">
-                    @foreach (var election in elections)
-                    {
-                        <InstanceListView election="election"/>
-                    }
-                </MudStack>
+<CascadingValue Value="_realElectionNames" >
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudGrid>
+            @if (_realElectionNames != null)
+            {
+                <MudItem xs="12">
+                    <RetriveRealElection retrieveFunction="RetrieveElection"/>
+                </MudItem>
+            }
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2"> Previous Instances</MudText>
             </MudItem>
-        }
-    </MudGrid>
-</MudContainer>
+            @if (@elections == null)
+            {
+                <MudText Typo="Typo.h3">Loading Instances</MudText>
+            }
+            else if (@elections.Count == 0)
+            {
+                <MudText Typo="Typo.h3"> No Elections Stored</MudText>
+            }
+            else
+            {
+                <MudItem>
+                    <MudStack xs="12" Spacing="12">
+                        @foreach (var election in elections)
+                        {
+                            <InstanceListView election="election"/>
+                        }
+                    </MudStack>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudContainer>
+    </CascadingValue>
 
 @code {
     [Inject] private IElectionsApiService ElectionsApiService { get; set; }
+    [Inject] private IPbEngineApiService _pbEngineApiService { get; set; }
+    private List<string> _realElectionNames = [];
 
     private List<Election> elections;
 
@@ -43,5 +54,26 @@
         elections = await ElectionsApiService.GetElections();
         Console.WriteLine("Elections loaded: " + elections?.Count);
         Console.WriteLine("First Election: "+ elections?.First());
+        var election_names =  await _pbEngineApiService.GetRealElectionsNames();
+        _realElectionNames = election_names.Select(x => x.Replace("_", " ").Replace(".pb","").Replace("../real-elections/","")).ToList();
+        StateHasChanged();
     }
+
+    public async Task RetrieveElection(string electionName)
+    {
+        if (electionName == "")
+        {
+            return;
+        }
+        var file_name = electionName.Replace(" ", "_") + ".pb";
+        _ = await _pbEngineApiService.DownloadRealElection(file_name);
+        Console.WriteLine("Election Downloaded");
+        elections = await ElectionsApiService.GetElections();
+    }
+
+    public List<string> GetRealElections()
+    {
+        return _realElectionNames;
+    }
+
 }

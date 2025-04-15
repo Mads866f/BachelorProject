@@ -85,10 +85,12 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("/realElections")]
     public List<string> GetRealElections()
     {
+        Console.WriteLine("Real Elections Was Requested");
         var folder = "../real-elections";
         string[] files = Directory.GetFiles(folder);
         Console.WriteLine(files[0]);
-        return files.ToList();
+        var result = files.ToList();
+        return result;
     }
 
     [HttpGet("/realElections/{filename}")]
