@@ -15,7 +15,8 @@ public class PbEngineController(IElectionService _electionService,
     IProjectService _projectService,
     IVotersService _votersService,
     IPbEngineService _service,
-    ElectionResultService _resultService
+    ElectionResultService _resultService,
+    IScoresService _scoresService
     )
 {
 
@@ -46,7 +47,10 @@ public class PbEngineController(IElectionService _electionService,
         {
             totalBudget = electionEntity!.TotalBudget,
             projects = pythonProjects,
-            votes = pythonVoters
+            votes = pythonVoters,
+            name = "",
+            method = "",
+            ballot_type = ""
         };
 
             
@@ -87,12 +91,52 @@ public class PbEngineController(IElectionService _electionService,
         return files.ToList();
     }
 
-    [HttpGet("/realElections/{filepath}")]
-    public async Task<(Election, List<Voter>)> GetRealElections(string filepath)
+    [HttpGet("/realElections/{filename}")]
+    public async Task<Election> GetRealElections(string filename)
     {
-        var result = await _service.convert_real_election(filepath);
-        Console.WriteLine(result);
-
-        return (null,null);
+        var result = await _service.convert_real_election(filename);
+        if (result is null)
+        {
+            Console.WriteLine(filename + " not found");
+        } 
+            
+        //Adding the election to the database
+        var election = new CreateElectionModel(){Name = result.name,TotalBudget = result.totalBudget,BallotDesign = result.ballot_type, Model = result.method};
+        var election_created= await _electionService.CreateElectionAsync(election);
+        //Adding the projects
+        var projects = result.projects;
+        var projectToIdMap = new Dictionary<string, Guid>();
+        foreach (var pythonProject in projects)
+        {
+            var project = new CreateProjectModel()
+            {
+                ElectionId = election_created.Id,
+                Name = pythonProject.name,
+                Cost = pythonProject.cost,
+                Categories = [],
+                Targets = []
+            };
+            var projectCreated = await _projectService.CreateProjectAsync(project);
+            projectToIdMap.Add(pythonProject.name, projectCreated.Id);
+        }
+        //Adding voters and votes
+        var voters = result.votes;
+        foreach (var pythonVoter in voters)
+        {
+            //Adding Voter
+            var voter_model = new CreateVoter(){ElectionId = election_created.Id};
+            var createdVoter = await _votersService.CreateVoterAsync(voter_model);
+            //Adding votes
+            for (int i = 0; i < pythonVoter.selectedProjects.Count; i++)
+            {
+                var project = pythonVoter.selectedProjects[i];
+                var degree = pythonVoter.selectedDegree[i];
+                //Adding Score to database
+                var score = new Scores(){Grade = degree,  Voter_Id = createdVoter.Id, Project_Id = projectToIdMap[project]};
+                await _scoresService.CreateVotersAsync(score);
+            }
+        }
+        return (election_created);
+        
     }
 }

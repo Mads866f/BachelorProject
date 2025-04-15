@@ -4,20 +4,20 @@ namespace Backend.Models;
 
 public class PythonProject
 {
-    public string Name { get; set; }
-    public int Cost { get; set; }
+    public string name { get; set; }
+    public int cost { get; set; }
 
-    public List<string> Categories { get; set; }
+    public List<string> categories { get; set; }
 
-    public List<string> Target { get; set; }
+    public List<string> target { get; set; }
     
     public PythonProject() { }
 
     public PythonProject(string name, int cost, List<string> categories, List<string> target)
     {
-        Name = name;
-        Cost = cost;
-        Categories = categories;
-        Target = target;
+        this.name = name;
+        this.cost = cost;
+        this.categories = categories;
+        this.target = target;
     }
 }

@@ -37,8 +37,8 @@ public class Initialtest(IHttpClientFactory clientFactory) : IInitialtest
             totalBudget = 10000,
             projects =
             [
-                new PythonProject{Name = "Project A", Cost = 3000,Categories = [],Target = []},
-                new PythonProject{Name = "Project B", Cost = 5000, Categories = [],Target = []}
+                new PythonProject{name = "Project A", cost = 3000,categories = [],target = []},
+                new PythonProject{name = "Project B", cost = 5000, categories = [],target = []}
             ],
             votes =
             [

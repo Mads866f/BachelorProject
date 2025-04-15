@@ -16,8 +16,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         var url  = "/getResult/?method="+method+"&ballot_type="+ballotType;
         try
         {
-            var json = JsonSerializer.Serialize(election,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var json = JsonSerializer.Serialize(election);
             Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpsClient.PostAsync(url, content);
@@ -48,13 +47,13 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
     }
 
-    public async Task<string> convert_real_election(string filepath)
+    public async Task<PythonElection?> convert_real_election(string fileName)
     {
-        var url = "realElections/"+filepath;
+        var url = "realElections?file_name="+fileName;
         try
         {
             var response = await _httpsClient.GetAsync(url);
-            return response.Content.ReadAsStringAsync().Result;
+            return await response.Content.ReadFromJsonAsync<PythonElection>();
         }
         catch (Exception e)
         {

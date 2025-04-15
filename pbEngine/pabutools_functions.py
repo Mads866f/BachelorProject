@@ -6,6 +6,7 @@ from typing import List, Tuple
 from Models import Election, Voter, Project
 import random
 from Constants import Rules,Ballot,TieBreaking,Satisfaction,InstanceAnalysis,InstanceBallotAnalysis, number_to_Ballot,number_to_Rule, number_to_Satisfaction, number_to_tiebreak,number_to_InstanceAnalysis,number_to_InstanceBallotAnalysis
+from typing import Optional
 
 
 
@@ -213,7 +214,7 @@ def convert_profile_mpq_to_float(profile: pbelec.Profile):
     voters = []
     for voter in profile:
         project_ids = voter.keys()
-        project_degree = [float(voter[k]) for k in project_ids]
+        project_degree = [int(voter[k]) for k in project_ids]
         selectedProjects = [str(k) for k in project_ids]
         voter_model = Voter(selectedProjects=selectedProjects,selectedDegree=project_degree)
         voters.append(voter_model)
@@ -224,7 +225,7 @@ def get_projects_from_real_instance(instance: pbelec.Instance):
     for p_id in instance.project_meta.keys():
         project = instance.project_meta[p_id]
         name =project["name"] if "name" in project else str(p_id)
-        new_project = Project(name = name, cost = float(project["cost"]),categories= [], target = [])
+        new_project = Project(name = name, cost = int(project["cost"]),categories= [], target = [])
         project_list.append(new_project)
     return project_list
 
@@ -286,5 +287,7 @@ def real_election_converter(filepath:str):
     instance, profile = pbelec.parse_pabulib(filepath)
     projects = get_projects_from_real_instance(instance)
     voters = voterlist_from_real_instance(instance,profile)
-    election = Election(totalBudget=int(instance.budget_limit),projects=projects, votes = voters)
+    method_used = instance.meta.get("rule")
+    ballot_used = instance.meta.get("vote_type")
+    election = Election(totalBudget=int(instance.budget_limit),projects=projects, votes = voters, method=method_used, ballot_type=ballot_used)
     return election

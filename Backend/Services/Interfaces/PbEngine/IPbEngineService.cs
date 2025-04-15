@@ -7,5 +7,5 @@ public interface IPbEngineService
 {
    Task<List<PythonProjects>> CalculateElection(PythonElection election,int method,int ballotType);
 
-   Task<string> convert_real_election(string filepath);
+   Task<PythonElection?> convert_real_election(string filepath);
 }

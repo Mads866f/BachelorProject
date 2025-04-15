@@ -7,18 +7,28 @@ using DTO.Models;
 
 namespace Backend.Repositories;
 
-public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepository
+public class VotersRepository(IDbConnectionFactory dbFactory, GlobalDatabaseSemaphore _semaphore) : IVotersRepository
 {
     private IVotersRepository _votersRepositoryImplementation;
 
     public async Task<IEnumerable<VoteEntity>> GetAllAsync()
     {
-        using var db = await dbFactory.CreateConnectionAsync();
-        const string query = """
-                             SELECT id AS Id, election_id AS ElectionId
-                             FROM voters_table
-                             """;
-        var result = await db.QueryAsync<VoteEntity>(query);
+        await _semaphore.semaphore.WaitAsync();
+        IEnumerable<VoteEntity> result;
+        try
+        {
+            using var db = await dbFactory.CreateConnectionAsync();
+            const string query = """
+                                 SELECT id AS Id, election_id AS ElectionId
+                                 FROM voters_table
+                                 """;
+            result = await db.QueryAsync<VoteEntity>(query);
+        }
+        finally
+        {
+            _semaphore.semaphore.Release();
+        }
+
         return result;
     }
 

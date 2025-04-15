@@ -68,7 +68,11 @@ async def root(election:Election,options:list[int]):
 
 @app.get("/realElections")
 async def root(file_name:str):
-    filepath = Path(__file__).resolve().parent.parent /"real-elections"/str(file_name)
+    #filepath = Path(__file__).resolve().parent.parent /"real-elections"/str(file_name) # Used when fastapi is alone
+    filepath = "real-elections/"+str(file_name)
+    print("FILEPATH:",filepath)
     instance  = pb.real_election_converter(filepath)
+    name_nice = file_name.replace("_"," ").replace(".pb","")
+    instance.name = name_nice
     return instance
     

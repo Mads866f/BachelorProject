@@ -1,4 +1,5 @@
 using AutoMapper;
+using Backend.Database;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
 using Backend.Services.Interfaces;
@@ -14,28 +15,40 @@ public class ScoresService : IScoresService
     private readonly IScoresRepository _repository;
     private readonly IVotersRepository _votersRepository;
     private readonly IProjectsRepository _projectsRepository;
+    private readonly GlobalDatabaseSemaphore _semaphore;
 
-    public ScoresService(IMapper mapper, IScoresRepository repository,IVotersRepository votersRepository, IProjectsRepository projectsRepository)
+    public ScoresService(IMapper mapper, IScoresRepository repository,IVotersRepository votersRepository, IProjectsRepository projectsRepository, GlobalDatabaseSemaphore sem)
     {
         _mapper = mapper;
         _repository = repository;
         _votersRepository = votersRepository;
         _projectsRepository = projectsRepository;
+        _semaphore = sem;
     }
 
     public async Task<IEnumerable<Scores>> GetScoresForVoterIdAsync(Guid id)
     {
-        //Check If Voter Exists
-        var voter = await _votersRepository.GetByIdAsync(id);
-        var voterExists = voter is not null;
-        if (!voterExists)
+        await _semaphore.semaphore.WaitAsync();
+        IEnumerable<Scores> scoresDto;
+        try
         {
-            return (List<Scores>)null;
+            //Check If Voter Exists
+            var voter = await _votersRepository.GetByIdAsync(id);
+            var voterExists = voter is not null;
+            if (!voterExists)
+            {
+                return (List<Scores>)null;
+            }
+
+            //Get Votes
+            var result = await _repository.GetScoreForVoter(id);
+            scoresDto = result
+                .Select(x => _mapper.Map<Scores>(x));
         }
-        //Get Votes
-        var result = await _repository.GetScoreForVoter(id);
-        var scoresDto = result
-            .Select(x => _mapper.Map<Scores>(x));
+        finally
+        {
+            _semaphore.semaphore.Release();
+        }
         return scoresDto;
 
     }

@@ -17,11 +17,14 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
            var electionres = new ElectionResult();
            electionres.Id = electionResult.Id;
            electionres.ElectionId = electionResult.ElectionId;
+           _logger.LogInformation("Constructing ElectionResult Dto with id: "+ electionres.Id + " Election Id: "+ electionResult.ElectionId);
            electionres.UsedBallot = electionResult.BallotUsed;
            electionres.UsedMethod = electionres.UsedMethod;
+           //Getting ElectedProjects
            var projects = await repository.GetProjectsByResultId(electionResult.Id);
            var projectsTransformed = projects.Select(p => mapper.Map<Project>(p)).ToList();
            electionres.ElectedProjects = projectsTransformed;
+           //Getting Submitted Projects
            var projectsElected = await _projectService.GetProjectsWithElectionId(electionResult.ElectionId);
            electionres.SubmittedProjects = projectsElected.ToList();
            result.Add(electionres);

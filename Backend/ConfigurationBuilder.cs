@@ -1,3 +1,4 @@
+using Backend.Database;
 using Backend.Repositories;
 using Backend.Repositories.Interfaces;
 using Backend.Services.ApiServices.PbEngine;
@@ -49,6 +50,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IProjectService, ProjectService>();
         builder.Services.AddScoped<IPbEngineService, PbEngineService>();
         builder.Services.AddScoped<ElectionResultService>(); //TODO ADD INTERFACE
+        builder.Services.AddSingleton(new GlobalDatabaseSemaphore(30));
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
