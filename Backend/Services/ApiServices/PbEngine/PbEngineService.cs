@@ -4,6 +4,8 @@ using System.Text.Json;
 using Backend.Models;
 using Backend.Services.Interfaces.PbEngine;
 using Backend.Utilities;
+using DTO.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Backend.Services.ApiServices.PbEngine;
 
@@ -54,6 +56,37 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         {
             var response = await _httpsClient.GetAsync(url);
             return await response.Content.ReadFromJsonAsync<PythonElection>();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Stream> DownloadElection(PythonElection election)
+    {
+        var url = "downloads/";
+        try
+        {
+            var json = JsonSerializer.Serialize(election);
+            Console.WriteLine(json);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpsClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStreamAsync();
+                /*using var result = await response.Content.ReadAsStreamAsync();
+                //Creating the file beforehand
+                var path = "custom-elections/" + election.name + "_custom.pb";
+                File.WriteAllText(path,"");
+                //Writing actual content to the file
+                var file = new FileStream(path,FileMode.Create);
+                await result.CopyToAsync(file);
+                return file;
+                */
+            }
+            throw new Exception("Internal Server Error");
         }
         catch (Exception e)
         {

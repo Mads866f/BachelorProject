@@ -1,5 +1,6 @@
 @page "/electionInfo/{ElectionId?}"
 @rendermode InteractiveServer
+@using System.Reflection.Metadata
 @using DTO.Models
 @using Front.Components.ElectionInfo.Dialogs
 @using Front.Services.Elections
@@ -9,6 +10,7 @@
 @using Front.Components.ElectionInfo.ActionPanel
 @using Front.Components.ElectionInfo.ActionPanel.Dialogs
 @using Front.Services.Interface.Elections
+@using Front.Utilities
 
 
 <PageTitle>Election Info</PageTitle>
@@ -35,7 +37,8 @@
                 AddVoter="AddVoter"
                 EndElection="EndElection"
                 CreateProject="CreateProject"
-                OpenCreateProjectDialog="OpenProjectDialogAsync"/>
+                OpenCreateProjectDialog="OpenProjectDialogAsync"
+                DownloadElection="DownloadElection"/>
             <!--Project List View - Bottom -->
             <ProjectListView
                 Projects="_projects"/>
@@ -155,6 +158,11 @@
         StateHasChanged();
     }
 
+    public void DownloadElection()
+    {
+        var url = $"http://localhost:5253/download/"+_currentElection.Id; //TODO CHECK IF THIS IS CORRECT
+        NavigationManager.NavigateTo(url,forceLoad:true);
+    }
 
-    
+
 }

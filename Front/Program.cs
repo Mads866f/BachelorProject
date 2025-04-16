@@ -28,10 +28,13 @@ builder.AddConfiguration();
 
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();
+
+
 //builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/app/keys")).SetApplicationName("front");
 
 var app = builder.Build();
-
+app.MapControllers();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

@@ -10,6 +10,9 @@
         <MudItem xs="12">
             <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" @onclick="EndElection">End Election</MudButton>
         </MudItem>
+        <MudItem xs="12">
+            <MudButton Class="full-width-btn" ButtonType="ButtonType.Button" @onclick="DownloadElection">Download Election</MudButton>
+        </MudItem>
     </MudGrid>
 
 </MudItem>
@@ -19,5 +22,6 @@
     [Parameter] public required EventCallback EndElection { get; set; }
     [Parameter] public required EventCallback<CreateProjectModel> CreateProject { get; set; }
     [Parameter] public required EventCallback OpenCreateProjectDialog { get; set; }
+    [Parameter] public required EventCallback DownloadElection { get; set; }
 
 }

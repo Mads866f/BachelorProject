@@ -8,4 +8,6 @@ public interface IPbEngineApiService
     Task<List<string>> GetRealElectionsNames();
 
     Task<Election> DownloadRealElection(string nameOfElection);
+    
+    Task<string> DownloadCustomElection(Election electionId);
 }

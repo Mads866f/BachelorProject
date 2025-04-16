@@ -27,4 +27,8 @@
       <ProjectReference Include="..\DTO\DTO.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="custom-elections\" />
+    </ItemGroup>
+
 </Project>

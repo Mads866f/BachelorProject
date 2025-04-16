@@ -313,8 +313,8 @@ def real_election_converter(filepath:str):
 def election_to_file(election:Election, file_name):
     instance = instance_from_election_model(election)
     profile = profile_from_voter_list(election.votes,ballot_type=Ballot.Approval,election=election) #Change the approval ballot later
-    filepath = Path(__file__).resolve().parent /"custom-elections"/str(str(file_name)+".pb") # Used when fastapi is alone
-    #filepath = "real-elections/"+str(file_name) # For when running through docker
+    #filepath = Path(__file__).resolve().parent /"custom-elections"/str(str(file_name)+".pb") # Used when fastapi is alone
+    filepath = "real-elections/"+str(file_name) # For when running through docker
     os.makedirs(os.path.dirname(filepath),exist_ok=True)
     with open(filepath,"w") as f:
               f.write("hello")

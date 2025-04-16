@@ -84,6 +84,7 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }
     }
 
+
     public async Task<Election> DownloadRealElection(string nameOfElection)
     {
         _logger.LogInformation("Downloading real election " + nameOfElection);
@@ -108,5 +109,34 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
             throw;
         }
            
+    }
+
+
+    public async Task<string> DownloadCustomElection(Election election)
+    {
+        var electionId = election.Id;
+        _logger.LogInformation("Downloading Custom election " + electionId);
+        try
+        {
+            var url = "download/"+electionId;
+            var response = await _client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                using var result = await response.Content.ReadAsStreamAsync();
+                //Creating the file beforehand
+                var path = "custom-elections/" + election.Name + "_custom.pb";
+                File.WriteAllText(path,"");
+                //Writing actual content to the file
+                var file = new FileStream(path,FileMode.Create);
+                await result.CopyToAsync(file);
+                return path;
+            }
+            throw new  InternalServerErrorException("Internal Server Error - Downloading Custom election");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

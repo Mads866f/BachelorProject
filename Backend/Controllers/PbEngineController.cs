@@ -17,16 +17,12 @@ public class PbEngineController(IElectionService _electionService,
     IPbEngineService _service,
     ElectionResultService _resultService,
     IScoresService _scoresService
-    )
+    ) :Controller
 {
 
-    [HttpGet("{id}")]
-    public async Task<List<Project>> CalculateElection(Guid id)
+    private async Task<PythonElection> createPythonElection(Election election)
     {
-        var electionEntity = await _electionService.GetElectionAsync(id);
-        var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
-        var method = 1; //TODO CHANGE IN DB TO STORE AS CONSTANTS FOR BETTER COMMUNICATION WITH PBENGIN
-        var ballotDesign = 1; //TODO SAME AS ABOVE
+        var electionId=election.Id;
         var voters = await _votersService.GetVotersByElectionId(electionId);
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
         
@@ -45,13 +41,38 @@ public class PbEngineController(IElectionService _electionService,
         
         var electionPython = new PythonElection
         {
-            totalBudget = electionEntity!.TotalBudget,
+            totalBudget = election.TotalBudget,
             projects = pythonProjects,
             votes = pythonVoters,
-            name = "",
-            method = "",
-            ballot_type = ""
+            name = election.Name,
+            method = election.Model,
+            ballot_type = election.BallotDesign
         };
+        return electionPython;
+    }
+
+    private Election election_from_electionEntity(ElectionEntity electionEntity)
+    {
+        return new Election()
+        {
+            Id = electionEntity.Id,
+            Name = electionEntity.Name,
+            BallotDesign = electionEntity.BallotDesign,
+            Model = electionEntity.Model,
+            TotalBudget = electionEntity.TotalBudget
+        };
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<List<Project>> CalculateElection(Guid id)
+    {
+        var electionEntity = await _electionService.GetElectionAsync(id);
+        var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
+        var method = 1; //TODO CHANGE IN DB TO STORE AS CONSTANTS FOR BETTER COMMUNICATION WITH PBENGIN
+        var ballotDesign = 1; //TODO SAME AS ABOVE
+        var projects = await _projectService.GetProjectsWithElectionId(electionId);
+        
+        var electionPython = await createPythonElection(electionEntity); 
 
             
 
@@ -140,5 +161,26 @@ public class PbEngineController(IElectionService _electionService,
         }
         return (election_created);
         
+    }
+
+    [HttpGet("/download/{id}")]
+    public async Task<IActionResult> DownloadElection(Guid id)
+    {
+        var election = await _electionService.GetElectionAsync(id);
+        if (election is null)
+        {
+            Console.WriteLine(id + " not found");
+            throw new Exception("Election not found");
+        }
+        var pythonElection = await createPythonElection(election);
+        var fileStream = await _service.DownloadElection(pythonElection);
+        if (fileStream is null)
+        {
+            Console.WriteLine(id + " not found");
+            throw new Exception("Election not found");
+        }
+        
+
+        return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
     }
 }
