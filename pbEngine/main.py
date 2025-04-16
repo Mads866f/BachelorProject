@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import pabutools_functions as pb
 import pabutools.election as pbelec
 from Models import Election, Voter, Project
@@ -75,4 +76,13 @@ async def root(file_name:str):
     name_nice = file_name.replace("_"," ").replace(".pb","")
     instance.name = name_nice
     return instance
-    
+
+@app.post("/downloads")
+async def root(instance:Election):
+    file_name = instance.name + "_custom"
+    real_file = pb.election_to_file(instance,file_name)
+    return FileResponse(
+        path = real_file,
+        filename=file_name+"_custom.pb",
+        media_type="application/octet-stream"
+    )

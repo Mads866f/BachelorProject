@@ -7,6 +7,8 @@ from Models import Election, Voter, Project
 import random
 from Constants import Rules,Ballot,TieBreaking,Satisfaction,InstanceAnalysis,InstanceBallotAnalysis, number_to_Ballot,number_to_Rule, number_to_Satisfaction, number_to_tiebreak,number_to_InstanceAnalysis,number_to_InstanceBallotAnalysis
 from typing import Optional
+from pathlib import Path
+import os
 
 
 
@@ -186,11 +188,27 @@ def calculate_result(election:Election,method:int,ballot_type:int):
     
 
 
+def instance_from_election_model(election:Election):
+    projects = election.projects
+    voting_instance = pbelec.Instance([],election.totalBudget)
+    # Create and add projects to instance
+    projects = election.projects
+    for project in projects:
+        project_to_add = pbelec.Project(project.name,project.cost,project.categories,project.target)
+        voting_instance.add(project_to_add)
+
+    voting_instance = pbelec.Instance([],election.totalBudget)
+    voting_instance.meta["name"] = election.name
+    voting_instance.meta["voting_rule"] = election.ballot_type
+    voting_instance.meta["rule"] = election.method
+    voting_instance = pbelec.Instance([],election.totalBudget)
+
+    return voting_instance
+
 
 def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction):
     sat = determine_satisfaction(satisfaction)
-    projects = map(project_model_to_project_pabu,election.projects)
-    voting_instance = pbelec.Instance(projects,election.totalBudget)
+    voting_instance = instance_from_election_model(election)
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #Change such that the ballot type is not hardcoded
     print("PROFILE:",profile)
     outcome = map(project_model_to_project_pabu,outcome)
@@ -291,3 +309,15 @@ def real_election_converter(filepath:str):
     ballot_used = instance.meta.get("vote_type")
     election = Election(totalBudget=int(instance.budget_limit),projects=projects, votes = voters, method=method_used, ballot_type=ballot_used)
     return election
+
+def election_to_file(election:Election, file_name):
+    instance = instance_from_election_model(election)
+    profile = profile_from_voter_list(election.votes,ballot_type=Ballot.Approval,election=election) #Change the approval ballot later
+    filepath = Path(__file__).resolve().parent /"custom-elections"/str(str(file_name)+".pb") # Used when fastapi is alone
+    #filepath = "real-elections/"+str(file_name) # For when running through docker
+    os.makedirs(os.path.dirname(filepath),exist_ok=True)
+    with open(filepath,"w") as f:
+              f.write("hello")
+
+    pbelec.write_pabulib(instance,profile,filepath)
+    return filepath
