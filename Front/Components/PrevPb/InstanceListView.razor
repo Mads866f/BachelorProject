@@ -1,5 +1,5 @@
 @using DTO.Models
-
+@rendermode InteractiveServer
 <MudPaper>
     <MudGrid Spacing="2" >
         <MudItem xs = "3">
@@ -54,12 +54,18 @@
         </MudItem>
         <MudDivider />
         <MudItem xs = "12">
-            <MudButton Style = "background-color: rebeccapurple; color: wheat" Class="full-width-btn" Href="/analytics">Read More</MudButton>
+            <MudButton Style = "background-color: rebeccapurple; color: wheat" Class="full-width-btn" OnClick="NavigateToResultsPage">Read More</MudButton>
         </MudItem>
     </MudGrid>
 </MudPaper>
 
 
 @code {
+    [Inject] public required NavigationManager NavigationManager { get; set; }
     [Parameter] public Election election { get; set; }
+
+    private void NavigateToResultsPage()
+    {
+        NavigationManager.NavigateTo($"electionResult/{election.Id}");
+    }
 }

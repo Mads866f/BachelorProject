@@ -17,12 +17,6 @@ else if (_hasError)
 else if (_currentElectionResult is not null)
 {
     <MudContainer>
-
-        <SelectElection
-            CurrentElection="_currentElection"
-            UpdateElection="UpdateSelectedElection">
-        </SelectElection>
-
         <CascadingValue Value="_currentElection">
             <MudGrid>
                 <!-- Election Info - Left side -->
@@ -84,35 +78,4 @@ else if (_currentElectionResult is not null)
 
         _isLoading = false;
     }
-
-    public async Task UpdateSelectedElection(Election newElection)
-    {
-        _currentElection = newElection;
-        ElectionId = _currentElection.Id.ToString();
-        await ReloadElectionData();
-    }
-
-    private async Task ReloadElectionData()
-    {
-        _isLoading = true;
-        _hasError = false;
-        _currentElectionResult = null;
-        StateHasChanged(); // Show loading spinner immediately
-
-        try
-        {
-            _electionResults = await ResultsApiService.GetResultsByElectionId(_currentElection.Id) ?? [];
-            _currentElectionResult = _electionResults.FirstOrDefault();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Failed to load election results: {ex.Message}", Severity.Error);
-            _hasError = true;
-        }
-
-        _isLoading = false;
-        StateHasChanged();
-    }
-
-
 }
