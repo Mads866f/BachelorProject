@@ -15,7 +15,6 @@
 <MudContainer>
     <!-- Election Selector - TopBar-->
     <SelectElection
-        AllElections="allElections"
         CurrentElection="_currentElection"
         UpdateElection="UpdateSelectedElection">
     </SelectElection>
@@ -102,20 +101,15 @@
     {
         _currentElection = newElection;
         ElectionId = _currentElection.Id.ToString();
-        await LoadElection();
+        await LoadElectionMetaData();
     }
 
 
-    private async Task LoadElection()
+    private async Task LoadElectionMetaData()
     {
         if (_currentElection.Id.ToString().Equals(""))
         {
             return;
-        }
-        else
-        {
-            var election = await ElectionsApiService.GetElection(_currentElection.Id);
-            _currentElection = election;
         }
         await LoadVoters();
         await LoadProjects();

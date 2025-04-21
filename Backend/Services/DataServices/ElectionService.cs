@@ -25,7 +25,21 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     return result
         .Select(mapper.Map<Election>); 
     }
+
+    public async Task<IEnumerable<Election>> GetEndedElectionsAsync()
+    {
+        var result = await repository.GetAllEndedAsync();
+        return result
+            .Select(mapper.Map<Election>);
+    }
     
+    public async Task<IEnumerable<Election>> GetOpenElectionsAsync()
+    {
+        var result = await repository.GetAllOpenAsync();
+        return result
+            .Select(mapper.Map<Election>);
+    }
+
     /// <summary>
     /// Retrieves a single election by its unique identifier.
     /// </summary>
@@ -40,6 +54,11 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
             return null;
         }
         return mapper.Map<Election>(electionEntity);
+    }
+
+    public void EndElectionAsync(Guid id)
+    {
+        repository.EndElectionAsync(id);
     }
 
     /// <summary>

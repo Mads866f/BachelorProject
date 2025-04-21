@@ -1,4 +1,5 @@
 @page "/electionResult/{ElectionId?}"
+@rendermode InteractiveServer
 @using Front.Services.Interface
 @using DTO.Models
 @using Front.Services.Elections
@@ -8,51 +9,55 @@
 
 @if (_isLoading)
 {
-    <MudProgressCircular Indeterminate="true" />
+    <MudProgressCircular Indeterminate="true"/>
 }
 else if (_hasError)
 {
-    <MudAlert Severity="Severity.Error">Invalid election ID. Please select an </MudAlert>
+    <MudAlert Severity="Severity.Error">Invalid election ID. Please select an election</MudAlert>
 }
 else if (_currentElectionResult is not null)
 {
-    <CascadingValue Value="_currentElection">
-        <MudGrid>
-            <!-- Election Info - Left side -->
-            <ElectionInfoPanel/>
+    <MudContainer>
 
-            <!-- Elected Project List View -->
-            <MudItem>
-                <div>Elected Projects</div>
-            </MudItem>
-            <ProjectListView Projects="_currentElectionResult.ElectedProjects" />
+        <SelectElection
+            CurrentElection="_currentElection"
+            UpdateElection="UpdateSelectedElection">
+        </SelectElection>
 
-            <!-- Submitted Project List View -->
-            <MudItem>
-                <div>All submitted projects</div>
-            </MudItem>
-            <ProjectListView Projects="_currentElectionResult.SubmittedProjects" />
-        </MudGrid>
-    </CascadingValue>
-}
-else
-{
-    <MudAlert Severity="Severity.Info">No results available for this election.</MudAlert>
+        <CascadingValue Value="_currentElection">
+            <MudGrid>
+                <!-- Election Info - Left side -->
+                <ElectionInfoPanel/>
+
+                <!-- Elected Project List View -->
+                <MudItem>
+                    <div>Elected Projects</div>
+                </MudItem>
+                <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
+
+                <!-- Submitted Project List View -->
+                <MudItem>
+                    <div>All submitted projects</div>
+                </MudItem>
+                <ProjectListView Projects="_currentElectionResult.SubmittedProjects"/>
+            </MudGrid>
+        </CascadingValue>
+    </MudContainer>
 }
 
 @code {
     [Inject] public required IElectionResultsApiService ResultsApiService { get; set; }
     [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
+    [Inject] public required ISnackbar Snackbar { get; set; }
 
     [Parameter] public string? ElectionId { get; set; }
 
     private Election? _currentElection;
     private ElectionResult? _currentElectionResult;
     private List<ElectionResult> _electionResults = [];
-
     private bool _isLoading = true;
     private bool _hasError = false;
-   
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,6 +68,7 @@ else
             _isLoading = false;
             return;
         }
+
         // Verify that ID matches an election
         var election = await ElectionsApiService.GetElection(electionGuid);
         if (election is null)
@@ -79,4 +85,35 @@ else
 
         _isLoading = false;
     }
+
+    public async Task UpdateSelectedElection(Election newElection)
+    {
+        _currentElection = newElection;
+        ElectionId = _currentElection.Id.ToString();
+        await ReloadElectionData();
+    }
+
+    private async Task ReloadElectionData()
+    {
+        _isLoading = true;
+        _hasError = false;
+        _currentElectionResult = null;
+        StateHasChanged(); // Show loading spinner immediately
+
+        try
+        {
+            _electionResults = await ResultsApiService.GetResultsByElectionId(_currentElection.Id) ?? [];
+            _currentElectionResult = _electionResults.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load election results: {ex.Message}", Severity.Error);
+            _hasError = true;
+        }
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+
 }

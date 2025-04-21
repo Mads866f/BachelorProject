@@ -1,27 +1,73 @@
 @using DTO.Models
+@using Front.Services.Elections
+@using MudBlazor.Utilities
 
-@if (AllElections is not null)
-{
-    <MudSelect T="Election" ValueChanged="OnValueChange" Label="Select an Election">
-        @foreach (var election in AllElections)
-        {
-            <MudSelectItem Value="@election">@election.Name</MudSelectItem>
-        }
-    </MudSelect>
-}
-else
+@if (_Error)
 {
     <MudAlert Severity="Severity.Error">ERROR: fetching elections</MudAlert>
 }
+else
+{
+    <MudAutocomplete @bind-Value="CurrentElection"
+                     SearchFunc="SearchElections"
+                     Variant="Variant.Text"
+                     Label="Select an Election"
+                     Dense="true"
+                     Clearable="true"
+                     ToStringFunc="FormatElection" />
+}
 
 @code {
-
-    [Parameter] public required List<Election> AllElections { get; set; }
-    [Parameter] public required Election CurrentElection { get; set; }
+    [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
+    
     [Parameter] public required EventCallback<Election> UpdateElection { get; set; }
+    private Election _currentElection;
+    [Parameter]
+    public required Election CurrentElection
+    {
+        get => _currentElection;
+        set
+        {
+            if (_currentElection == value) return;
+            _currentElection = value;
+            OnValueChange(_currentElection);
+        }
+    }
+    private bool _Error = false;
+    private List<Election> _allElections = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _allElections = await FetchAllElections();
+    }
 
     private void OnValueChange(Election selected)
     {
         UpdateElection.InvokeAsync(selected);
+    }
+
+    private async Task<IEnumerable<Election>>? SearchElections(string? value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return _allElections;
+        }
+
+        return _allElections.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<List<Election>> FetchAllElections()
+    {
+        var allElections = await ElectionsApiService.GetElections("Open");
+        if (allElections.Any()) return allElections;
+        _Error = true;
+        return [];
+    }
+    
+    private string FormatElection(Election? e)
+    {
+        if (e is null) return string.Empty;
+        return $"{e.Name} - ${e.TotalBudget:N0} - Model: {e.Model} - Ballot: {e.BallotDesign}";
     }
 }

@@ -2,34 +2,33 @@ using DTO.Models;
 using Front.Services.Elections;
 using Front.Utilities;
 using Front.Utilities.Errors;
-using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Front.Services.ApiService.Elections;
+namespace Front.Services.ApiService;
 
-public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<ElectionsApiService> _logger) : IElectionsApiService
+public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<ElectionsApiService> _logger)
+    : IElectionsApiService
 {
-   
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.Backend);
     private readonly string url = "api/Election";
-    
-   /// <summary>
-   ///  Requests to create a new election within the database
-   /// </summary>
-   /// <param name="election">
-   /// The Election To be created
-   /// </param>
-   /// <returns>
-   /// Returns the Election if it is created
-   /// </returns>
-   /// <exception cref="CreationException"></exception>
-   /// <exception cref="InternalServerErrorException"></exception>>
+
+    /// <summary>
+    ///  Requests to create a new election within the database
+    /// </summary>
+    /// <param name="election">
+    /// The Election To be created
+    /// </param>
+    /// <returns>
+    /// Returns the Election if it is created
+    /// </returns>
+    /// <exception cref="CreationException"></exception>
+    /// <exception cref="InternalServerErrorException"></exception>>
     public async Task<Election> CreateElection(Election election)
     {
-        _logger.LogInformation("Creating Election with id: {id}",election.Id); 
+        _logger.LogInformation("Creating Election with id: {id}", election.Id);
         try
         {
-            election.Id = Guid.NewGuid();//TODO CHECK IF THIS IS NEEDED
-            var response = await _client.PostAsJsonAsync( url, election);
+            election.Id = Guid.NewGuid(); //TODO CHECK IF THIS IS NEEDED
+            var response = await _client.PostAsJsonAsync(url, election);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Election>();
@@ -55,27 +54,38 @@ public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<Elect
         {
             _logger.LogError(e, "Failed to create Election");
             throw;
-        } 
-        
-        
+        }
     }
 
 
-/// <summary>
-///  Requests all elections from the database through backend
-/// </summary>
-/// <returns>
-/// A List of the elections.
-/// </returns>
-/// <exception cref="InternalServerErrorException"></exception>
-    public async Task<List<Election>> GetElections() 
+    /// <summary>
+    /// Retrieves a list of elections from the backend API. 
+    /// Optionally filters the elections based on their status (e.g., "Open" or "Ended").
+    /// </summary>
+    /// <param name="status">
+    /// An optional filter to specify the status of the elections to retrieve.
+    /// Accepted values are "Open" and "Ended". If not provided, all elections will be returned.
+    /// </param>
+    /// <returns>
+    /// A list of <see cref="Election"/> objects, filtered by status if specified.
+    /// </returns>
+    /// <exception cref="InternalServerErrorException">
+    /// Thrown when the request to the backend fails.
+    /// </exception>
+    public async Task<List<Election>> GetElections(string? status = null)
     {
         _logger.LogInformation("Getting Elections");
         try
         {
+            // Switch to handle different types of election statuses
+            var requestUrl = status switch
+            {
+                "Open" or "Ended" => $"{url}?status={status}",
+                _ => url
+            };
 
-            var response = await _client.GetAsync(url);
-            Console.WriteLine(("Got Response From Backend" +  response.StatusCode));
+            var response = await _client.GetAsync(requestUrl);
+            Console.WriteLine(("Got Response From Backend" + response.StatusCode));
             if (response.IsSuccessStatusCode)
             {
                 var elections = await response.Content.ReadFromJsonAsync<List<Election>>();
@@ -93,22 +103,23 @@ public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<Elect
             throw;
         }
     }
-/// <summary>
-///  Requests a specific election based on the Id from the database
-/// </summary>
-/// <param name="id">
-///The Guid that represents the id of the election
-/// </param>
-/// <returns>
-/// An Election if found, otherwise null
-/// </returns>
-/// <exception cref="InternalServerErrorException"></exception>
+
+    /// <summary>
+    ///  Requests a specific election based on the Id from the database
+    /// </summary>
+    /// <param name="id">
+    ///The Guid that represents the id of the election
+    /// </param>
+    /// <returns>
+    /// An Election if found, otherwise null
+    /// </returns>
+    /// <exception cref="InternalServerErrorException"></exception>
     public async Task<Election?> GetElection(Guid id)
     {
         _logger.LogInformation("Getting Election Called with id: " + id);
         try
         {
-            var response = await _client.GetAsync(url+"/"+id);
+            var response = await _client.GetAsync(url + "/" + id);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Election>();
@@ -124,7 +135,7 @@ public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<Elect
         {
             _logger.LogError(e, "Error getting Election");
             throw;
-        } 
+        }
     }
 
 

@@ -29,7 +29,7 @@ public class ElectionControllerTest
         var elections = new List<Election>(){election1, election2};
         _electionService.Setup(x => x.GetAllElectionsAsync()).Returns(Task.FromResult<IEnumerable<Election>>(elections));
         //Act
-        var  result = await _controller.GetAll(); 
+        var  result = await _controller.GetElections(); 
         //Assert
         Assert.NotNull(result);
         if (result?.Value != null) Assert.Equal(result?.Value.Count(), elections.Count());
@@ -42,7 +42,7 @@ public class ElectionControllerTest
         var elections = new List<Election>();
         _electionService.Setup(x => x.GetAllElectionsAsync()).Returns(Task.FromResult<IEnumerable<Election>>(elections));
         //Act
-        var result = await _controller.GetAll();
+        var result = await _controller.GetElections();
         //Assert
         Assert.NotNull(result);
         if (result.Value != null) Assert.Empty(result.Value);

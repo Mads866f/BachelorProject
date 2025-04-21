@@ -22,6 +22,7 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("{id}")]
     public async Task<List<Project>> CalculateElection(Guid id)
     {
+        _electionService.EndElectionAsync(id);
         var electionEntity = await _electionService.GetElectionAsync(id);
         var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
         var method = 1; //TODO CHANGE IN DB TO STORE AS CONSTANTS FOR BETTER COMMUNICATION WITH PBENGIN

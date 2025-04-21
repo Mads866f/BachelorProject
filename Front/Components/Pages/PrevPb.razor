@@ -39,8 +39,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Ensure the async call is awaited and does not block the UI thread
-        elections = await ElectionsApiService.GetElections();
+        elections = await ElectionsApiService.GetElections("Ended");
         Console.WriteLine("Elections loaded: " + elections?.Count);
         Console.WriteLine("First Election: "+ elections?.First());
     }

@@ -9,6 +9,7 @@ namespace Backend.Models
         public int TotalBudget { get; set; }
         public string Model { get; set; }
         public string BallotDesign { get; set; }
+        public bool Ended { get; set; }
         public ElectionEntity() { }
         
         protected bool Equals(ElectionEntity other)

@@ -4,7 +4,7 @@ namespace Front.Services.Elections;
 
 public interface IElectionsApiService
 {
-   Task<List<Election>> GetElections();
+   Task<List<Election>> GetElections(string? status = null);
    
    Task<Election?> GetElection(Guid id);
    

@@ -15,11 +15,48 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
         using var db = await dbFactory.CreateConnectionAsync();
         var result = await db.QueryAsync<ElectionEntity>(
             """
-            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign, ended AS Ended
             FROM elections_table
             """);
         return result;
     }
+
+    public async Task<IEnumerable<ElectionEntity>> GetAllEndedAsync()
+    {
+        using var db = await dbFactory.CreateConnectionAsync();
+        var result = await db.QueryAsync<ElectionEntity>(
+            """
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign, ended AS Ended
+            FROM elections_table
+            WHERE ended = true
+            """);
+        return result;
+    }
+
+    public async Task<IEnumerable<ElectionEntity>> GetAllOpenAsync()
+    {
+        using var db = await dbFactory.CreateConnectionAsync();
+        var result = await db.QueryAsync<ElectionEntity>(
+            """
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign, ended AS Ended
+            FROM elections_table
+            WHERE ended = false
+            """);
+        return result;
+    }
+
+    public async Task EndElectionAsync(Guid id)
+    {
+        using var db = await dbFactory.CreateConnectionAsync();
+        await db.ExecuteAsync(
+            """
+            UPDATE elections_table 
+            SET ended = true
+            WHERE id = @idToLookUp
+            """,
+            new { idToLookUp = id });
+    }
+    
 
     public async Task<ElectionEntity?> GetByIdAsync(Guid id)
     {
@@ -27,7 +64,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
 
         return db.QuerySingleOrDefault<ElectionEntity>(
             """
-            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign 
+            SELECT id, name, total_budget AS TotalBudget, model, ballot_design AS BallotDesign, ended AS Ended
             FROM elections_table
             WHERE id = @idToLookUp LIMIT 1
             """, new { idToLookUp = id });
@@ -52,7 +89,8 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             Name = election.Name,
             TotalBudget = election.TotalBudget,
             Model = election.Model,
-            BallotDesign = election.BallotDesign
+            BallotDesign = election.BallotDesign,
+            Ended = false
         };
     }
 
@@ -65,7 +103,8 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             SET name = @Name, 
                 total_budget = @TotalBudget, 
                 model = @Model, 
-                ballot_design = @BallotDesign
+                ballot_design = @BallotDesign,
+                ended = @Ended
             WHERE id = @Voter_Id
             """,
             election);

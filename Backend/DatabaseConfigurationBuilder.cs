@@ -24,7 +24,8 @@ public static class DatabaseConfigurationBuilder
                 name TEXT NOT NULL,
                 total_budget INT NOT NULL,
                 model TEXT NOT NULL,
-                ballot_design TEXT NOT NULL
+                ballot_design TEXT NOT NULL,
+                ended BOOLEAN NOT NULL DEFAULT FALSE
             );
             """,
             """

@@ -32,14 +32,16 @@ public class ProjectsApiService(IHttpClientFactory clientFactory, ILogger<Projec
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<List<Project>>();
-                return content ?? new List<Project>();
+                return content ?? [];
             }
-            else
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                var exception = new InternalServerErrorException("Internal Server Error - GetProjectsWithElectionId");
-                _logger.LogError(exception, "Internal Server Error - GetProjectsWithElectionId");
-                throw exception;
+                _logger.LogWarning("No projects found for election with Id: " + id);
+                return [];
             }
+            var exception = new InternalServerErrorException("Internal Server Error - GetProjectsWithElectionId");
+            _logger.LogError(exception, "Internal Server Error - GetProjectsWithElectionId");
+            throw exception;
         }
         catch (Exception e)
         {
