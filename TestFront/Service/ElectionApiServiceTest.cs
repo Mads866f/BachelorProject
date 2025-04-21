@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DTO.Models;
+using Front.Services.ApiService;
 using Front.Services.ApiService.Elections;
 using Front.Utilities.Errors;
 using Microsoft.AspNetCore.Http;

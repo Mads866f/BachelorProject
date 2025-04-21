@@ -10,14 +10,16 @@ namespace TestsBackend.Controllers
     public class VotersControllerTest
     {
         private readonly Mock<IVotersService> _mockService;
+        private readonly Mock<IProjectService> _mockProjectService;
         private readonly Mock<ILogger<VotersController>> _mockLogger;
         private readonly VotersController _controller;
 
         public VotersControllerTest()
         {
             _mockService = new Mock<IVotersService>();
+            _mockProjectService = new Mock<IProjectService>();
             _mockLogger = new Mock<ILogger<VotersController>>();
-            _controller = new VotersController(_mockService.Object, _mockLogger.Object);
+            _controller = new VotersController(_mockService.Object, _mockLogger.Object, _mockProjectService.Object);;
         }
 
         // Test for GetAllAsync

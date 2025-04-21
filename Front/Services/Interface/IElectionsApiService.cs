@@ -1,10 +1,10 @@
 using DTO.Models;
 
-namespace Front.Services.Elections;
+namespace Front.Services.Interface;
 
 public interface IElectionsApiService
 {
-   Task<List<Election>> GetElections();
+   Task<List<Election>> GetElections(string? status = null);
    
    Task<Election?> GetElection(Guid id);
    

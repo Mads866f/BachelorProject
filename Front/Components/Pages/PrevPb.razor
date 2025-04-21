@@ -1,6 +1,5 @@
 ﻿@page "/prevpb"
 @using DTO.Models
-@using Front.Services.Elections
 @using Front.Components.PrevPb
 @using Front.Services.Interface
 @rendermode InteractiveServer
@@ -51,8 +50,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Ensure the async call is awaited and does not block the UI thread
-        elections = await ElectionsApiService.GetElections();
+        elections = await ElectionsApiService.GetElections("Ended");
         Console.WriteLine("Elections loaded: " + elections?.Count);
         Console.WriteLine("First Election: "+ elections?.First());
         var election_names =  await _pbEngineApiService.GetRealElectionsNames();

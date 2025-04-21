@@ -34,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\ResultInfo\" />
+      <Folder Include="Components\Results\" />
     </ItemGroup>
 
     <ItemGroup>

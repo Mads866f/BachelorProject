@@ -10,31 +10,37 @@ namespace Backend.Controllers.DataControllers;
 [Route("api/[controller]")]
 public class ElectionController(IElectionService service, ILogger<ElectionController> logger) : ControllerBase
 {
-        /// <summary>
-        /// HttpGet call for getting all elections in the database 
-        /// </summary>
-        /// <returns>
-        /// Ok with a list of elections
-        /// </returns>
+    /// <summary>
+    /// HttpGet call for getting all elections in the database 
+    /// </summary>
+    /// <returns>
+    /// Ok with a list of elections
+    /// </returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<Election>>> GetAll()
+    public async Task<ActionResult<IEnumerable<Election>>> GetElections([FromQuery] string? status = null)
     {
-        logger.LogInformation("Getting all Elections");
+        logger.LogInformation("Getting Elections with status: {status}", status ?? "all");
         try
         {
-            // Await the result from the service call to database
-            var result = await service.GetAllElectionsAsync();
-            //Return Result
+            var result = status?.ToLower() switch
+            {
+                "open" => await service.GetOpenElectionsAsync(),
+                "ended" => await service.GetEndedElectionsAsync(),
+                _ => await service.GetAllElectionsAsync()
+            };
+
             return Ok(result);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error while retrieving all Elections");
+            logger.LogError(e, "Error while retrieving Elections with status: {status}", status);
             return StatusCode(500);
         }
     }
+
+    
 
     /// <summary>
     /// Retrieves a specific election with the given Id.
@@ -48,19 +54,19 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Election>> GetById(Guid id)
     {
-        logger.LogInformation("Getting Election by id {id}",id);
+        logger.LogInformation("Getting Election by id {id}", id);
         try
         {
             //Await the database for response
             var result = await service.GetElectionAsync(id);
-            //Check if result signifies that the election exists within the database
+            //Check if a result signifies that the election exists within the database
             var resultExists = result is not null;
             //Returns the result or Notfound depending on bool
             return resultExists ? Ok(result) : NotFound();
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error while getting Election by {id}",id);
+            logger.LogError(e, "Error while getting Election by {id}", id);
             return StatusCode(500);
         }
     }
@@ -77,7 +83,7 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Election>> CreateElection([FromBody] CreateElectionModel election)
     {
-        logger.LogInformation("Creating Election with name: {Name}",election.Name);
+        logger.LogInformation("Creating Election with name: {Name}", election.Name);
         try
         {
             //Await the database creation of the election
@@ -87,12 +93,12 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error while creating Election with name: {name}",election.Name);
+            logger.LogError(e, "Error while creating Election with name: {name}", election.Name);
             return StatusCode(500);
         }
     }
 
-    
+
     /// <summary>
     /// Requests to update an entry of an election in the database
     /// </summary>
@@ -109,7 +115,7 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Election>> UpdateElection([FromBody] Election election)
     {
-        logger.LogInformation("Updating Election with id: {id}",election.Id);
+        logger.LogInformation("Updating Election with id: {id}", election.Id);
         try
         {
             //Await for database to update election
@@ -121,7 +127,7 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error while updating Election with id: {id}",election.Id);
+            logger.LogError(e, "Error while updating Election with id: {id}", election.Id);
             return StatusCode(500);
         }
     }
@@ -142,7 +148,7 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteByIdAsync(Guid id)
     {
-        logger.LogInformation("Deleting Election with id: {id}",id);
+        logger.LogInformation("Deleting Election with id: {id}", id);
         try
         {
             //Await for database to express if deletion of election were succesfull
@@ -152,7 +158,7 @@ public class ElectionController(IElectionService service, ILogger<ElectionContro
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error while deleting Election with id: {id}",id);
+            logger.LogError(e, "Error while deleting Election with id: {id}", id);
             return StatusCode(500);
         }
     }

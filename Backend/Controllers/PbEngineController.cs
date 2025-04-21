@@ -22,6 +22,7 @@ public class PbEngineController(IElectionService _electionService,
 
     private async Task<PythonElection> createPythonElection(Election election)
     {
+        _electionService.EndElectionAsync(election.Id);
         var electionId=election.Id;
         var voters = await _votersService.GetVotersByElectionId(electionId);
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
