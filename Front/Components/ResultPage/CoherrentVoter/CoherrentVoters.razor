@@ -2,7 +2,7 @@
 @using MudBlazor
 @rendermode InteractiveServer
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="p-4">
+<MudContainer MaxWidth="MaxWidth.Large" Class="p-4" Style="overflow: auto; max-height: 500px">
     <MudText Typo="Typo.h4" Class="mb-2">Coherent Voters</MudText>
     <MudDivider Class="mb-3"/>
 
@@ -10,17 +10,19 @@
         <ColGroup>
             <col style="width:100px;" />
             <col style="width:100px;" />
-            <col />
+            <col style="width:100px;" />
             <col style="width:100px;" />
         </ColGroup>
         <HeaderContent>
             <MudTh>Members</MudTh>
-            <MudTh>Fraction</MudTh>
+            <MudTh>Percentage</MudTh>
+            <MudTh>No Of Projects</MudTh>
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="members">@context.number_of_voters</MudTd>
-            <MudTd DataLabel="fraction">@context.fraction</MudTd>
+            <MudTd DataLabel="percentage">@context.fraction</MudTd>
+            <MudTd DataLabel="numberOfProjects">@context.projects.Count</MudTd>
             <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>
             <!--<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>-->
         </RowTemplate>
@@ -127,6 +129,7 @@
     protected override Task OnInitializedAsync()
     {
         CalculateCoherrentVoters();
+        coherrentVoters.Sort((a, b) => b.number_of_voters.CompareTo(a.number_of_voters)); 
         return base.OnInitializedAsync();
     }
 

@@ -70,7 +70,6 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         try
         {
             var json = JsonSerializer.Serialize(election);
-            Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpsClient.PostAsync(url, content);
             if (response.IsSuccessStatusCode)
@@ -86,6 +85,52 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
                 return file;
                 */
             }
+            throw new Exception("Internal Server Error");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects)
+    {
+        var url = "analyze/";
+        var sats = (new List<int>(){1,2,3,5,6,7,8,10,11});
+        var load = new
+        {
+            election = election,
+            outcome = electedProjects,
+            satisfactions = sats
+        };
+        var json = JsonSerializer.Serialize(load);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await _httpsClient.PostAsync(url + "avgSatisfaction", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(jsonString);
+
+                var map = new Dictionary<string, float>();
+
+                if (doc.RootElement.TryGetProperty("result", out var resultElement))
+                {
+                    foreach (var prop in resultElement.EnumerateObject())
+                    {
+                        if (prop.Value.ValueKind == JsonValueKind.Number
+                            && prop.Value.TryGetSingle(out var f))
+                        {
+                            map[prop.Name] = f;
+                        }
+                    }
+                }
+
+                return map;
+            }
+
             throw new Exception("Internal Server Error");
         }
         catch (Exception e)

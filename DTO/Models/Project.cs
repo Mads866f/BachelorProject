@@ -8,4 +8,5 @@ public class Project
     public required  int Cost { get; set; }
     public List<Category>? Categories { get; set; }
     public List<Target>? Targets { get; set; }
+    public int? votes { get; set; }
 }

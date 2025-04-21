@@ -28,10 +28,11 @@ async def root(election:Election,method:int, ballot_type:int):
 @app.post("/analyze/avgSatisfaction")
 async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
     try:
-        result = []
+        result = {}
         for sat in satisfactions:
             sat_number = pb.calculate_satisfaction(election,outcome,sat)
-            result.append(sat_number)
+            result[str(sat)] = sat_number
+        print(result)
         return {"result":result}
 
     except Exception as e:

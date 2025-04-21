@@ -25,27 +25,32 @@ else if (_currentElectionResult is not null)
                 <MudTabPanel Text="@result.Id.ToString()">
                 <CascadingValue Value="_currentElection">
                     <MudGrid>
-                        <!-- Election Info - Left side -->
-                        <ElectionInfoPanel
-                            NewBallotFormat="@result.UsedBallot"
-                            NewModelFormat="@result.UsedMethod"/>
-
-            <!-- Elected Project List View -->
-            <MudItem>
-                <CoherrentVoters voters="_voters"/>
-            </MudItem>
-            <ProjectListView Projects="_currentElectionResult.ElectedProjects" />
-                        <!-- Elected Project List View -->
-                        <MudItem>
-                            <div>Elected Projects</div>
+                        <MudItem xs="12">
+                            <MudSpacer/>
                         </MudItem>
-                        <ProjectListView Projects="result.ElectedProjects"/>
+                        <!-- Election Info - Left side -->
+                            <ElectionInfoPanel
+                                NewBallotFormat="@result.UsedBallot"
+                                NewModelFormat="@result.UsedMethod"/>
 
+                        <!-- Elected Project List View -->
+                        <MudItem xs="6">
+                            <CoherrentVoters voters="_voters"/>
+                        </MudItem>
+                        <MudItem xs = "2">
+                            <AnalysisNumberDisplay numbers="analysisNumbers"/>
+                        </MudItem>
+                        <!-- Elected Project List View -->
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.h4" Align="Align.Center">Elected Projects</MudText>
+                            <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
+                            <MudDivider/>
+                        </MudItem>
                         <!-- Submitted Project List View -->
                         <MudItem>
-                            <div>All submitted projects</div>
+                            <MudText Typo="Typo.h3" Align="Align.Center">All submitted projects</MudText>
+                            <ProjectListView Projects="result.SubmittedProjects"/>
                         </MudItem>
-                        <ProjectListView Projects="result.SubmittedProjects"/>
                     </MudGrid>
                 </CascadingValue>
                 </MudTabPanel>
@@ -58,6 +63,7 @@ else if (_currentElectionResult is not null)
     [Inject] public required IElectionResultsApiService ResultsApiService { get; set; }
     [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
     [Inject] public required IVotersApiService VotersApiService { get; set;}
+    [Inject] public required IPbEngineApiService PbEngineApiService { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
 
     [Parameter] public string? ElectionId { get; set; }
@@ -66,6 +72,7 @@ else if (_currentElectionResult is not null)
     private ElectionResult? _currentElectionResult;
     private List<ElectionResult> _electionResults = [];
     private List<Voter> _voters;
+    private Dictionary<string, float> analysisNumbers = new Dictionary<string, float>();
 
     private bool _isLoading = true;
     private bool _hasError = false;
@@ -94,6 +101,7 @@ else if (_currentElectionResult is not null)
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
+        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
         Console.WriteLine("HER" + _currentElectionResult.ElectedProjects.Count);
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
 

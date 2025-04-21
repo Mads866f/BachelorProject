@@ -139,4 +139,32 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
             throw;
         }
     }
+
+    public async Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult)
+    {
+        _logger.LogInformation("Getting Avg Satisfaction");
+        try
+        {
+            Console.WriteLine(url+"/analyze/avgSatisfaction");
+            var response = await _client.GetAsync($"/analyze/avgSatisfaction/{electionResult.Id}");
+            Console.WriteLine("RESPONSE: " + response);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<string, float>>();
+                return result ?? throw new Exception("Internal Server Error - GetAvgSatisfaction");
+            }  
+            else
+            {
+                var exception = new InternalServerErrorException("Internal Server Error - Getting AvgSatisfaction");
+                _logger.LogError(exception,exception.Message);
+                throw exception;
+            } 
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"Error Retrieving Real Elections");
+            throw;
+        }}
+    
+    
 }

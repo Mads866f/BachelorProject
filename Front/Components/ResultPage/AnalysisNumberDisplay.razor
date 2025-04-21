@@ -1,0 +1,13 @@
+<MudText Typo="Typo.h4">Analysis Numbers</MudText>
+<MudDivider/>
+@foreach (var indicator in numbers)
+{
+   <MudPaper Class="mb-2 p-2">
+      <MudText>@indicator.Key</MudText>
+      <MudText>@indicator.Value</MudText>
+   </MudPaper>
+}
+
+@code {
+   [Parameter] public required Dictionary<string,float> numbers { get; set; }
+}

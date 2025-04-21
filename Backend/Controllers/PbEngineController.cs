@@ -1,9 +1,12 @@
+using System.Collections;
+using System.Runtime.InteropServices;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
 using Backend.Services.ApiServices.PbEngine;
 using Backend.Services.DataServices;
 using Backend.Services.Interfaces;
 using Backend.Services.Interfaces.PbEngine;
+using Backend.Utilities;
 using DTO.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -183,5 +186,58 @@ public class PbEngineController(IElectionService _electionService,
         
 
         return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
+    }
+
+    [HttpGet("/analyze/avgSatisfaction/{resultId}")]
+    public async Task<Dictionary<string,float>> GetAverageSatisfaction(Guid resultId)
+    {
+        Console.WriteLine("CALLLED");
+        var election = await _resultService.GetElectionResultByResultId(resultId);
+        var submittedPythonProjects = election.SubmittedProjects.Select(p => 
+            new PythonProject()
+                {name =p.Id.ToString(), cost = p.Cost, 
+                    categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
+        
+        
+        var electedProjects= election.ElectedProjects.Select(p => 
+            new PythonProject()
+                {name =p.Id.ToString(), cost = p.Cost, 
+                    categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
+       var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
+       var votersPython = voters.Select(v => new PythonVoter
+       {
+           selectedProjects = v.Votes.Select(p => p.Project_Id.ToString()).ToList(),
+           selectedDegree = v.Votes.Select(d => d.Grade).ToList()
+       }).ToList();
+        var pythonElection = new PythonElection()
+        {
+            ballot_type = election.UsedBallot,
+            method = election.UsedBallot,
+            name = "",
+            projects = submittedPythonProjects,
+            votes = votersPython,
+        };
+        
+        var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects);
+        
+        Console.WriteLine("RESULT");
+        var updates = new List<(string OldKey, string NewKey, float Value)>();
+
+        foreach (var (key, value) in result.Reverse())
+        {
+            if (Constants.sat_map.TryGetValue(key, out var newKey))
+            {
+                updates.Add((key, newKey, value));
+            }
+        }
+
+// Apply updates after iteration
+        foreach (var (oldKey, newKey, value) in updates)
+        {
+            result[newKey] = value;
+            result.Remove(oldKey);
+        }
+        return result;
+
     }
 }

@@ -10,4 +10,5 @@ public interface IElectionResultRepository
     Task<IEnumerable<ProjectsEntity>> GetProjectsByResultId(Guid resultId);
     
     Task<ElectionResult> AddElectionResult(ElectionResult result);
+    Task<ElectionResultEntity> GetElectionResultByResultId(Guid resultId);
 }

@@ -11,4 +11,6 @@ public interface IPbEngineService
    Task<PythonElection?> convert_real_election(string filepath);
    
    Task<Stream> DownloadElection(PythonElection election);
+
+   Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election, List<PythonProject> electedProjects);
 }

@@ -8,6 +8,19 @@ namespace Backend.Repositories;
 
 public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<ElectionResultRepository> _logger, IProjectsRepository _projectsRepository): IElectionResultRepository
 {
+    public async Task<ElectionResultEntity> GetElectionResultByResultId(Guid resultId)
+    {
+      _logger.LogInformation("Getting ElectionResults from database with Result Id: "+ resultId);
+        using var db = await dbFactory.CreateConnectionAsync();
+        var query = """
+                    SELECT id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed
+                    FROM result_table as result
+                    WHERE result.id = @Id
+                    """;
+        var result = await db.QueryAsync<ElectionResultEntity>(query, new { Id = resultId });
+        return result.ToList().First();
+    }
+    
     /// <summary>
     ///  Requests all Election Results with the given electionId from the database
     /// </summary>
@@ -19,7 +32,7 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
     /// </returns>
     public async Task<IEnumerable<ElectionResultEntity>> GetElectionsResultByElectionId(Guid electionId)
     {
-        _logger.LogInformation("Getting ElectionResults from database with Id: "+ electionId);
+        _logger.LogInformation("Getting ElectionResults from database with election Id: "+ electionId);
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
                     SELECT id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed
@@ -95,4 +108,5 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
         }
         return result;
     }
+
 }

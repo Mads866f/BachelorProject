@@ -10,4 +10,6 @@ public interface IPbEngineApiService
     Task<Election> DownloadRealElection(string nameOfElection);
     
     Task<string> DownloadCustomElection(Election electionId);
+
+    Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult);
 }
