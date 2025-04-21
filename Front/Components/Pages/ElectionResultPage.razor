@@ -17,24 +17,33 @@ else if (_hasError)
 else if (_currentElectionResult is not null)
 {
     <MudContainer>
-        <CascadingValue Value="_currentElection">
-            <MudGrid>
-                <!-- Election Info - Left side -->
-                <ElectionInfoPanel/>
+        <MudTabs>
+            @foreach (var result in _electionResults)
+            {
+                <MudTabPanel Text="@result.Id.ToString()">
+                <CascadingValue Value="_currentElection">
+                    <MudGrid>
+                        <!-- Election Info - Left side -->
+                        <ElectionInfoPanel
+                            NewBallotFormat="@result.UsedBallot"
+                            NewModelFormat="@result.UsedMethod"/>
 
-                <!-- Elected Project List View -->
-                <MudItem>
-                    <div>Elected Projects</div>
-                </MudItem>
-                <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
+                        <!-- Elected Project List View -->
+                        <MudItem>
+                            <div>Elected Projects</div>
+                        </MudItem>
+                        <ProjectListView Projects="result.ElectedProjects"/>
 
-                <!-- Submitted Project List View -->
-                <MudItem>
-                    <div>All submitted projects</div>
-                </MudItem>
-                <ProjectListView Projects="_currentElectionResult.SubmittedProjects"/>
-            </MudGrid>
-        </CascadingValue>
+                        <!-- Submitted Project List View -->
+                        <MudItem>
+                            <div>All submitted projects</div>
+                        </MudItem>
+                        <ProjectListView Projects="result.SubmittedProjects"/>
+                    </MudGrid>
+                </CascadingValue>
+                </MudTabPanel>
+            }
+        </MudTabs>
     </MudContainer>
 }
 
@@ -78,4 +87,5 @@ else if (_currentElectionResult is not null)
 
         _isLoading = false;
     }
+
 }
