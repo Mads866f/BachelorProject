@@ -1,6 +1,6 @@
 using DTO.Models;
 
-namespace Front.Services.Elections;
+namespace Front.Services.Interface;
 
 public interface IElectionsApiService
 {

@@ -1,5 +1,5 @@
 using DTO.Models;
-using Front.Services.Elections;
+using Front.Services.Interface;
 using Front.Utilities;
 using Front.Utilities.Errors;
 
