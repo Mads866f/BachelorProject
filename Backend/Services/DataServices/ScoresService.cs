@@ -36,6 +36,11 @@ public class ScoresService : IScoresService
         var result = await _repository.GetScoreForVoter(id);
         var scoresDto = result
             .Select(x => _mapper.Map<Scores>(x));
+        foreach (var scoreDto in scoresDto)
+        {
+            var project = await _projectsRepository.GetByIdAsync(scoreDto.Project_Id);
+            scoreDto.project = _mapper.Map<Project>(project);
+        }
         return scoresDto;
 
     }

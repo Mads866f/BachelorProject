@@ -6,11 +6,12 @@ namespace Backend.Controllers.DataControllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VotersController(IVotersService voterService, ILogger<VotersController> logger)
+    public class VotersController(IVotersService voterService, ILogger<VotersController> logger, IProjectService projectService)
         : ControllerBase
     {
         private readonly IVotersService _voterService = voterService ?? throw new ArgumentNullException(nameof(voterService));
         private readonly ILogger<VotersController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly IProjectService _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
 
         /// <summary>
         /// Retrieves all voters.
@@ -31,6 +32,14 @@ namespace Backend.Controllers.DataControllers
                 if (voterList.Count != 0)
                 {
                     _logger.LogInformation("Found {VoterCount} voters.", voterList.Count);
+                    foreach (var voter in voterList)
+                    {
+                        foreach (var score in voter.Votes)
+                        {
+                            var project = await _projectService.GetProjectByIdAsync(score.Project_Id);
+                            score.project = project;
+                        }
+                    }
                     return Ok(result);
                 }
 
