@@ -20,7 +20,6 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
            _logger.LogInformation("Constructing ElectionResult Dto with id: "+ electionres.Id + " Election Id: "+ electionResult.ElectionId);
            electionres.UsedBallot = electionResult.BallotUsed;
            electionres.UsedMethod = electionres.UsedMethod;
-           //Getting ElectedProjects
            var projects = await repository.GetProjectsByResultId(electionResult.Id);
            var projectsTransformed = projects.Select(p => mapper.Map<Project>(p)).ToList();
            electionres.ElectedProjects = projectsTransformed;

@@ -2,7 +2,7 @@
 
 @if (AllElections is not null)
 {
-    <MudSelect T="Election" ValueChanged="OnValueChange">
+    <MudSelect T="Election" ValueChanged="OnValueChange" Label="Select an Election">
         @foreach (var election in AllElections)
         {
             <MudSelectItem Value="@election">@election.Name</MudSelectItem>
@@ -11,7 +11,7 @@
 }
 else
 {
-    <div>ERROR: fetching elections</div>
+    <MudAlert Severity="Severity.Error">ERROR: fetching elections</MudAlert>
 }
 
 @code {

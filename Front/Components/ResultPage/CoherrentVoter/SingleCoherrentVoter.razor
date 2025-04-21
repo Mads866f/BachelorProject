@@ -1,0 +1,93 @@
+@using DTO.Models
+@using MudBlazor
+@inject Random _random
+@rendermode InteractiveServer
+@using System.Drawing
+@using System.Runtime.InteropServices
+@using MudBlazor.Utilities
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+<MudPaper Class="p-6 rounded-lg">
+    <MudGrid RowSpacing="3" ColumnSpacing="2" AlignItems="Center">
+        <MudItem xs="2" >
+            <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Align="Align.Center">
+                Members
+            </MudText>
+        </MudItem>
+        <MudItem xs="2" >
+            <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Align="Align.Center">
+                Fraction
+            </MudText>
+        </MudItem>
+        <MudItem xs="8" >
+            <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Align="Align.Center">
+                Projects
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="2">
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                @coherrentVoter.number_of_voters
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="2">
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                @((((double) coherrentVoter.number_of_voters)/ NoOfVoters) * 100)%
+            </MudText>
+        </MudItem>
+
+        <MudItem xs="8">
+            <MudGrid Class="d-flex flex-wrap justify-center" Gutter="0">
+                @foreach (var project in coherrentVoter.projects)
+                {
+                    var text = GetToolTipText(project);
+                    var color = "background-color:" + GetRandomColor(project);
+                    <MudItem xs="2">
+                        <MudTooltip Text="@text" Placement="Placement.Top" Arrow="true">
+                            <MudAvatar Icon="@Icons.Material.Filled.Circle" Style="@color" Size="Size.Medium" Class="m-1 shadow-sm" />
+                        </MudTooltip>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Parameter] public required CoherrentVoter coherrentVoter { get; set; }
+    [Parameter] public required int NoOfVoters { get; set; }
+    
+
+    
+    
+    
+    private string GetRandomColor(Project project)
+    {
+        
+    var ColorPalette = new[]
+    {
+        "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
+        "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
+        "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000",
+        "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080",
+        "#ffffff", "#000000", "#ff4500", "#32cd32", "#1e90ff",
+        "#ff69b4", "#7fffd4", "#dda0dd", "#ff6347", "#40e0d0",
+        "#8a2be2", "#00ced1", "#dc143c", "#7cfc00", "#00bfff",
+        "#ff1493", "#20b2aa", "#ffb6c1", "#2e8b57", "#6a5acd",
+        "#ff8c00", "#8b0000", "#00fa9a", "#ba55d3", "#cd5c5c",
+        "#deb887", "#5f9ea0", "#d2691e", "#9acd32", "#6495ed",
+        "#ff7f50", "#6b8e23", "#00ff7f", "#ff00ff", "#b22222",
+        "#4682b4", "#ffdead", "#9932cc", "#adff2f", "#ffdab9"  
+    };
+    var index = Math.Abs(project.Id.GetHashCode()) % (ColorPalette.Count()-1);
+
+    return ColorPalette[index];
+    }
+
+    private string GetToolTipText(Project project)
+    {
+        return project.Name + ":" + project.Cost + "\u20ac";
+    }
+}

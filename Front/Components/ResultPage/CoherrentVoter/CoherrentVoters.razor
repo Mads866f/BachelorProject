@@ -1,0 +1,70 @@
+@using DTO.Models
+@using MudBlazor
+@rendermode InteractiveServer
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="p-4">
+    <MudText Typo="Typo.h4" Class="mb-2">Coherrent Voters</MudText>
+    <MudDivider Class="mb-3"/>
+
+    <MudPaper Class="p-3" Style="max-height: 500px; overflow-y: auto;">
+        <MudStack Spacing="2">
+            @foreach (var voter in cohrrentVoters)
+            {
+                <SingleCoherrentVoter coherrentVoter="voter" NoOfVoters="voters.Count"/>
+            }
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public required List<Voter> voters { get; set; }
+    private List<CoherrentVoter> cohrrentVoters = new List<CoherrentVoter>();
+
+
+    private void CalculateCoherrentVoters()
+    {
+        foreach (var voter in voters)
+        {
+            var votedProjects = new List<Project>();
+            foreach (var vote in voter.Votes)
+            {
+                if (vote.project is null)
+                {
+                    votedProjects.Add(new Project
+                    {
+                        Id = vote.Project_Id,
+                        ElectionId = default,
+                        Name = "NOT DEFINED",
+                        Cost = -1
+                    });
+                    continue;
+                }
+                votedProjects.Add(vote.project);
+            }
+            var existed = false;
+            foreach (var coVote in cohrrentVoters)
+            {
+                if (coVote.UpdateIfInGroup(votedProjects))
+                {
+                    existed = true;
+                } 
+            }
+
+            if (!existed)
+            {
+                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects };
+                Console.WriteLine("Created Coherrent Voter with:");
+                votedProjects.ForEach(p => Console.WriteLine(p));
+                cohrrentVoters.Add(new_coVote);
+            }
+            
+        }
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        CalculateCoherrentVoters();
+        return base.OnInitializedAsync();
+    }
+
+}

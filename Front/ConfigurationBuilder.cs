@@ -40,5 +40,6 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped <IScoresApiService,ScoresApiService>();
         builder.Services.AddScoped<IPbEngineApiService, PbEngineApiService>();
         builder.Services.AddScoped<IElectionResultsApiService, ElectionResultsApiService>();
+        builder.Services.AddScoped<Random>();
     }
 }

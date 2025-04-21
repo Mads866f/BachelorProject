@@ -3,6 +3,8 @@
 @using DTO.Models
 @using Front.Services.Elections
 @using Front.Components.ElectionInfo
+@using Front.Components.ResultPage
+@using Front.Components.ResultPage.CoherrentVoter
 
 <PageTitle>Election Results</PageTitle>
 
@@ -12,7 +14,7 @@
 }
 else if (_hasError)
 {
-    <MudAlert Severity="Severity.Error">Invalid or missing election ID.</MudAlert>
+    <MudAlert Severity="Severity.Error">Invalid election ID. Please select an </MudAlert>
 }
 else if (_currentElectionResult is not null)
 {
@@ -23,7 +25,7 @@ else if (_currentElectionResult is not null)
 
             <!-- Elected Project List View -->
             <MudItem>
-                <div>Elected Projects</div>
+                <CoherrentVoters voters="_voters"/>
             </MudItem>
             <ProjectListView Projects="_currentElectionResult.ElectedProjects" />
 
@@ -43,25 +45,29 @@ else
 @code {
     [Inject] public required IElectionResultsApiService ResultsApiService { get; set; }
     [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
+    [Inject] public required IVotersApiService VotersApiService { get; set;}
 
     [Parameter] public string? ElectionId { get; set; }
 
     private Election? _currentElection;
     private ElectionResult? _currentElectionResult;
     private List<ElectionResult> _electionResults = [];
+    private List<Voter> _voters;
 
     private bool _isLoading = true;
     private bool _hasError = false;
+   
 
     protected override async Task OnInitializedAsync()
     {
+        // Verify that the ElectionId from Url is valid
         if (string.IsNullOrWhiteSpace(ElectionId) || !Guid.TryParse(ElectionId, out var electionGuid))
         {
             _hasError = true;
             _isLoading = false;
             return;
         }
-
+        // Verify that ID matches an election
         var election = await ElectionsApiService.GetElection(electionGuid);
         if (election is null)
         {
@@ -74,6 +80,8 @@ else
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
+        Console.WriteLine("HER" + _currentElectionResult.ElectedProjects.Count);
+        _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
 
         _isLoading = false;
     }
