@@ -39,15 +39,18 @@
         </MudItem>
 
         <MudItem xs="8">
-            <MudGrid Class="d-flex flex-wrap justify-center" Gutter="0">
+            <MudGrid Class="d-flex flex-wrap justify-center" Gutter="0" Style="max-width: 1000px;overflow: auto">
                 @foreach (var project in coherrentVoter.projects)
                 {
                     var text = GetToolTipText(project);
                     var color = "background-color:" + GetRandomColor(project);
                     <MudItem xs="2">
-                        <MudTooltip Text="@text" Placement="Placement.Top" Arrow="true">
-                            <MudAvatar Icon="@Icons.Material.Filled.Circle" Style="@color" Size="Size.Medium" Class="m-1 shadow-sm" />
-                        </MudTooltip>
+                        <MudAvatar Icon="@Icons.Material.Filled.Circle" Style="@color" Size="Size.Medium" Class="m-1 shadow-sm"/>
+                        <MudText Typo="Typo.body2"
+                                 Style="max-width: 200px; overflow: auto; white-space: nowrap; text-overflow: ellipsis;">
+                            @project.Name
+                        </MudText>
+                        <MudText Typo="Typo.body2">@project.Cost</MudText>
                     </MudItem>
                 }
             </MudGrid>

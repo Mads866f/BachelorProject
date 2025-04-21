@@ -42,11 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-<<<<<<< HEAD
       <Folder Include="custom-elections\" />
-=======
       <Folder Include="Components\ResultInfo\" />
->>>>>>> ResultsPage-Voters
     </ItemGroup>
 
 </Project>

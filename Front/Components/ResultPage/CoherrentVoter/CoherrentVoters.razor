@@ -3,31 +3,84 @@
 @rendermode InteractiveServer
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="p-4">
-    <MudText Typo="Typo.h4" Class="mb-2">Coherrent Voters</MudText>
+    <MudText Typo="Typo.h4" Class="mb-2">Coherent Voters</MudText>
     <MudDivider Class="mb-3"/>
 
-    <MudPaper Class="p-3" Style="max-height: 500px; overflow-y: auto;">
-        <MudStack Spacing="2">
-            @foreach (var voter in cohrrentVoters)
+    <MudTable Items="@coherrentVoters" Hover="true" Breakpoint="Breakpoint.Sm">
+        <ColGroup>
+            <col style="width:100px;" />
+            <col style="width:100px;" />
+            <col />
+            <col style="width:100px;" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh>Members</MudTh>
+            <MudTh>Fraction</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="members">@context.number_of_voters</MudTd>
+            <MudTd DataLabel="fraction">@context.fraction</MudTd>
+            <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>
+            <!--<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>-->
+        </RowTemplate>
+        <ChildRowContent>
+            @if (context.ShowDetails)
             {
-                <SingleCoherrentVoter coherrentVoter="voter" NoOfVoters="voters.Count"/>
+                <MudTr>
+                    <td colspan="4">
+                        <MudCard Elevation="0">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.body1">Projects Within Group</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent Class="pa-0">
+                                <MudTable Items="@context.projects" Context="project" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                    <ColGroup>
+                                        <col />
+                                        <col />
+                                        <col style="width:200px;" />
+                                    </ColGroup>
+                                    <HeaderContent>
+                                        <MudTh>Name</MudTh>
+                                        <MudTh>Cost</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Project Name">@project.Name</MudTd>
+                                        <MudTd DataLabel="Project Cost">@project.Cost</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            </MudCardContent>
+                        </MudCard>
+                    </td>
+                </MudTr>
             }
-        </MudStack>
-    </MudPaper>
+        </ChildRowContent>
+    </MudTable>
 </MudContainer>
 
 @code {
     [Parameter] public required List<Voter> voters { get; set; }
-    private List<CoherrentVoter> cohrrentVoters = new List<CoherrentVoter>();
+    [Inject] public required ISnackbar Snackbar { get; set; }
+    private List<CoherrentVoter> coherrentVoters = new List<CoherrentVoter>();
+    
 
-
+    private void ShowBtnPress(CoherrentVoter coVoter)
+    {
+        coVoter.ShowDetails = !coVoter.ShowDetails;
+    } 
+    
     private void CalculateCoherrentVoters()
     {
         foreach (var voter in voters)
         {
+            Console.WriteLine("Voter:");
+            voter.Votes.ForEach(c => Console.WriteLine(c.project.Name));
             var votedProjects = new List<Project>();
             foreach (var vote in voter.Votes)
             {
+                Console.WriteLine("HERHE");
                 if (vote.project is null)
                 {
                     votedProjects.Add(new Project
@@ -42,7 +95,7 @@
                 votedProjects.Add(vote.project);
             }
             var existed = false;
-            foreach (var coVote in cohrrentVoters)
+            foreach (var coVote in coherrentVoters)
             {
                 if (coVote.UpdateIfInGroup(votedProjects))
                 {
@@ -52,15 +105,25 @@
 
             if (!existed)
             {
-                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects };
+                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects , voters =voters.Count, ShowDetails = false};
                 Console.WriteLine("Created Coherrent Voter with:");
-                votedProjects.ForEach(p => Console.WriteLine(p));
-                cohrrentVoters.Add(new_coVote);
+                votedProjects.ForEach(p => Console.WriteLine(p.Name));
+                coherrentVoters.Add(new_coVote);
             }
             
         }
     }
 
+    private HashSet<CoherrentVoter> expandedRows = new();
+
+    private void ToggleRow(CoherrentVoter voter)
+    {
+        if (!expandedRows.Add(voter))
+            expandedRows.Remove(voter);
+    }
+
+    private bool IsExpanded(CoherrentVoter voter) => expandedRows.Contains(voter);
+    
     protected override Task OnInitializedAsync()
     {
         CalculateCoherrentVoters();

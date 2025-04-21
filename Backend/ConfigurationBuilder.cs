@@ -50,7 +50,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IProjectService, ProjectService>();
         builder.Services.AddScoped<IPbEngineService, PbEngineService>();
         builder.Services.AddScoped<ElectionResultService>(); //TODO ADD INTERFACE
-        builder.Services.AddSingleton(new GlobalDatabaseSemaphore(30));
+        builder.Services.AddSingleton(new GlobalDatabaseSemaphore(1_000_000));
     }
 
     private static void SetupRepositories(WebApplicationBuilder builder)
