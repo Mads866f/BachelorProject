@@ -33,4 +33,8 @@
       <AdditionalFiles Include="Components\Voter\ProjectVoteBar.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Components\ResultInfo\" />
+    </ItemGroup>
+
 </Project>

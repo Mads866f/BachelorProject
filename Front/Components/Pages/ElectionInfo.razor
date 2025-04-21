@@ -1,7 +1,6 @@
 @page "/electionInfo/{ElectionId?}"
 @rendermode InteractiveServer
 @using DTO.Models
-@using Front.Components.ElectionInfo.Dialogs
 @using Front.Services.Elections
 @using Front.Components.ElectionInfo
 @using Front.Services.Interface
@@ -18,7 +17,8 @@
     <SelectElection
         AllElections="allElections"
         CurrentElection="_currentElection"
-        UpdateElection="UpdateSelectedElection"></SelectElection>
+        UpdateElection="UpdateSelectedElection">
+    </SelectElection>
 
     @if (_currentElection is null) return;
     
@@ -108,17 +108,13 @@
 
     private async Task LoadElection()
     {
-        Console.WriteLine("Load Election Started");
         if (_currentElection.Id.ToString().Equals(""))
         {
-            Console.WriteLine("ID empty");
             return;
         }
         else
         {
-            Console.WriteLine("Getting election");
             var election = await ElectionsApiService.GetElection(_currentElection.Id);
-            Console.WriteLine(election.ToString());
             _currentElection = election;
         }
         await LoadVoters();

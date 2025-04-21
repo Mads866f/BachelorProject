@@ -12,7 +12,7 @@
 }
 else if (_hasError)
 {
-    <MudAlert Severity="Severity.Error">Invalid or missing election ID.</MudAlert>
+    <MudAlert Severity="Severity.Error">Invalid election ID. Please select an </MudAlert>
 }
 else if (_currentElectionResult is not null)
 {
@@ -52,16 +52,18 @@ else
 
     private bool _isLoading = true;
     private bool _hasError = false;
+   
 
     protected override async Task OnInitializedAsync()
     {
+        // Verify that the ElectionId from Url is valid
         if (string.IsNullOrWhiteSpace(ElectionId) || !Guid.TryParse(ElectionId, out var electionGuid))
         {
             _hasError = true;
             _isLoading = false;
             return;
         }
-
+        // Verify that ID matches an election
         var election = await ElectionsApiService.GetElection(electionGuid);
         if (election is null)
         {
