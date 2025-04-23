@@ -49,7 +49,7 @@ public static class ConfigurationBuilder
         builder.Services.AddScoped<IScoresService, ScoresService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
         builder.Services.AddScoped<IPbEngineService, PbEngineService>();
-        builder.Services.AddScoped<ElectionResultService>(); //TODO ADD INTERFACE
+        builder.Services.AddScoped<IElectionResultService, ElectionResultService>();
         builder.Services.AddSingleton(new GlobalDatabaseSemaphore(1_000_000));
     }
 

@@ -94,7 +94,7 @@ else if (_currentElectionResult is not null)
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
-        Console.WriteLine("HER" + _currentElectionResult.ElectedProjects.Count);
+        
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
 
         _isLoading = false;

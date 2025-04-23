@@ -15,9 +15,9 @@ public class PbEngineController(IElectionService _electionService,
     IProjectService _projectService,
     IVotersService _votersService,
     IPbEngineService _service,
-    ElectionResultService _resultService,
+    IElectionResultService _resultService,
     IScoresService _scoresService
-    ) :Controller
+    ) :ControllerBase
 {
 
     private async Task<PythonElection> createPythonElection(Election election)
@@ -68,7 +68,7 @@ public class PbEngineController(IElectionService _electionService,
     public async Task<List<Project>> CalculateElection(Guid id)
     {
         var electionEntity = await _electionService.GetElectionAsync(id);
-        var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
+        var electionId = electionEntity?.Id ?? Guid.Empty;
         var method = 1; //TODO CHANGE IN DB TO STORE AS CONSTANTS FOR BETTER COMMUNICATION WITH PBENGIN
         var ballotDesign = 1; //TODO SAME AS ABOVE
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
@@ -126,7 +126,7 @@ public class PbEngineController(IElectionService _electionService,
             
         //Adding the election to the database
         var election = new CreateElectionModel(){Name = result.name,TotalBudget = result.totalBudget,BallotDesign = result.ballot_type, Model = result.method};
-        var election_created= await _electionService.CreateElectionAsync(election);
+        var electionCreated = await _electionService.CreateElectionAsync(election);
         //Adding the projects
         var projects = result.projects;
         var projectToIdMap = new Dictionary<string, Guid>();
@@ -134,7 +134,7 @@ public class PbEngineController(IElectionService _electionService,
         {
             var project = new CreateProjectModel()
             {
-                ElectionId = election_created.Id,
+                ElectionId = electionCreated.Id,
                 Name = pythonProject.name,
                 Cost = pythonProject.cost,
                 Categories = [],
@@ -148,8 +148,8 @@ public class PbEngineController(IElectionService _electionService,
         foreach (var pythonVoter in voters)
         {
             //Adding Voter
-            var voter_model = new CreateVoter(){ElectionId = election_created.Id};
-            var createdVoter = await _votersService.CreateVoterAsync(voter_model);
+            var voterModel = new CreateVoter(){ElectionId = electionCreated.Id};
+            var createdVoter = await _votersService.CreateVoterAsync(voterModel);
             //Adding votes
             for (int i = 0; i < pythonVoter.selectedProjects.Count; i++)
             {
@@ -160,7 +160,7 @@ public class PbEngineController(IElectionService _electionService,
                 await _scoresService.CreateVotersAsync(score);
             }
         }
-        return (election_created);
+        return (electionCreated);
         
     }
 

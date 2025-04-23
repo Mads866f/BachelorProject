@@ -34,10 +34,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\Results\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="custom-elections\" />
     </ItemGroup>
 

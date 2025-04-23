@@ -61,8 +61,10 @@
 </MudContainer>
 
 @code {
-    [Parameter] public required List<Voter> voters { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
+    [Parameter] public required List<Voter> voters { get; set; }
+    
+    
     private List<CoherrentVoter> coherrentVoters = new List<CoherrentVoter>();
     
 
