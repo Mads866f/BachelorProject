@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <Folder Include="custom-elections\" />
+      <Folder Include="real-elections\" />
     </ItemGroup>
 
 </Project>

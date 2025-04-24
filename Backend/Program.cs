@@ -3,14 +3,27 @@ using Backend.Database;
 using Microsoft.AspNetCore.DataProtection;
 
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"keys"));
 
 // Get Connection string
 // TODO CHANGE CONNECTION STRING TO MAKE IT WORK IN DOCKER CONTAINER
-//var connectionString = builder.Configuration.GetConnectionString("Postgres_db");
-var connectionString = builder.Configuration.GetConnectionString("Local_Postgres_db");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+string pbconnection = "";
+if(args.Contains("-Dev"))
+{ 
+    connectionString = builder.Configuration.GetConnectionString("Local_Postgres_db");
+
+    pbconnection= "http://localhost:8000";
+}
+else{
+    connectionString = builder.Configuration.GetConnectionString("Postgres_db");
+    pbconnection= "http://pbengine:8000";
+}
 builder.Services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlDbConnectionFactory(connectionString!));
 
 // Add services to the container.
@@ -22,7 +35,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Backend.xml"));
 });
 
-builder.AddConfiguration();
+builder.AddConfiguration(pbconnection);
 builder.Services.AddControllers();
 
 var app = builder.Build();

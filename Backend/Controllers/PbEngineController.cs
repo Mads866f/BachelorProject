@@ -111,7 +111,7 @@ public class PbEngineController(IElectionService _electionService,
     public List<string> GetRealElections()
     {
         Console.WriteLine("Real Elections Was Requested");
-        var folder = "../real-elections";
+        var folder = "real-elections";
         string[] files = Directory.GetFiles(folder);
         Console.WriteLine(files[0]);
         var result = files.ToList();
@@ -221,10 +221,13 @@ public class PbEngineController(IElectionService _electionService,
         var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects);
         
         Console.WriteLine("RESULT");
+        Console.WriteLine(result.Keys.First());
+        Console.WriteLine(result.Values.First());
         var updates = new List<(string OldKey, string NewKey, float Value)>();
 
         foreach (var (key, value) in result.Reverse())
         {
+            Console.WriteLine($"{key}: {value}"); 
             if (Constants.sat_map.TryGetValue(key, out var newKey))
             {
                 updates.Add((key, newKey, value));

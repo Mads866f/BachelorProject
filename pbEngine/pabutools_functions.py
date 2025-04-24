@@ -209,6 +209,7 @@ def instance_from_election_model(election:Election):
 def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction):
     sat = determine_satisfaction(satisfaction)
     voting_instance = instance_from_election_model(election)
+    print("PROJECTS IN ELECTION:",voting_instance)
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #Change such that the ballot type is not hardcoded
     print("PROFILE:",profile)
     outcome = map(project_model_to_project_pabu,outcome)

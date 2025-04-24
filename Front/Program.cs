@@ -23,8 +23,15 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
+var connection = "";
+if(args.Contains("-Dev")){
+connection = "http://localhost:5253";
+}
+else{
+connection = "http://backend:8080"; 
+}
 
-builder.AddConfiguration();
+builder.AddConfiguration(connection);
 
 builder.Services.AddRazorPages();
 

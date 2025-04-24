@@ -12,9 +12,9 @@ namespace Backend;
 
 public static class ConfigurationBuilder
 {
-    public static void AddConfiguration(this WebApplicationBuilder builder)
+    public static void AddConfiguration(this WebApplicationBuilder builder,string pbconnection)
     {
-        SetupHttpClient(builder);
+        SetupHttpClient(builder,pbconnection);
         SetupMappings(builder);
         SetupRepositories(builder);
         SetupServices(builder);
@@ -27,7 +27,7 @@ public static class ConfigurationBuilder
     }
 
     // Setup http client for PBengine
-    private static void SetupHttpClient(WebApplicationBuilder builder)
+    private static void SetupHttpClient(WebApplicationBuilder builder,string pbconnection)
     {
         builder.Services.AddHttpClient(Constants.PbEngine, client =>
         {
@@ -35,9 +35,7 @@ public static class ConfigurationBuilder
             //                        ?? throw new InvalidOperationException(
             //                          "Connection string 'BackendAPI' not found.");
             // TODO CHANGE FOR DOCKER WHOLE PROJECT
-            //string connectionString = "http://pbengine:8000";
-            string connectionString = "http://localhost:8000";
-            client.BaseAddress = new Uri(connectionString);
+            client.BaseAddress = new Uri(pbconnection);
         });
     }
 

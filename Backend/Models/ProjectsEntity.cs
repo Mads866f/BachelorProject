@@ -6,4 +6,5 @@ public class ProjectsEntity
     public Guid ElectionId { get; set; }
     public string Name { get; set; }
     public int Cost { get; set; }
+    public int? votes { get; set; }
 }

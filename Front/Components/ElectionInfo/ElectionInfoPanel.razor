@@ -41,7 +41,34 @@
                 </MudItem>
             </MudGrid>
         </MudPaper>
+            @if(NoOfProjects is not 0){
+            <MudPaper>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudText Typo="Typo.h6">No Of Voters</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1">@NoOfVoters</MudText>
+            </MudItem>
+        </MudGrid>
+        </MudPaper>
+            
+            }
+        @if (NoOfVoters is not 0)
+        { 
+            <MudPaper>
+        <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">No Of Projects</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@NoOfProjects</MudText>
+                </MudItem>
+            </MudGrid>
+            </MudPaper>
+        }
     </MudStack>
+    
 
 </MudItem>
 
@@ -49,6 +76,8 @@
     [CascadingParameter] public required Election Election { get; set; }
     [Parameter] public string? NewBallotFormat { get; set; }
     [Parameter] public string? NewModelFormat { get; set; }
+    [Parameter] public int NoOfVoters { get; set; }
+    [Parameter] public int NoOfProjects { get; set; }
 
     private string UseUpdatedBallotFormat()
     {

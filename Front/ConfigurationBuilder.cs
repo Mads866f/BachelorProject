@@ -9,24 +9,21 @@ namespace Front;
 
 public static class ConfigurationBuilder
 {
-    public static void AddConfiguration(this WebApplicationBuilder builder)
+    public static void AddConfiguration(this WebApplicationBuilder builder, string connectionString)
     {
-        SetupHttpClient(builder);
+        SetupHttpClient(builder, connectionString);
         SetupServices(builder);
     }
     
     // Setup http client for Backend
-    private static void SetupHttpClient(WebApplicationBuilder builder)
+    private static void SetupHttpClient(WebApplicationBuilder builder,string connection)
     {
         builder.Services.AddHttpClient(Constants.Backend, client =>
         {
             //string connectionString = builder.Configuration.GetConnectionString("BackendAPI")
               //                        ?? throw new InvalidOperationException(
                 //                          "Connection string 'BackendAPI' not found.");
-            //TODO Change this to not use localhost if building entire project
-            //string connectionString = "http://backend:8080"; 
-            string connectionString = "http://localhost:5253";
-            client.BaseAddress = new Uri(connectionString);
+            client.BaseAddress = new Uri(connection);
         });
     }
 

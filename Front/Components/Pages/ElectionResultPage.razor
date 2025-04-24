@@ -28,11 +28,16 @@ else if (_currentElectionResult is not null)
                         <MudItem xs="12">
                             <MudSpacer/>
                         </MudItem>
+                        @{
+                            Console.WriteLine("WTF?" + _currentElectionResult.SubmittedProjects.Count());
+                            Console.WriteLine("WTF???" + _voters.Count());
+                        }
                         <!-- Election Info - Left side -->
                             <ElectionInfoPanel
                                 NewBallotFormat="@result.UsedBallot"
-                                NewModelFormat="@result.UsedMethod"/>
-
+                                NewModelFormat="@result.UsedMethod"
+                                NoOfProjects="@_currentElectionResult.SubmittedProjects.Count()"
+                                NoOfVoters="@_voters.Count()"/>
                         <!-- Elected Project List View -->
                         <MudItem xs="6">
                             <CoherrentVoters voters="_voters"/>
@@ -104,6 +109,8 @@ else if (_currentElectionResult is not null)
         analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
         Console.WriteLine("HER" + _currentElectionResult.ElectedProjects.Count);
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
+        Console.WriteLine($"VOTERS:{_voters.Count()}");
+        Console.WriteLine($"Submitted Projects:{_currentElectionResult.SubmittedProjects.Count()}");
 
         _isLoading = false;
     }
