@@ -1,5 +1,4 @@
 @using DTO.Models
-@using MudBlazor
 @rendermode InteractiveServer
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="p-4">
@@ -62,27 +61,23 @@
 
 @code {
     [Inject] public required ISnackbar Snackbar { get; set; }
-    [Parameter] public required List<Voter> voters { get; set; }
     
+    [Parameter] public required List<Voter> voters { get; set; }
     
     private List<CoherrentVoter> coherrentVoters = new List<CoherrentVoter>();
     
-
     private void ShowBtnPress(CoherrentVoter coVoter)
     {
         coVoter.ShowDetails = !coVoter.ShowDetails;
     } 
     
-    private void CalculateCoherrentVoters()
+    private void CalculateCoherentVoters()
     {
         foreach (var voter in voters)
         {
-            Console.WriteLine("Voter:");
-            voter.Votes.ForEach(c => Console.WriteLine(c.project.Name));
             var votedProjects = new List<Project>();
             foreach (var vote in voter.Votes)
             {
-                Console.WriteLine("HERHE");
                 if (vote.project is null)
                 {
                     votedProjects.Add(new Project
@@ -108,8 +103,6 @@
             if (!existed)
             {
                 var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects , voters =voters.Count, ShowDetails = false};
-                Console.WriteLine("Created Coherrent Voter with:");
-                votedProjects.ForEach(p => Console.WriteLine(p.Name));
                 coherrentVoters.Add(new_coVote);
             }
             
@@ -128,7 +121,7 @@
     
     protected override Task OnInitializedAsync()
     {
-        CalculateCoherrentVoters();
+        CalculateCoherentVoters();
         return base.OnInitializedAsync();
     }
 
