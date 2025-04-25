@@ -29,7 +29,7 @@
       - pb_network
     volumes:
       - ./keys:/app/keys
-      - ./real-elections:/app/Backend/real-elections
+      - ./real-elections:/app/real-elections
   
   pbengine:
     image: pbengine

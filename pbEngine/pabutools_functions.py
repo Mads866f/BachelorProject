@@ -40,7 +40,6 @@ def initialTest():
 
     outcome_greedy = pbrule.greedy_utilitarian_welfare(voting_instance,approval_profile,sat_class = pbelec.Cost_Sat )
 
-
     return voting_instance,approval_profile, outcome_greedy
 
 def instance_to_array_of_projects(instance):
@@ -157,6 +156,11 @@ def create_profile(ballot_type,ballots):
         print("Profile Does Not Exist")
 
 def project_model_to_project_pabu(project_model: Project):
+    name = project_model.name
+    cost = project_model.cost
+    cat = project_model.categories
+    tag =project_model.target
+    print(f"name{name}:cost{cost}:cat:{cat}:tag{tag}")
     return pbelec.Project(project_model.name,project_model.cost,project_model.categories,project_model.target)
 
 def profile_from_voter_list(votes:list[Voter],ballot_type,election):
@@ -197,11 +201,9 @@ def instance_from_election_model(election:Election):
         project_to_add = pbelec.Project(project.name,project.cost,project.categories,project.target)
         voting_instance.add(project_to_add)
 
-    voting_instance = pbelec.Instance([],election.totalBudget)
     voting_instance.meta["name"] = election.name
     voting_instance.meta["voting_rule"] = election.ballot_type
     voting_instance.meta["rule"] = election.method
-    voting_instance = pbelec.Instance([],election.totalBudget)
 
     return voting_instance
 
@@ -209,11 +211,23 @@ def instance_from_election_model(election:Election):
 def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction):
     sat = determine_satisfaction(satisfaction)
     voting_instance = instance_from_election_model(election)
-    print("PROJECTS IN ELECTION:",voting_instance)
+    print("PROJECTS IN Voting Instance:",voting_instance)
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #Change such that the ballot type is not hardcoded
-    print("PROFILE:",profile)
-    outcome = map(project_model_to_project_pabu,outcome)
-    return float(pban.avg_satisfaction(voting_instance,profile,outcome,sat_class=sat))
+    print("OUTCOME BEFORE")
+    for o in outcome:
+        print(o)
+    print("OUTCOME AFTER")
+    for o in outcome:
+        print(o)
+    print("PROFILE:",type(list(profile[0])[0]))
+    print("PROFILE:",list(profile[2])[0])
+    print("PROFILE:",type(outcome[0]))
+    print("PROFILE:",list(profile[0])[0]==outcome[0])
+    print("PROFILE:",list(profile[2])[0]==outcome[0])
+    pabu_outcome = []
+    for p in outcome:
+        pabu_outcome.append(project_model_to_project_pabu(p))
+    return float(pban.avg_satisfaction(voting_instance,profile,pabu_outcome,sat_class=sat))
 
 
 

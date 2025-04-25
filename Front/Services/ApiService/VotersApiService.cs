@@ -76,17 +76,11 @@ public class VotersApiService(IHttpClientFactory clientFactory, ILogger<VotersAp
         _logger.LogInformation($"Getting voters by election id {electionId}");
         try
         {
-            var response = await _client.GetAsync(url);
+            var response = await _client.GetAsync($"{url}/election/{electionId}");
             if (response.IsSuccessStatusCode)
             {
                 var result =  await response.Content.ReadFromJsonAsync<List<Voter>>();
-                if (result != null) return result.Where(voter => voter.ElectionId == electionId).ToList();
-                else
-                {
-                    var exception =  new NotFoundError("Election not found with id: " + electionId);
-                    _logger.LogError(exception, "No Election found with given id");
-                    throw exception;
-                }
+                return result ?? [] ;
             }
             else
             {

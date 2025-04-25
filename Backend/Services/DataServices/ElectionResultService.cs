@@ -54,6 +54,7 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
             UsedMethod = electionResult.MethodUsed,
             ElectedProjects = electedProjects,
             SubmittedProjects = submittedProjects.ToList(),
+            TotalBudget = electionResult.TotalBudget,
         };
         return result;
         

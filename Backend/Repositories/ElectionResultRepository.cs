@@ -13,8 +13,9 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
       _logger.LogInformation("Getting ElectionResults from database with Result Id: "+ resultId);
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
-                    SELECT id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed
+                    SELECT result.id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed, e.total_budget as TotalBudget
                     FROM result_table as result
+                    JOIN elections_table as e on result.election_id = e.id
                     WHERE result.id = @Id
                     """;
         var result = await db.QueryAsync<ElectionResultEntity>(query, new { Id = resultId });
@@ -35,8 +36,9 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
         _logger.LogInformation("Getting ElectionResults from database with election Id: "+ electionId);
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
-                    SELECT id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed
+                    SELECT result.id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed, e.total_budget as TotalBudget
                     FROM result_table as result
+                    JOIN elections_table as e on result.election_id = e.id
                     WHERE result.election_id = @electionId
                     """;
         var result = await db.QueryAsync<ElectionResultEntity>(query, new { electionId = electionId });

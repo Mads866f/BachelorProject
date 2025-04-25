@@ -216,6 +216,7 @@ public class PbEngineController(IElectionService _electionService,
             name = "",
             projects = submittedPythonProjects,
             votes = votersPython,
+            totalBudget = election.TotalBudget
         };
         
         var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects);

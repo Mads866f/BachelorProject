@@ -54,7 +54,7 @@
         Console.WriteLine("Elections loaded: " + elections?.Count);
         Console.WriteLine("First Election: "+ elections?.First());
         var election_names =  await _pbEngineApiService.GetRealElectionsNames();
-        _realElectionNames = election_names.Select(x => x.Replace("_", " ").Replace(".pb","").Replace("Backend/real-elections/","").Replace("../real-elections/","")).ToList();
+        _realElectionNames = election_names.Select(x => x.Replace("_", " ").Replace(".pb","").Replace("real-elections/","").Replace("../real-elections/","")).ToList();
         StateHasChanged();
     }
 

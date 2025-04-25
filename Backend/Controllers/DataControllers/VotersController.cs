@@ -53,6 +53,40 @@ namespace Backend.Controllers.DataControllers
             }
         }
 
+        [HttpGet("election/{Electionid}")]
+        public async Task<ActionResult<Voter>> GetByElectionId(Guid Electionid)
+        {
+            
+            _logger.LogInformation($"Fetching all voters from election with id {Electionid}.");
+
+            try
+            {
+                var result = await _voterService.GetVotersByElectionId(Electionid);
+                var voterList = result.ToList();
+                if (voterList.Count != 0)
+                {
+                    _logger.LogInformation("Found {VoterCount} voters.", voterList.Count);
+                    foreach (var voter in voterList)
+                    {
+                        foreach (var score in voter.Votes)
+                        {
+                            var project = await _projectService.GetProjectByIdAsync(score.Project_Id); //TODO - Optimize this
+                            score.project = project;
+                        }
+                    }
+                    return Ok(result);
+                }
+
+                _logger.LogWarning("No voters found.");
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching all voters by Id.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+        
         /// <summary>
         /// Retrieves a voter by ID.
         /// </summary>
