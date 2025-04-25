@@ -3,6 +3,7 @@ using Backend.Models;
 using Backend.Repositories.Interfaces;
 using Dapper;
 using DTO.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Repositories;
 
@@ -19,7 +20,14 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
                     WHERE result.id = @Id
                     """;
         var result = await db.QueryAsync<ElectionResultEntity>(query, new { Id = resultId });
-        return result.ToList().First();
+        if (result.Any())
+        {
+            return result.ToList().First();
+        }
+
+        var error = new Exception("ElectionResult With id: "+ resultId+" Not Found");
+        _logger.LogError(error,error.Message);
+        throw error;
     }
     
     /// <summary>

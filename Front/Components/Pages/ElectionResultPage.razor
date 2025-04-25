@@ -37,11 +37,14 @@ else if (_currentElectionResult is not null)
                                 NoOfProjects="@_currentElectionResult.SubmittedProjects.Count()"
                                 NoOfVoters="@_voters.Count()"/>
                         <!-- Elected Project List View -->
-                        <MudItem xs="6">
-                            <CoherrentVoters voters="_voters"/>
+                        <MudItem xs="8">
+                            <CoherrentVoters coherrentVoters="_coherrentVoters"/>
                         </MudItem>
-                        <MudItem xs = "2">
-                            <AnalysisNumberDisplay numbers="analysisNumbers"/>
+                        <MudItem xs = "10">
+                            <AnalysisNumberDisplay avgNumbers="analysisNumbers" coNumbers="coVoteAnalNumbers" />
+                        </MudItem>
+                        <MudItem xs="2">
+                            <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
                         </MudItem>
                         <!-- Elected Project List View -->
                         <MudItem xs="12">
@@ -75,7 +78,9 @@ else if (_currentElectionResult is not null)
     private ElectionResult? _currentElectionResult;
     private List<ElectionResult> _electionResults = [];
     private List<Voter> _voters;
+    private List<CoherrentVoter> _coherrentVoters = [];
     private Dictionary<string, float> analysisNumbers = new Dictionary<string, float>();
+    private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
 
     private bool _isLoading = true;
     private bool _hasError = false;
@@ -104,13 +109,54 @@ else if (_currentElectionResult is not null)
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
-        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
-        Console.WriteLine("HER" + _currentElectionResult.ElectedProjects.Count);
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
-        Console.WriteLine($"VOTERS:{_voters.Count()}");
-        Console.WriteLine($"Submitted Projects:{_currentElectionResult.SubmittedProjects.Count()}");
-
+        CalculateCoherrentVoters();
+        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
+        coVoteAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters, _currentElectionResult);
         _isLoading = false;
     }
 
+    private void CalculateCoherrentVoters()
+    {
+        foreach (var voter in _voters)
+        {
+            Console.WriteLine("Voter:");
+            voter.Votes.ForEach(c => Console.WriteLine(c.project.Name));
+            var votedProjects = new List<Project>();
+            foreach (var vote in voter.Votes)
+            {
+                Console.WriteLine("HERHE");
+                if (vote.project is null)
+                {
+                    votedProjects.Add(new Project
+                    {
+                        Id = vote.Project_Id,
+                        ElectionId = default,
+                        Name = "NOT DEFINED",
+                        Cost = -1
+                    });
+                    continue;
+                }
+
+                votedProjects.Add(vote.project);
+            }
+
+            var existed = false;
+            foreach (var coVote in _coherrentVoters)
+            {
+                if (coVote.UpdateIfInGroup(votedProjects))
+                {
+                    existed = true;
+                }
+            }
+
+            if (!existed)
+            {
+                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects, voters = _voters.Count, ShowDetails = false };
+                Console.WriteLine("Created Coherrent Voter with:");
+                votedProjects.ForEach(p => Console.WriteLine(p.Name));
+                _coherrentVoters.Add(new_coVote);
+            }
+        }
+    }
 }

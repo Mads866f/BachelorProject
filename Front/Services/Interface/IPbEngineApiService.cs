@@ -1,4 +1,5 @@
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
 
 namespace Front.Services.Interface;
 
@@ -12,4 +13,8 @@ public interface IPbEngineApiService
     Task<string> DownloadCustomElection(Election electionId);
 
     Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult);
+
+
+    Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(List<CoherrentVoter> coherrents,
+        ElectionResult electionResult);
 }

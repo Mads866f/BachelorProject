@@ -8,6 +8,8 @@ using Backend.Services.Interfaces;
 using Backend.Services.Interfaces.PbEngine;
 using Backend.Utilities;
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -188,10 +190,49 @@ public class PbEngineController(IElectionService _electionService,
         return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
     }
 
+    [HttpPost("analyze/CoherrentGroups/{resultId}")]
+    public async Task<Dictionary<Guid,Dictionary<string,float>>> GetGroupsAvgSat([FromBody]List<CoherrentVoter> groups,[FromRoute]Guid resultId)
+    {
+        Console.WriteLine("HELLLO HELLO HELLO");
+        var election = await _resultService.GetElectionResultByResultId(resultId);
+        var pythonProjectElected = election.ElectedProjects.Select(p => new PythonProject() {name = p.Id.ToString(),cost = p.Cost,categories = p.Categories.Select(c => c.Name).ToList() ??[],target = p.Targets.Select(t => t.Name).ToList() ?? []}).ToList();
+    Console.WriteLine("Elected Python Projects size: " + pythonProjectElected.Count());
+        var accSats = new Dictionary<Guid, Dictionary<string, float>>();
+        foreach (var group in groups)
+        {
+            //Create the group as 1 voter
+            var pythonVoter = new List<PythonVoter>()
+            {
+                new PythonVoter()
+                {
+                    selectedProjects = group.projects.Select(p => p.Id.ToString()).ToList(),
+                    selectedDegree = group.projects.Select(_ => 1).ToList()
+                }
+            };
+            //Create the Election simulating only that group as voters
+            var pythonElection = new PythonElection()
+            {
+                ballot_type = election.UsedBallot,
+                method = election.UsedMethod,
+                name = "NOT NEEDED",
+                projects = election.SubmittedProjects.Select(p => new PythonProject()
+                    { cost = p.Cost, name = p.Id.ToString(), categories = [], target = [] }).ToList(),
+                totalBudget = election.TotalBudget,
+                votes = pythonVoter
+            };
+            //Analyze avg satisfaction:
+            var groupSat = await _service.GetAnalysisNumbers(pythonElection,pythonProjectElected);
+            ChangeKeysFromNumbersToReal(groupSat); 
+            accSats.Add(group.id, groupSat);
+        }
+        return accSats; 
+        
+    }
+    
+    
     [HttpGet("/analyze/avgSatisfaction/{resultId}")]
     public async Task<Dictionary<string,float>> GetAverageSatisfaction(Guid resultId)
     {
-        Console.WriteLine("CALLLED");
         var election = await _resultService.GetElectionResultByResultId(resultId);
         var submittedPythonProjects = election.SubmittedProjects.Select(p => 
             new PythonProject()
@@ -203,6 +244,7 @@ public class PbEngineController(IElectionService _electionService,
             new PythonProject()
                 {name =p.Id.ToString(), cost = p.Cost, 
                     categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
+        Console.WriteLine($"ElectedProjectListSize - Here: {electedProjects.Count()}");
        var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
        var votersPython = voters.Select(v => new PythonVoter
        {
@@ -220,13 +262,16 @@ public class PbEngineController(IElectionService _electionService,
         };
         
         var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects);
-        
-        Console.WriteLine("RESULT");
-        Console.WriteLine(result.Keys.First());
-        Console.WriteLine(result.Values.First());
+        ChangeKeysFromNumbersToReal(result); 
+        return result;
+
+    }
+
+    private void ChangeKeysFromNumbersToReal(Dictionary<string,float> dict)
+    {
         var updates = new List<(string OldKey, string NewKey, float Value)>();
 
-        foreach (var (key, value) in result.Reverse())
+        foreach (var (key, value) in dict.Reverse())
         {
             Console.WriteLine($"{key}: {value}"); 
             if (Constants.sat_map.TryGetValue(key, out var newKey))
@@ -238,10 +283,9 @@ public class PbEngineController(IElectionService _electionService,
 // Apply updates after iteration
         foreach (var (oldKey, newKey, value) in updates)
         {
-            result[newKey] = value;
-            result.Remove(oldKey);
+            dict[newKey] = value;
+            dict.Remove(oldKey);
         }
-        return result;
-
+        
     }
 }

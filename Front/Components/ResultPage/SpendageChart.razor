@@ -1,0 +1,21 @@
+@using DTO.Models
+<MudChart ChartType="ChartType.Donut" InputLabels="labels" InputData="_series" ></MudChart>
+
+@code {
+    [Parameter] public List<Project> electedProjects { get; set; }
+    [Parameter] public int totalBudget { get; set; }
+    private string[] labels { get; set; }
+    private double[] _series { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        var tmplabels = electedProjects.Select(p => p.Name).ToList();
+        var tmp_series = electedProjects.Select(p => (double) p.Cost).ToList();
+        tmplabels.Add("Unused");
+        tmp_series.Add(totalBudget- electedProjects.Sum(p => p.Cost));
+        labels = tmplabels.ToArray();
+        _series = tmp_series.ToArray();
+        return base.OnInitializedAsync();
+    }
+
+}

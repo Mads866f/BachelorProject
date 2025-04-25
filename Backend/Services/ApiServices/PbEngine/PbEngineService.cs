@@ -99,6 +99,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         var url = "analyze/";
         var sats = (new List<int>(){1,2,3,5,6,7,8,10,11});
         Console.WriteLine($"BUDGET BACKEND: {election.totalBudget}");
+        Console.WriteLine($"NUMBER OF ELECTED PROJECTS: {electedProjects.Count()}");
         var load = new
         {
             election = election,
@@ -140,4 +141,5 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
             throw;
         }
     }
+    
 }

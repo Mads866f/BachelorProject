@@ -219,11 +219,6 @@ def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction)
     print("OUTCOME AFTER")
     for o in outcome:
         print(o)
-    print("PROFILE:",type(list(profile[0])[0]))
-    print("PROFILE:",list(profile[2])[0])
-    print("PROFILE:",type(outcome[0]))
-    print("PROFILE:",list(profile[0])[0]==outcome[0])
-    print("PROFILE:",list(profile[2])[0]==outcome[0])
     pabu_outcome = []
     for p in outcome:
         pabu_outcome.append(project_model_to_project_pabu(p))

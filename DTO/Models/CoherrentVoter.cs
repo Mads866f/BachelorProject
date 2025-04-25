@@ -1,5 +1,4 @@
 using DTO.Models;
-using MudBlazor;
 
 namespace Front.Components.ResultPage.CoherrentVoter;
 

@@ -1,13 +1,39 @@
+@using MudBlazor
+
 <MudText Typo="Typo.h4">Analysis Numbers</MudText>
 <MudDivider/>
-@foreach (var indicator in numbers)
-{
-   <MudPaper Class="mb-2 p-2">
-      <MudText>@indicator.Key</MudText>
-      <MudText>@indicator.Value</MudText>
+   <MudPaper>
+      <MudChart ChartType="ChartType.Bar" ChartSeries="@charts" LegendPosition="Position.Bottom" XAxisLabels="@x_labels" Height="500" ></MudChart>
    </MudPaper>
-}
 
 @code {
-   [Parameter] public required Dictionary<string,float> numbers { get; set; }
+   [Parameter] public required Dictionary<string,float> avgNumbers { get; set; }
+   [Parameter] public required Dictionary<Guid,Dictionary<string ,float>> coNumbers {get; set; }
+   private List<ChartSeries> charts = [];
+   private string[] x_labels;
+   private ChartOptions _options;
+
+
+
+   protected override Task OnInitializedAsync()
+   {
+      x_labels = avgNumbers.Keys.Select(k => k.Split(" ")[0]).ToArray();
+      var avgValues = avgNumbers.Values.Select(p => (double)p).ToArray();
+      avgValues[0] = avgValues[0] * 100;
+      Console.WriteLine("AVG VALUES 1: - "+avgValues[0]);
+      var avgChartSeries = new ChartSeries() { Name = "Average", Data = avgValues };
+      charts.Add(avgChartSeries);
+      foreach (var coNum in coNumbers)
+      {
+         var dict = coNum.Value;
+         var vals = dict.Values.Select(v => (double)v).ToArray();
+         vals[0] = vals[0] * 100;
+         var newSeries = new ChartSeries() { Name = coNum.Key.ToString().Substring(0, 5), Data = vals };
+         charts.Add(newSeries);
+      }
+
+      return base.OnInitializedAsync();
+   }
+
+
 }

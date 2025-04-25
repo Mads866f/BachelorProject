@@ -15,37 +15,24 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
       _logger.LogInformation("Getting projects from database for election with id: " + electionID);
       using var db = await dbFactory.CreateConnectionAsync();
 
-      var queryprojects = await db.QueryAsync<ProjectsEntity>(
-            """ 
-            SELECT id as Id, name as Name, election_id as ElectionId, cost as Cost 
-            FROM projects_table as p 
-            WHERE p.election_id = @idAsGuid
-            """,
-            new {idAsGuid = electionID});
-
-      foreach (var project in queryprojects)
-      {
-         var projectId = project.Id;
-         using var db1 = await dbFactory.CreateConnectionAsync();
-         var query = await db1.QueryAsync<int>("""
-                     Select Count(*) as votes
-                     FROM scores_table as s
-                     Where s.project_id = @idAsGuid
-                     GROUP BY  project_id
-                     ORDER BY votes Desc
-                     """,new {idAsGuid = projectId});
-         if (query.Any())
-         {
-            project.votes = query.ToList().First();
-         }
-         else
-         {
-            project.votes = 0;
-         }
+      var query = await db.QueryAsync<ProjectsEntity>(
+          """
+          SELECT 
+              p.id AS Id, 
+              p.name AS Name, 
+              p.election_id AS ElectionId, 
+              p.cost AS Cost,
+              COUNT(s.project_id) AS Votes
+          FROM projects_table AS p
+          LEFT JOIN scores_table AS s ON p.id = s.project_id
+          WHERE p.election_id = @idAsGuid
+          GROUP BY p.id, p.name, p.election_id, p.cost
+          ORDER BY Votes DESC
+          """,
+          new { idAsGuid = electionID });
          
-      }
       
-      return queryprojects;
+      return query;
    }
 
    public async Task<Project> CreateAsync(ProjectsEntity project)

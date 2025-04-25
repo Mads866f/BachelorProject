@@ -63,9 +63,8 @@
 </MudContainer>
 
 @code {
-    [Parameter] public required List<Voter> voters { get; set; }
+    [Parameter] public required List<CoherrentVoter> coherrentVoters { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
-    private List<CoherrentVoter> coherrentVoters = new List<CoherrentVoter>();
     
 
     private void ShowBtnPress(CoherrentVoter coVoter)
@@ -73,48 +72,6 @@
         coVoter.ShowDetails = !coVoter.ShowDetails;
     } 
     
-    private void CalculateCoherrentVoters()
-    {
-        foreach (var voter in voters)
-        {
-            Console.WriteLine("Voter:");
-            voter.Votes.ForEach(c => Console.WriteLine(c.project.Name));
-            var votedProjects = new List<Project>();
-            foreach (var vote in voter.Votes)
-            {
-                Console.WriteLine("HERHE");
-                if (vote.project is null)
-                {
-                    votedProjects.Add(new Project
-                    {
-                        Id = vote.Project_Id,
-                        ElectionId = default,
-                        Name = "NOT DEFINED",
-                        Cost = -1
-                    });
-                    continue;
-                }
-                votedProjects.Add(vote.project);
-            }
-            var existed = false;
-            foreach (var coVote in coherrentVoters)
-            {
-                if (coVote.UpdateIfInGroup(votedProjects))
-                {
-                    existed = true;
-                } 
-            }
-
-            if (!existed)
-            {
-                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects , voters =voters.Count, ShowDetails = false};
-                Console.WriteLine("Created Coherrent Voter with:");
-                votedProjects.ForEach(p => Console.WriteLine(p.Name));
-                coherrentVoters.Add(new_coVote);
-            }
-            
-        }
-    }
 
     private HashSet<CoherrentVoter> expandedRows = new();
 
@@ -128,7 +85,6 @@
     
     protected override Task OnInitializedAsync()
     {
-        CalculateCoherrentVoters();
         coherrentVoters.Sort((a, b) => b.number_of_voters.CompareTo(a.number_of_voters)); 
         return base.OnInitializedAsync();
     }

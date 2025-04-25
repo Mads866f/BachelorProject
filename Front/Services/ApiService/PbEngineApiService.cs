@@ -1,4 +1,7 @@
+using System.Text;
+using System.Text.Json;
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
 using Front.Services.Interface;
 using Front.Utilities;
 using Front.Utilities.Errors;
@@ -165,6 +168,32 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
             _logger.LogError(e,"Error Retrieving Real Elections");
             throw;
         }}
+
+    public async Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(
+        List<CoherrentVoter> coherrents, ElectionResult electionResult)
+    {
+        _logger.LogInformation("Getting Avg Satisfaction - For Coherent Groups");
+        var json = JsonSerializer.Serialize(coherrents);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await _client.PostAsync( $"{url}/analyze/CoherrentGroups/{electionResult.Id}", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, Dictionary<string, float>>>();
+                return result ?? new Dictionary<Guid, Dictionary<string, float>>();
+            }
+            var error = new InternalServerErrorException("Internal Server Error - GetAvgSatisfactionCoherentGroups");
+            _logger.LogError(error,error.Message);
+            throw error;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"Error Calculating Avg Satisfaction");
+            throw;
+        }
+
+    }
     
     
 }
