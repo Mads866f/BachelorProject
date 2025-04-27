@@ -1,0 +1,151 @@
+@using MudBlazor
+@rendermode InteractiveServer
+
+<MudGrid>
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1"> CC-Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool" @bind-Value="Cc"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1"> Cost-sqrt Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool" @bind-Value="CostSqrt"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1"> Cost-log-sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool" @bind-Value="CostLog"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="2">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1"> Relative Cost Approx Normaliser Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool" @bind-Value="RelCostApproxNormal"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1" @bind-Value="AddCostSqrt"> Additive Cost Sqrt Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1"> Cost Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool" @bind-Value="Cost"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+    <MudItem xs="1">
+        <MudGrid>
+            <MudItem xs="11">
+                <MudText Typo="Typo.body1" @bind-Value="Card"> Cardinality Sat</MudText>
+            </MudItem>
+            <MudItem xs="1">
+                <MudCheckBox T="bool"></MudCheckBox>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+<MudItem xs="2">
+    <MudGrid>
+        <MudItem xs="11">
+            <MudText Typo="Typo.body1" @bind-Value="RelCard"> Relative Cardinality Sat</MudText>
+        </MudItem>
+        <MudItem xs="1">
+            <MudCheckBox T="bool"></MudCheckBox>
+        </MudItem>
+    </MudGrid>
+</MudItem>
+    <MudItem xs="12">
+        <MudButton Class="full-width-btn" Color="Color.Primary" ButtonType="ButtonType.Button" @onclick="SetAnalysisNumbers">Apply Analysis Numbers</MudButton>
+    </MudItem>
+    </MudGrid>
+
+
+@code {
+
+    [Parameter] public required EventCallback<List<int>> UpdateAnalFunctions { get; set; }
+    public bool RelCard { get; set; }
+    public bool Card { get; set; }
+    public bool Cost { get; set; }
+    public bool AddCostSqrt { get; set; }
+    public bool RelCostApproxNormal { get; set; }
+    public bool CostLog { get; set; }
+    public bool CostSqrt { get; set; }
+    public bool Cc { get; set; }
+
+    public void SetAnalysisNumbers()
+    {
+        List<int> result = [];
+        if (Cc)
+        {
+            result.Add(1);
+        }
+
+        if (CostSqrt)
+        {
+            result.Add(2);
+        }
+
+        if (CostLog)
+        {
+            result.Add(3);
+        }
+
+        if (RelCostApproxNormal)
+        {
+            result.Add(6);
+        }
+
+        if (AddCostSqrt)
+        {
+            result.Add(7);
+        }
+
+        if (Cost)
+        {
+            result.Add(16);
+        }
+
+        if (Card)
+        {
+            result.Add(10);
+        }
+
+        if (RelCard)
+        {
+            result.Add(14);
+        }
+
+        UpdateAnalFunctions.InvokeAsync(result);
+    }
+
+}

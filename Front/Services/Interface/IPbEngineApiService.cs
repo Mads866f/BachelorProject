@@ -12,9 +12,9 @@ public interface IPbEngineApiService
     
     Task<string> DownloadCustomElection(Election electionId);
 
-    Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult);
+    Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult,List<int> sats);
 
 
     Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(List<CoherrentVoter> coherrents,
-        ElectionResult electionResult);
+        ElectionResult electionResult,int sat);
 }

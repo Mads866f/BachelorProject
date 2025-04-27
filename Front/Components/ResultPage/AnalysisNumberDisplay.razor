@@ -1,11 +1,10 @@
 @using MudBlazor
-@rendermode InteractiveServer
 
 <MudText Typo="Typo.h4">Analysis Numbers</MudText>
 <MudDivider/>
-   <MudPaper>
-      <MudChart ChartType="ChartType.Bar" ChartSeries="@charts" LegendPosition="Position.Bottom" XAxisLabels="@x_labels" Height="500"  ChartOptions="_options"></MudChart>
-   </MudPaper>
+<MudPaper>
+   <MudChart Style="padding: 10px" ChartType="ChartType.Bar" ChartSeries="@charts" LegendPosition="Position.Bottom" XAxisLabels="@x_labels"  ></MudChart>
+</MudPaper>
 
 @code {
    [Parameter] public required Dictionary<string,float> avgNumbers { get; set; }
@@ -20,23 +19,17 @@
    {
       x_labels = avgNumbers.Keys.Select(k => k.Split(" ")[0]).ToArray();
       var avgValues = avgNumbers.Values.Select(p => (double)p).ToArray();
-      avgValues[0] = avgValues[0] * 100;
-      Console.WriteLine("AVG VALUES 1: - "+avgValues[0]);
       var avgChartSeries = new ChartSeries() { Name = "Average", Data = avgValues };
       charts.Add(avgChartSeries);
       foreach (var coNum in coNumbers)
       {
          var dict = coNum.Value;
          var vals = dict.Values.Select(v => (double)v).ToArray();
-         vals[0] = vals[0] * 100;
+         Console.WriteLine(vals[0]);
          var newSeries = new ChartSeries() { Name = coNum.Key.ToString().Substring(0, 5), Data = vals };
          charts.Add(newSeries);
       }
 
-      _options = new ChartOptions()
-      {
-         ShowToolTips = true
-      };
       return base.OnInitializedAsync();
    }
 
@@ -50,16 +43,12 @@
 
       // 3) Build the "Average" series
       var avgValues = avgNumbers.Values.Select(v => (double)v).ToArray();
-      avgValues[0] *= 100;  // TODO INCREASE THIS BETTER
-      avgValues[2] *= 100;  // TODO INCREASE THIS BETTER
       charts.Add(new ChartSeries { Name = "Average", Data = avgValues });
 
       // 4) Build one series per co-number
       foreach (var coNum in coNumbers)
       {
          var vals = coNum.Value.Values.Select(v => (double)v).ToArray();
-         vals[0] *= 100; //TODO INCREASE THESE BETTER
-         vals[2] *= 100;
          charts.Add(new ChartSeries {
             Name = coNum.Key.ToString().Substring(0, 5),
             Data = vals

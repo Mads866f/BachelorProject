@@ -143,13 +143,15 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }
     }
 
-    public async Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult)
+    public async Task<Dictionary<string, float>> GetAvgSatisfactions(ElectionResult electionResult,List<int> sats)
     {
         _logger.LogInformation("Getting Avg Satisfaction");
         try
         {
             Console.WriteLine(url+"/analyze/avgSatisfaction");
-            var response = await _client.GetAsync($"/analyze/avgSatisfaction/{electionResult.Id}");
+            var json = JsonSerializer.Serialize(sats);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"/analyze/avgSatisfaction/{electionResult.Id}",content);
             Console.WriteLine("RESPONSE: " + response);
             if (response.IsSuccessStatusCode)
             {
@@ -170,14 +172,14 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }}
 
     public async Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(
-        List<CoherrentVoter> coherrents, ElectionResult electionResult)
+        List<CoherrentVoter> coherrents, ElectionResult electionResult,int sat)
     {
         _logger.LogInformation("Getting Avg Satisfaction - For Coherent Groups");
         var json = JsonSerializer.Serialize(coherrents);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await _client.PostAsync( $"{url}/analyze/CoherrentGroups/{electionResult.Id}", content);
+            var response = await _client.PostAsync( $"{url}/analyze/CoherrentGroups/{electionResult.Id}/{sat}", content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, Dictionary<string, float>>>();

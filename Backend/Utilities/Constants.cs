@@ -20,6 +20,7 @@ public class Constants
         { "12", "Effort  Sat " },
         { "13", "Additive  Cardinal  Sat" },
         { "14", "Relative  Cardinality  Sat" },
-        { "15", "Additive  Borda  Sat " }
+        { "15", "Additive  Borda  Sat " },
+        { "16", "Cost" }
     };
 }

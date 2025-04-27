@@ -94,10 +94,9 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
     }
 
-    public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects)
+    public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects, List<int> sats)
     {
         var url = "analyze/";
-        var sats = (new List<int>(){1,3,10});
         Console.WriteLine($"BUDGET BACKEND: {election.totalBudget}");
         Console.WriteLine($"NUMBER OF ELECTED PROJECTS: {electedProjects.Count()}");
         var load = new
@@ -114,9 +113,10 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
+                
+                var map = new Dictionary<string, float>();
                 using var doc = JsonDocument.Parse(jsonString);
 
-                var map = new Dictionary<string, float>();
 
                 if (doc.RootElement.TryGetProperty("result", out var resultElement))
                 {

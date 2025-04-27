@@ -40,13 +40,18 @@ else if (_currentElectionResult is not null)
                             <!-- Elected Project List View -->
                             <MudItem xs="8">
                                 <CoherentVotersForm Add="AddToCovote"/>
-                                <CoherrentVoters coherrentVoters="_coherrentVoters"/>
+                                <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()"/>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <SatSelectionPicker UpdateAnalFunctions="UpdateAnalNumbers"/>
                             </MudItem>
                             <MudItem xs="10">
                                 <AnalysisNumberDisplay avgNumbers="analysisNumbers" coNumbers="coVoteAnalNumbers"/>
                             </MudItem>
                             <MudItem xs="2">
                                 <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
+                            </MudItem>
+                            <MudItem xs="1">
                             </MudItem>
                             <!-- Elected Project List View -->
                             <MudItem xs="12">
@@ -81,10 +86,11 @@ else if (_currentElectionResult is not null)
     private ElectionResult? _currentElectionResult;
     private List<ElectionResult> _electionResults = [];
     private List<Voter> _voters;
-    private List<CoherrentVoter> _coherrentVoters = [];
+    private HashSet<CoherrentVoter> _coherrentVoters = [];
     private HashSet<(int, int)> _wantedCoVoters = new HashSet<(int, int)>();
     private Dictionary<string, float> analysisNumbers = new Dictionary<string, float>();
     private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
+    private List<int> currentSats = [];
 
     private bool _isLoading = true;
     private bool _hasError = false;
@@ -114,11 +120,39 @@ else if (_currentElectionResult is not null)
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
-        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
-        coVoteAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters, _currentElectionResult);
         _isLoading = false;
     }
 
+    public async void UpdateAnalNumbers(List<int> sats)
+    {
+        currentSats = sats;
+        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats);
+        coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
+        UpdateCoVotersSats();
+    }
+
+    public async void UpdateCoVotersSats()
+    {
+        foreach (var sat in currentSats)
+        {
+            var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, sat);
+            foreach (var (key, value)in newCoAnalNumbers)
+            {
+                if (coVoteAnalNumbers.ContainsKey(key))
+                {
+                    foreach (var dict in newCoAnalNumbers.Values)
+                    {
+                        coVoteAnalNumbers[key][dict.Keys.First()] = dict.Values.First();
+                    }
+                }
+                else
+                {
+                    coVoteAnalNumbers[key] = value;
+                }
+            }
+        }
+    }
+    
     public async void AddToCovote((int,int) toBeAdded)
     {
         var newAdd = _wantedCoVoters.Add(toBeAdded);
@@ -127,15 +161,16 @@ else if (_currentElectionResult is not null)
             var newCoVoters = await VotersApiService.GetCoherentVotersByElectionId(_currentElection.Id, toBeAdded.Item1, toBeAdded.Item2);
             foreach (var covot in newCoVoters)
             {
+                var alreadyIn = _coherrentVoters.Where(x => x.number_of_voters == covot.number_of_voters && 
+                   x.projects.Select(p=>p.Name).ToList().All(covot.projects.Select(p => p.Name).ToList().Contains) 
+                    );
                 Console.WriteLine("Covot:" + covot.projects.Count());
-                _coherrentVoters.Add(covot);
-                var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters, _currentElectionResult);
-                foreach (var (key,value)in newCoAnalNumbers)
+                if (!alreadyIn.Any())
                 {
-                    coVoteAnalNumbers[key] = value;
+                    _coherrentVoters.Add(covot);
                 }
+                UpdateCoVotersSats();
             }
-            _coherrentVoters.Sort((x,y) => y.fraction-x.fraction);
             await InvokeAsync(StateHasChanged);
             Snackbar.Add("Coherrent groups fully added",Severity.Success);
         } 

@@ -190,8 +190,8 @@ public class PbEngineController(IElectionService _electionService,
         return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
     }
 
-    [HttpPost("analyze/CoherrentGroups/{resultId}")]
-    public async Task<Dictionary<Guid,Dictionary<string,float>>> GetGroupsAvgSat([FromBody]List<CoherrentVoter> groups,[FromRoute]Guid resultId)
+    [HttpPost("analyze/CoherrentGroups/{resultId}/{sat}")]
+    public async Task<Dictionary<Guid,Dictionary<string,float>>> GetGroupsAvgSat([FromBody]List<CoherrentVoter> groups,[FromRoute]Guid resultId,[FromRoute]int sat)
     {
         Console.WriteLine("HELLLO HELLO HELLO");
         var election = await _resultService.GetElectionResultByResultId(resultId);
@@ -222,7 +222,7 @@ public class PbEngineController(IElectionService _electionService,
                 votes = pythonVoter
             };
             //Analyze avg satisfaction:
-            var groupSat = await _service.GetAnalysisNumbers(pythonElection,pythonProjectElected);
+            var groupSat = await _service.GetAnalysisNumbers(pythonElection,pythonProjectElected, [sat]);
             ChangeKeysFromNumbersToReal(groupSat); 
             accSats.Add(group.id, groupSat);
         }
@@ -231,8 +231,8 @@ public class PbEngineController(IElectionService _electionService,
     }
     
     
-    [HttpGet("/analyze/avgSatisfaction/{resultId}")]
-    public async Task<Dictionary<string,float>> GetAverageSatisfaction(Guid resultId)
+    [HttpPost("/analyze/avgSatisfaction/{resultId}")]
+    public async Task<Dictionary<string,float>> GetAverageSatisfaction(Guid resultId,[FromBody]List<int> sats)
     {
         var election = await _resultService.GetElectionResultByResultId(resultId);
         var submittedPythonProjects = election.SubmittedProjects.Select(p => 
@@ -262,7 +262,7 @@ public class PbEngineController(IElectionService _electionService,
             totalBudget = election.TotalBudget
         };
         
-        var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects);
+        var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects, sats);
         ChangeKeysFromNumbersToReal(result); 
         return result;
 

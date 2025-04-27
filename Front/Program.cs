@@ -1,3 +1,4 @@
+using ApexCharts;
 using Front;
 using Front.Components;
 using Microsoft.AspNetCore.DataProtection;
@@ -32,7 +33,7 @@ connection = "http://backend:8080";
 }
 
 builder.AddConfiguration(connection);
-
+builder.Services.AddApexCharts();
 builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();

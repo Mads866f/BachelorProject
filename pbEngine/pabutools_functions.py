@@ -101,7 +101,8 @@ def determine_satisfaction(sat_number):
     12:pbelec.Effort_Sat ,
     13:pbelec.Additive_Cardinal_Sat ,
     14:pbelec.Relative_Cardinality_Sat ,
-    15:pbelec.Additive_Borda_Sat 
+    15:pbelec.Additive_Borda_Sat,
+    16:pbelec.Cost_Sat
    }
 
    return sat_map[sat_number]

@@ -42,4 +42,38 @@ public class CoherrentVoter
         
         return true;
     }
+
+    public override bool Equals(object? obj) =>
+        Equals(obj as CoherrentVoter);
+
+    public bool Equals(CoherrentVoter? other)
+    {
+        if (other is null) 
+            return false;
+        if (ReferenceEquals(this, other)) 
+            return true;
+
+        return number_of_voters.Equals(other.number_of_voters)
+               && projects.SequenceEqual(other.projects)
+               && voters.Equals(other.voters);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            // start with a prime
+            int hash = 17;
+            hash = hash * 23 + number_of_voters.GetHashCode();
+
+            // fold in each project
+            foreach (var p in projects)
+                hash = hash * 23 + p.GetHashCode();
+
+            // fold in each voter
+                hash = hash * 23 + voters.GetHashCode();
+
+            return hash;
+        }
+    }
 }

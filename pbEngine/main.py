@@ -32,10 +32,10 @@ async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
         result = {}
         for sat in satisfactions:
             sat_number = pb.calculate_satisfaction(election,outcome,sat)
+            print(sat,":",sat_number)
             result[str(sat)] = sat_number
         print(result)
         return {"result":result}
-
     except Exception as e:
         print(e)
         return{"error":str(e)}
