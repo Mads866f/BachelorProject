@@ -44,6 +44,8 @@ public class ScoresService : IScoresService
             var result = await _repository.GetScoreForVoter(id);
             scoresDto = result
                 .Select(x => _mapper.Map<Scores>(x));
+            //Add Projects
+            scoresDto.Select(async s => s.project = _mapper.Map<Project>(await _projectsRepository.GetByIdAsync(s.Project_Id)));
         }
         finally
         {

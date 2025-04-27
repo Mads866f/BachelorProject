@@ -28,7 +28,6 @@ async def root(election:Election,method:int, ballot_type:int):
 @app.post("/analyze/avgSatisfaction")
 async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
     
-    print("First Election Budget:" , election.totalBudget)
     try:
         result = {}
         for sat in satisfactions:

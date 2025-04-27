@@ -1,0 +1,45 @@
+@using MudBlazor
+
+
+<MudGrid>
+    <MudItem xs="5">
+        <MudText Typo="Typo.body1">No Of Projects</MudText>
+    </MudItem>
+    <MudItem xs="5">
+        <MudText Typo="Typo.body1">Lower bound of members</MudText>
+    </MudItem>
+    <MudItem xs="2">
+        <MudSpacer/>
+    </MudItem>
+    <MudItem xs="5">
+        <MudTextField T="int" @bind-Value="value1" ></MudTextField>
+    </MudItem>
+    <MudItem xs="5">
+        <MudTextField T="int" @bind-Value="value2" ></MudTextField>
+    </MudItem>
+    <MudItem xs="2">
+        <MudButton Class="full-width-btn" Color="Color.Success" ButtonType="ButtonType.Button" OnClick="AddFilter">Add Filter</MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public required EventCallback<(int,int)> Add { get; set; }
+    [Inject] public required ISnackbar Snackbar { get; set; }
+    private int value1 = 0;
+    private int value2 = 0;
+    
+
+
+    private void AddFilter()
+    {
+        if (value1<2 || value2 <1)
+        {
+            return;
+        }
+        Snackbar.Add($"Adding Coherent Voters with {value1} projects and at least {value2} members", Severity.Info);
+        Add.InvokeAsync((value1, value2));
+        value1 = 0;
+        value2 = 0;
+        StateHasChanged();
+    }
+}

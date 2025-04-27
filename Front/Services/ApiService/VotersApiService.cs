@@ -1,6 +1,7 @@
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
 using Front.Utilities;
 using Front.Services.Interface;
 using Front.Utilities.Errors;
@@ -127,6 +128,29 @@ public class VotersApiService(IHttpClientFactory clientFactory, ILogger<VotersAp
         catch (Exception e)
         {
             _logger.LogError(e, "Internal server error - CreateVoter");
+            throw;
+        }
+    }
+
+    public async Task<List<CoherrentVoter>> GetCoherentVotersByElectionId(Guid electionId, int noOfProjectsInGroup, int lowerbound)
+    {
+        
+        _logger.LogInformation($"Getting Coherent voters by election id {electionId},  no of projects in {noOfProjectsInGroup}, lowerbound {lowerbound}");
+        try
+        {
+            var response = await _client.GetAsync($"{url}/{electionId}/{noOfProjectsInGroup}/{lowerbound}");
+            if (response.IsSuccessStatusCode)
+            {
+                var result =  await response.Content.ReadFromJsonAsync<List<CoherrentVoter>>();
+                return result ?? new List<CoherrentVoter>();
+            }
+            var exception = new InternalServerErrorException("Internal server error - GetCoherentVotersByElectionId");
+            _logger.LogError(exception, exception.Message);
+            throw exception;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
             throw;
         }
     }

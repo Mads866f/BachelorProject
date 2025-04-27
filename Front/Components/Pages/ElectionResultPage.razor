@@ -5,6 +5,7 @@
 @using Front.Components.ElectionInfo
 @using Front.Components.ResultPage
 @using Front.Components.ResultPage.CoherrentVoter
+@using Front.Components.ElectionInfo.ActionPanel.Dialogs
 
 <PageTitle>Election Results</PageTitle>
 
@@ -23,42 +24,43 @@ else if (_currentElectionResult is not null)
             @foreach (var result in _electionResults)
             {
                 <MudTabPanel Text="@result.Id.ToString()">
-                <CascadingValue Value="_currentElection">
-                    <MudGrid>
-                        <MudItem xs="12">
-                            <MudSpacer/>
-                        </MudItem>
-                        @{
-                        }
-                        <!-- Election Info - Left side -->
+                    <CascadingValue Value="_currentElection">
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudSpacer/>
+                            </MudItem>
+                            @{
+                            }
+                            <!-- Election Info - Left side -->
                             <ElectionInfoPanel
                                 NewBallotFormat="@result.UsedBallot"
                                 NewModelFormat="@result.UsedMethod"
                                 NoOfProjects="@_currentElectionResult.SubmittedProjects.Count()"
                                 NoOfVoters="@_voters.Count()"/>
-                        <!-- Elected Project List View -->
-                        <MudItem xs="8">
-                            <CoherrentVoters coherrentVoters="_coherrentVoters"/>
-                        </MudItem>
-                        <MudItem xs = "10">
-                            <AnalysisNumberDisplay avgNumbers="analysisNumbers" coNumbers="coVoteAnalNumbers" />
-                        </MudItem>
-                        <MudItem xs="2">
-                            <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
-                        </MudItem>
-                        <!-- Elected Project List View -->
-                        <MudItem xs="12">
-                            <MudText Typo="Typo.h4" Align="Align.Center">Elected Projects</MudText>
-                            <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
-                            <MudDivider/>
-                        </MudItem>
-                        <!-- Submitted Project List View -->
-                        <MudItem>
-                            <MudText Typo="Typo.h3" Align="Align.Center">All submitted projects</MudText>
-                            <ProjectListView Projects="result.SubmittedProjects"/>
-                        </MudItem>
-                    </MudGrid>
-                </CascadingValue>
+                            <!-- Elected Project List View -->
+                            <MudItem xs="8">
+                                <CoherentVotersForm Add="AddToCovote"/>
+                                <CoherrentVoters coherrentVoters="_coherrentVoters"/>
+                            </MudItem>
+                            <MudItem xs="10">
+                                <AnalysisNumberDisplay avgNumbers="analysisNumbers" coNumbers="coVoteAnalNumbers"/>
+                            </MudItem>
+                            <MudItem xs="2">
+                                <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
+                            </MudItem>
+                            <!-- Elected Project List View -->
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.h4" Align="Align.Center">Elected Projects</MudText>
+                                <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
+                                <MudDivider/>
+                            </MudItem>
+                            <!-- Submitted Project List View -->
+                            <MudItem>
+                                <MudText Typo="Typo.h3" Align="Align.Center">All submitted projects</MudText>
+                                <ProjectListView Projects="result.SubmittedProjects"/>
+                            </MudItem>
+                        </MudGrid>
+                    </CascadingValue>
                 </MudTabPanel>
             }
         </MudTabs>
@@ -70,6 +72,7 @@ else if (_currentElectionResult is not null)
     [Inject] public required IElectionsApiService ElectionsApiService { get; set; }
     [Inject] public required IVotersApiService VotersApiService { get; set;}
     [Inject] public required IPbEngineApiService PbEngineApiService { get; set; }
+    [Inject] public required IDialogService DialogService { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
 
     [Parameter] public string? ElectionId { get; set; }
@@ -79,6 +82,7 @@ else if (_currentElectionResult is not null)
     private List<ElectionResult> _electionResults = [];
     private List<Voter> _voters;
     private List<CoherrentVoter> _coherrentVoters = [];
+    private HashSet<(int, int)> _wantedCoVoters = new HashSet<(int, int)>();
     private Dictionary<string, float> analysisNumbers = new Dictionary<string, float>();
     private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
 
@@ -110,53 +114,34 @@ else if (_currentElectionResult is not null)
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
-        CalculateCoherrentVoters();
         analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult!);
         coVoteAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters, _currentElectionResult);
         _isLoading = false;
     }
 
-    private void CalculateCoherrentVoters()
+    public async void AddToCovote((int,int) toBeAdded)
     {
-        foreach (var voter in _voters)
+        var newAdd = _wantedCoVoters.Add(toBeAdded);
+        if (newAdd)
         {
-            Console.WriteLine("Voter:");
-            voter.Votes.ForEach(c => Console.WriteLine(c.project.Name));
-            var votedProjects = new List<Project>();
-            foreach (var vote in voter.Votes)
+            var newCoVoters = await VotersApiService.GetCoherentVotersByElectionId(_currentElection.Id, toBeAdded.Item1, toBeAdded.Item2);
+            foreach (var covot in newCoVoters)
             {
-                Console.WriteLine("HERHE");
-                if (vote.project is null)
+                Console.WriteLine("Covot:" + covot.projects.Count());
+                _coherrentVoters.Add(covot);
+                var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters, _currentElectionResult);
+                foreach (var (key,value)in newCoAnalNumbers)
                 {
-                    votedProjects.Add(new Project
-                    {
-                        Id = vote.Project_Id,
-                        ElectionId = default,
-                        Name = "NOT DEFINED",
-                        Cost = -1
-                    });
-                    continue;
-                }
-
-                votedProjects.Add(vote.project);
-            }
-
-            var existed = false;
-            foreach (var coVote in _coherrentVoters)
-            {
-                if (coVote.UpdateIfInGroup(votedProjects))
-                {
-                    existed = true;
+                    coVoteAnalNumbers[key] = value;
                 }
             }
-
-            if (!existed)
-            {
-                var new_coVote = new CoherrentVoter() { number_of_voters = 1, projects = votedProjects, voters = _voters.Count, ShowDetails = false };
-                Console.WriteLine("Created Coherrent Voter with:");
-                votedProjects.ForEach(p => Console.WriteLine(p.Name));
-                _coherrentVoters.Add(new_coVote);
-            }
-        }
+            _coherrentVoters.Sort((x,y) => y.fraction-x.fraction);
+            await InvokeAsync(StateHasChanged);
+            Snackbar.Add("Coherrent groups fully added",Severity.Success);
+        } 
     }
+    
+    
+    
+
 }

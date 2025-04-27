@@ -1,5 +1,6 @@
 using Backend.Services.Interfaces;
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers.DataControllers
@@ -217,6 +218,23 @@ namespace Backend.Controllers.DataControllers
             {
                 _logger.LogError(ex, "Error occurred while deleting voter with ID {VoterId}.", id);
                 return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{electionId}/{noOfProjectsInGroup}/{lowerbound}")]
+        public async Task<IEnumerable<CoherrentVoter>> GetCoherentVotersFromElection(Guid electionId,
+            int noOfProjectsInGroup, int lowerbound)
+        {
+            _logger.LogInformation($"Getting Coherent voters from election with id {electionId} of size {noOfProjectsInGroup}.}}");
+            try
+            {
+                var result = await _voterService.GetCoherentVotersFromElection(electionId, noOfProjectsInGroup,lowerbound);
+                return result ?? Enumerable.Empty<CoherrentVoter>();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }

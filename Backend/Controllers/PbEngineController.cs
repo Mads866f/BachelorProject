@@ -195,7 +195,7 @@ public class PbEngineController(IElectionService _electionService,
     {
         Console.WriteLine("HELLLO HELLO HELLO");
         var election = await _resultService.GetElectionResultByResultId(resultId);
-        var pythonProjectElected = election.ElectedProjects.Select(p => new PythonProject() {name = p.Id.ToString(),cost = p.Cost,categories = p.Categories.Select(c => c.Name).ToList() ??[],target = p.Targets.Select(t => t.Name).ToList() ?? []}).ToList();
+        var pythonProjectElected = election.ElectedProjects.Select(p => new PythonProject() {name = p.Name,cost = p.Cost,categories = p.Categories.Select(c => c.Name).ToList() ??[],target = p.Targets.Select(t => t.Name).ToList() ?? []}).ToList();
     Console.WriteLine("Elected Python Projects size: " + pythonProjectElected.Count());
         var accSats = new Dictionary<Guid, Dictionary<string, float>>();
         foreach (var group in groups)
@@ -205,10 +205,11 @@ public class PbEngineController(IElectionService _electionService,
             {
                 new PythonVoter()
                 {
-                    selectedProjects = group.projects.Select(p => p.Id.ToString()).ToList(),
+                    selectedProjects = group.projects.Select(p => p.Name).ToList(),
                     selectedDegree = group.projects.Select(_ => 1).ToList()
                 }
             };
+            Console.WriteLine("Profile Backend: " + pythonVoter.First().selectedProjects.Count());
             //Create the Election simulating only that group as voters
             var pythonElection = new PythonElection()
             {
@@ -216,7 +217,7 @@ public class PbEngineController(IElectionService _electionService,
                 method = election.UsedMethod,
                 name = "NOT NEEDED",
                 projects = election.SubmittedProjects.Select(p => new PythonProject()
-                    { cost = p.Cost, name = p.Id.ToString(), categories = [], target = [] }).ToList(),
+                    { cost = p.Cost, name = p.Name, categories = [], target = [] }).ToList(),
                 totalBudget = election.TotalBudget,
                 votes = pythonVoter
             };
@@ -236,19 +237,19 @@ public class PbEngineController(IElectionService _electionService,
         var election = await _resultService.GetElectionResultByResultId(resultId);
         var submittedPythonProjects = election.SubmittedProjects.Select(p => 
             new PythonProject()
-                {name =p.Id.ToString(), cost = p.Cost, 
+                {name =p.Name, cost = p.Cost, 
                     categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
         
         
         var electedProjects= election.ElectedProjects.Select(p => 
             new PythonProject()
-                {name =p.Id.ToString(), cost = p.Cost, 
+                {name =p.Name, cost = p.Cost, 
                     categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
         Console.WriteLine($"ElectedProjectListSize - Here: {electedProjects.Count()}");
        var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
        var votersPython = voters.Select(v => new PythonVoter
        {
-           selectedProjects = v.Votes.Select(p => p.Project_Id.ToString()).ToList(),
+           selectedProjects = election.SubmittedProjects.Where(p => v.Votes.Select(r => r.Project_Id).ToList().ToList().Contains(p.Id)).ToList().ToList().Select(n => n.Name).ToList(),
            selectedDegree = v.Votes.Select(d => d.Grade).ToList()
        }).ToList();
         var pythonElection = new PythonElection()

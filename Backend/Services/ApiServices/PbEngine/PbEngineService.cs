@@ -97,7 +97,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
     public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects)
     {
         var url = "analyze/";
-        var sats = (new List<int>(){1,2,3,5,6,7,8,10,11});
+        var sats = (new List<int>(){1,3,10});
         Console.WriteLine($"BUDGET BACKEND: {election.totalBudget}");
         Console.WriteLine($"NUMBER OF ELECTED PROJECTS: {electedProjects.Count()}");
         var load = new

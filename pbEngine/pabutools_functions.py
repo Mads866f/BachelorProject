@@ -129,11 +129,14 @@ def determine_instance_ballot_analysis(inst_ballot_an_number: int):
 
 
 def create_ballot(ballot_type, votes_gained: Voter,election:Election):
-    voters_project_models_to_projects = [
-    project for project in election.projects if project.name in votes_gained.selectedProjects
-    ]
+    voters_project_model_to_project = []
+    for p in election.projects:
+        project_name = p.name
+        for pe in votes_gained.selectedProjects:
+            if pe == project_name:
+                voters_project_model_to_project.append(p)
     ballot_dictonary = {
-        Ballot.Approval: pbelec.ApprovalBallot(map(project_model_to_project_pabu,voters_project_models_to_projects)),
+        Ballot.Approval: pbelec.ApprovalBallot(map(project_model_to_project_pabu,voters_project_model_to_project)),
         Ballot.Cardinal: None,
         Ballot.Cumulative: None,
         Ballot.Ordinal: None,
@@ -160,7 +163,6 @@ def project_model_to_project_pabu(project_model: Project):
     cost = project_model.cost
     cat = project_model.categories
     tag =project_model.target
-    print(f"name{name}:cost{cost}:cat:{cat}:tag{tag}")
     return pbelec.Project(project_model.name,project_model.cost,project_model.categories,project_model.target)
 
 def profile_from_voter_list(votes:list[Voter],ballot_type,election):
@@ -211,14 +213,9 @@ def instance_from_election_model(election:Election):
 def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction):
     sat = determine_satisfaction(satisfaction)
     voting_instance = instance_from_election_model(election)
-    print("PROJECTS IN Voting Instance:",voting_instance)
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #Change such that the ballot type is not hardcoded
-    print("OUTCOME BEFORE")
-    for o in outcome:
-        print(o)
-    print("OUTCOME AFTER")
-    for o in outcome:
-        print(o)
+    for p in profile:
+        print(p)
     pabu_outcome = []
     for p in outcome:
         pabu_outcome.append(project_model_to_project_pabu(p))

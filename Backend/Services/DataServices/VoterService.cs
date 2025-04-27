@@ -3,6 +3,7 @@ using Backend.Models;
 using Backend.Repositories.Interfaces;
 using Backend.Services.Interfaces;
 using DTO.Models;
+using Front.Components.ResultPage.CoherrentVoter;
 
 namespace Backend.Services.DataServices;
 
@@ -33,6 +34,22 @@ public class VoterService : IVotersService
         var voterDtos = result.Select(x => _mapper.Map<Voter>(x)).ToList();
         await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
         return voterDtos;
+    }
+
+    public async Task<IEnumerable<CoherrentVoter>> GetCoherentVotersFromElection(Guid electionId, int projectCount,int lowerbound)
+    {
+        var result = await _repository.GetKSizeCoherentVotersFromElection(electionId, projectCount,lowerbound);
+        var votersInElection = await _repository.GetByElectionIdAsync(electionId);
+        var noOfVotersInElection = votersInElection.Count();
+        var coheretDtos = result.Select(c => new CoherrentVoter()
+        {
+            fraction = (int)(((float)c.Item2/noOfVotersInElection)*100),
+            id = Guid.NewGuid(),
+            number_of_voters = c.Item2,
+            ShowDetails = false,
+            projects = c.Item1.Select(p => _mapper.Map<Project>(p)).ToList()
+        });
+        return coheretDtos;
     }
 
     public async Task<Voter?> GetVoterAsync(Guid id)
