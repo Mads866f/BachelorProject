@@ -229,6 +229,7 @@ namespace Backend.Controllers.DataControllers
             try
             {
                 var result = await _voterService.GetCoherentVotersFromElection(electionId, noOfProjectsInGroup,lowerbound);
+                _logger.LogInformation("Database have responded with coherent voters");
                 return result ?? Enumerable.Empty<CoherrentVoter>();
             }
             catch (Exception e)

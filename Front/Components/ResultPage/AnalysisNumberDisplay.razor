@@ -1,59 +1,88 @@
 @using MudBlazor
+@using ApexCharts
+@using AutoMapper.Internal
+@using ApexCharts.Internal
+@rendermode InteractiveServer
 
-<MudText Typo="Typo.h4">Analysis Numbers</MudText>
-<MudDivider/>
 <MudPaper>
-   <MudChart Style="padding: 10px" ChartType="ChartType.Bar" ChartSeries="@charts" LegendPosition="Position.Bottom" XAxisLabels="@x_labels"  ></MudChart>
+   <ApexChart TItem="SatPoint"
+              Title="Order  Value"
+              Options="options"
+              Width="600"
+              Height="600">
+      <ApexPointSeries TItem="SatPoint"
+                       Items="_satPoints"
+                       Name="Average Value"
+                       SeriesType="SeriesType.Radar"
+                       XValue="@(e => e.Sat)"
+                       YValue="@((e => (decimal)e.Value))"
+                       OrderByDescending="e => e.X"/>
+      @foreach (var covote in _coVotSatsList)
+      {
+      <ApexPointSeries TItem="SatPoint"
+                       Items="covote.Item2"
+                       Name="@covote.Item1"
+                       SeriesType="SeriesType.Radar"
+                       XValue="@(e => e.Sat)"
+                       YValue="@((e => (decimal)e.Value))"
+                       OrderByDescending="e => e.X"/>
+      }
+   </ApexChart>
 </MudPaper>
 
 @code {
    [Parameter] public required Dictionary<string,float> avgNumbers { get; set; }
    [Parameter] public required Dictionary<Guid,Dictionary<string ,float>> coNumbers {get; set; }
-   private List<ChartSeries> charts = [];
-   private string[] x_labels;
-   private ChartOptions _options;
-
-
+   [Parameter] public required bool Scale { get; set; }
+   private List<SatPoint> _satPoints = [];
+   private List<(string, List<SatPoint>)> _coVotSatsList = [];
+   private ApexChartOptions<SatPoint> options = new ApexChartOptions<SatPoint>();
 
    protected override Task OnInitializedAsync()
    {
-      x_labels = avgNumbers.Keys.Select(k => k.Split(" ")[0]).ToArray();
-      var avgValues = avgNumbers.Values.Select(p => (double)p).ToArray();
-      var avgChartSeries = new ChartSeries() { Name = "Average", Data = avgValues };
-      charts.Add(avgChartSeries);
-      foreach (var coNum in coNumbers)
+      if (Scale)
       {
-         var dict = coNum.Value;
-         var vals = dict.Values.Select(v => (double)v).ToArray();
-         Console.WriteLine(vals[0]);
-         var newSeries = new ChartSeries() { Name = coNum.Key.ToString().Substring(0, 5), Data = vals };
-         charts.Add(newSeries);
+         options.Tooltip = new()
+         {
+            Y = new TooltipY
+            {
+               Formatter = @"function(value) {
+            var original = Math.pow(2,value);
+            return original.toLocaleString(undefined, {maximumFractionDigits: 2});
+        }"
+            }
+         };
       }
 
       return base.OnInitializedAsync();
    }
 
+   public class SatPoint
+   {
+      public string Sat { get; set; }
+      public float RealValue { get; set;}
+      public float Value { get; set; }
+   }
+
+
    protected override void OnParametersSet()
    {
-      // 1) Clear old data
-      charts.Clear();
-
-      // 2) Rebuild X labels
-      x_labels = avgNumbers.Keys.Select(k => k.Split(' ')[0]).ToArray();
-
-      // 3) Build the "Average" series
-      var avgValues = avgNumbers.Values.Select(v => (double)v).ToArray();
-      charts.Add(new ChartSeries { Name = "Average", Data = avgValues });
-
-      // 4) Build one series per co-number
-      foreach (var coNum in coNumbers)
+      _satPoints.Clear();
+      foreach (var avgSat in avgNumbers)
       {
-         var vals = coNum.Value.Values.Select(v => (double)v).ToArray();
-         charts.Add(new ChartSeries {
-            Name = coNum.Key.ToString().Substring(0, 5),
-            Data = vals
-         });
+         _satPoints.Add(new SatPoint(){Sat = avgSat.Key,Value = (float)Math.Log2(avgSat.Value), RealValue = avgSat.Value});
       }
+
+      foreach (var covoter in coNumbers)
+      {
+         var newCoSat = new List<SatPoint>();
+         foreach (var coSat in covoter.Value)
+         {
+            newCoSat.Add(new SatPoint(){Sat = coSat.Key, Value = (float)Math.Log2(coSat.Value), RealValue = coSat.Value});
+         }
+         _coVotSatsList.Add((covoter.Key.ToString().Substring(0,5),newCoSat));
+      }
+      StateHasChanged();
    }
 }
 

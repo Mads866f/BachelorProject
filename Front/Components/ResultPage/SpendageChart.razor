@@ -1,21 +1,77 @@
 @using DTO.Models
-<MudChart ChartType="ChartType.Donut" InputLabels="labels" InputData="_series" ></MudChart>
+@using ApexCharts
+@using ChartType = ApexCharts.ChartType
+@rendermode InteractiveServer
+
+<ApexChart TItem="ProjectCost"
+           Title="Total Spent"
+           Height="800"
+           Width="800"
+           Options="chartOptions"
+
+>
+
+    <ApexPointSeries TItem="ProjectCost"
+                     Items="projectCosts"
+                     SeriesType="SeriesType.Donut"
+                     Name="Gross Value"
+                     XValue="@(e => e.Name)"
+                     YAggregate="@(e => (decimal) e.Sum(e => e.Cost))"
+                     OrderByDescending="e=>e.Y" />
+</ApexChart>
 
 @code {
-    [Parameter] public List<Project> electedProjects { get; set; }
-    [Parameter] public int totalBudget { get; set; }
-    private string[] labels { get; set; }
-    private double[] _series { get; set; }
+    [Parameter] public required List<Project> electedProjects { get; set; }
+    [Parameter] public required int totalBudget { get; set; }
+
+    private List<ProjectCost> projectCosts = new();
+    private ApexChartOptions<ProjectCost> chartOptions = new();
 
     protected override Task OnInitializedAsync()
     {
-        var tmplabels = electedProjects.Select(p => p.Name).ToList();
-        var tmp_series = electedProjects.Select(p => (double) p.Cost).ToList();
-        tmplabels.Add("Unused");
-        tmp_series.Add(totalBudget- electedProjects.Sum(p => p.Cost));
-        labels = tmplabels.ToArray();
-        _series = tmp_series.ToArray();
+        var totalSpent = electedProjects.Sum(p => p.Cost);
+
+            projectCosts.Add(new ProjectCost
+            {
+                Name = "Unused",
+                Cost = totalBudget - totalSpent
+            });
+        
+        var additions = electedProjects
+            .Select(p => new ProjectCost
+            {
+                Name = p.Name,
+                Cost = p.Cost
+            })
+            .ToList();
+        // Add "Unused" if there is leftover budget
+        additions.ForEach(a => projectCosts.Add(a));
+        chartOptions = new ApexChartOptions<ProjectCost> { };
+        chartOptions.PlotOptions = new PlotOptions
+        {
+            Pie = new PlotOptionsPie()
+            {
+                Donut = new PlotOptionsDonut()
+                {
+                    Labels = new DonutLabels(){Total = new DonutLabelTotal(){Label = totalBudget.ToString()}}
+                }
+            }
+        };
+        chartOptions.Legend = new Legend
+        {
+            Position = LegendPosition.Bottom, // 👈 new position
+        };
+            
+       
+     
+        
         return base.OnInitializedAsync();
     }
 
+    public class ProjectCost
+    {
+        public string Name { get; set; }
+        public double Cost { get; set; }
+    }
 }
+

@@ -46,10 +46,10 @@
     <MudItem xs="1">
         <MudGrid>
             <MudItem xs="11">
-                <MudText Typo="Typo.body1" @bind-Value="AddCostSqrt"> Additive Cost Sqrt Sat</MudText>
+                <MudText Typo="Typo.body1" > Additive Cost Sqrt Sat</MudText>
             </MudItem>
             <MudItem xs="1">
-                <MudCheckBox T="bool"></MudCheckBox>
+                <MudCheckBox T="bool" @bind-Value="AddCostSqrt"></MudCheckBox>
             </MudItem>
         </MudGrid>
     </MudItem>
@@ -67,20 +67,20 @@
     <MudItem xs="1">
         <MudGrid>
             <MudItem xs="11">
-                <MudText Typo="Typo.body1" @bind-Value="Card"> Cardinality Sat</MudText>
+                <MudText Typo="Typo.body1" > Cardinality Sat</MudText>
             </MudItem>
             <MudItem xs="1">
-                <MudCheckBox T="bool"></MudCheckBox>
+                <MudCheckBox T="bool" @bind-Value="Card"></MudCheckBox>
             </MudItem>
         </MudGrid>
     </MudItem>
 <MudItem xs="2">
     <MudGrid>
         <MudItem xs="11">
-            <MudText Typo="Typo.body1" @bind-Value="RelCard"> Relative Cardinality Sat</MudText>
+            <MudText Typo="Typo.body1" > Relative Cardinality Sat</MudText>
         </MudItem>
         <MudItem xs="1">
-            <MudCheckBox T="bool"></MudCheckBox>
+            <MudCheckBox T="bool" @bind-Value="RelCard"></MudCheckBox>
         </MudItem>
     </MudGrid>
 </MudItem>
@@ -107,41 +107,49 @@
         List<int> result = [];
         if (Cc)
         {
+            Console.WriteLine("1");
             result.Add(1);
         }
 
         if (CostSqrt)
         {
+            Console.WriteLine("2");
             result.Add(2);
         }
 
         if (CostLog)
         {
+        Console.WriteLine("3");
             result.Add(3);
         }
 
         if (RelCostApproxNormal)
         {
+        Console.WriteLine("6");
             result.Add(6);
         }
 
         if (AddCostSqrt)
         {
+        Console.WriteLine("7");
             result.Add(7);
         }
 
         if (Cost)
         {
+        Console.WriteLine("16");
             result.Add(16);
         }
 
         if (Card)
         {
+        Console.WriteLine("10");
             result.Add(10);
         }
 
         if (RelCard)
         {
+        Console.WriteLine("14");
             result.Add(14);
         }
 

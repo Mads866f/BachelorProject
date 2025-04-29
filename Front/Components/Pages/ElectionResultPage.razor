@@ -38,26 +38,43 @@ else if (_currentElectionResult is not null)
                                 NoOfProjects="@_currentElectionResult.SubmittedProjects.Count()"
                                 NoOfVoters="@_voters.Count()"/>
                             <!-- Elected Project List View -->
-                            <MudItem xs="8">
+                            <MudItem xs="7">
                                 <CoherentVotersForm Add="AddToCovote"/>
                                 <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()"/>
                             </MudItem>
                             <MudItem xs="12">
-                                <SatSelectionPicker UpdateAnalFunctions="UpdateAnalNumbers"/>
-                            </MudItem>
-                            <MudItem xs="10">
-                                <AnalysisNumberDisplay avgNumbers="analysisNumbers" coNumbers="coVoteAnalNumbers"/>
-                            </MudItem>
-                            <MudItem xs="2">
-                                <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
-                            </MudItem>
-                            <MudItem xs="1">
+                                <MudText Typo="Typo.h4">Analysis Numbers</MudText>
+                                <MudDivider/>
+                                @if (reload)
+                                {
+                                    <MudGrid>
+                                        <MudItem xs="6">
+                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers1" coNumbers="coVoteAnalNumbers1" Scale = "false"/>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers2" coNumbers="coVoteAnalNumbers2" Scale = "true"/>
+                                        </MudItem>
+                                    </MudGrid>
+                                }
+                                else{
+                                    <MudGrid>
+                                        <MudItem xs="6">
+                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers1" coNumbers="coVoteAnalNumbers1" Scale = "false"/>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers2" coNumbers="coVoteAnalNumbers2" Scale = "true"/>
+                                        </MudItem>
+                                    </MudGrid>
+                                }
                             </MudItem>
                             <!-- Elected Project List View -->
-                            <MudItem xs="12">
+                            <MudItem xs="6">
                                 <MudText Typo="Typo.h4" Align="Align.Center">Elected Projects</MudText>
                                 <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
                                 <MudDivider/>
+                            </MudItem>
+                            <MudItem xs="6" Class="align-content-center" Style="height: max-content; width: max-content">
+                                <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
                             </MudItem>
                             <!-- Submitted Project List View -->
                             <MudItem>
@@ -88,12 +105,16 @@ else if (_currentElectionResult is not null)
     private List<Voter> _voters;
     private HashSet<CoherrentVoter> _coherrentVoters = [];
     private HashSet<(int, int)> _wantedCoVoters = new HashSet<(int, int)>();
-    private Dictionary<string, float> analysisNumbers = new Dictionary<string, float>();
-    private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
-    private List<int> currentSats = [];
+    private Dictionary<string, float> analysisNumbers1 = new Dictionary<string, float>();
+    private Dictionary<string, float> analysisNumbers2 = new Dictionary<string, float>();
+    private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers1 = new Dictionary<Guid, Dictionary<string, float>>();
+    private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers2 = new Dictionary<Guid, Dictionary<string, float>>();
+    private List<int> currentSats1 = [5,1,10,14,3];
+    private List<int> currentSats2 = [2,7,16];
 
     private bool _isLoading = true;
     private bool _hasError = false;
+    private bool reload = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -119,38 +140,57 @@ else if (_currentElectionResult is not null)
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
+        analysisNumbers2 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats2);
+        analysisNumbers1 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats1);
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
         _isLoading = false;
     }
 
     public async void UpdateAnalNumbers(List<int> sats)
     {
-        currentSats = sats;
-        analysisNumbers = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats);
-        coVoteAnalNumbers = new Dictionary<Guid, Dictionary<string, float>>();
         UpdateCoVotersSats();
     }
 
     public async void UpdateCoVotersSats()
     {
-        foreach (var sat in currentSats)
+        foreach (var sat in currentSats1)
         {
             var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, sat);
             foreach (var (key, value)in newCoAnalNumbers)
             {
-                if (coVoteAnalNumbers.ContainsKey(key))
+                if (coVoteAnalNumbers1.ContainsKey(key))
                 {
                     foreach (var dict in newCoAnalNumbers.Values)
                     {
-                        coVoteAnalNumbers[key][dict.Keys.First()] = dict.Values.First();
+                        coVoteAnalNumbers1[key][dict.Keys.First()] = dict.Values.First();
                     }
                 }
                 else
                 {
-                    coVoteAnalNumbers[key] = value;
+                    coVoteAnalNumbers1[key] = value;
                 }
             }
         }
+        foreach (var sat in currentSats2)
+        {
+            var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, sat);
+            foreach (var (key, value)in newCoAnalNumbers)
+            {
+                if (coVoteAnalNumbers2.ContainsKey(key))
+                {
+                    foreach (var dict in newCoAnalNumbers.Values)
+                    {
+                        coVoteAnalNumbers2[key][dict.Keys.First()] = dict.Values.First();
+                    }
+                }
+                else
+                {
+                    coVoteAnalNumbers2[key] = value;
+                }
+            }
+        }
+
+        reload = !reload;
     }
     
     public async void AddToCovote((int,int) toBeAdded)
