@@ -190,8 +190,10 @@ def calculate_result(election:Election,method:int,ballot_type:int):
     profile = profile_from_voter_list(election.votes,ballot_type,election)
 
     #Calculate Result
-    outcome = method_to_use(voting_instance,profile,sat_class=pbelec.Cost_Sat)
-    return outcome
+    if method != 4:
+       return method_to_use(voting_instance,profile,sat_class=pbelec.Cost_Sat)
+
+    return method_to_use(voting_instance,profile)
     
 
 

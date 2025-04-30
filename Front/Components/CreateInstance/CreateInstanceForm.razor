@@ -6,18 +6,13 @@
     <MudTextField T="string" @bind-Value="_model.Name" Label="Election Name" Required="true"
                   RequiredError="Election Name Is Required!" Immediate="true"/>
     <MudSelect T="string" @bind-Value="_model.Model" Label="Method" Placeholder="Please Select" Required="true">
-        <MudSelectItem T="string" Value="@("EqualShares")">Equal Shares</MudSelectItem>
-        <MudSelectItem T="string" Value="@("GreedyUtil")">Greedy Utilitarian</MudSelectItem>
-        <MudSelectItem T="string" Value="@("SeqPharg")">Sequential Phragmen</MudSelectItem>
+        <MudSelectItem T="string" Value="@("mes")">Equal Shares</MudSelectItem>
+        <MudSelectItem T="string" Value="@("greedy")">Greedy Utilitarian</MudSelectItem>
+        <MudSelectItem T="string" Value="@("seq")">Sequential Phragmen</MudSelectItem>
     </MudSelect>
     <MudDivider/>
     <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!"
                   @bind-Value="_model.TotalBudget"></MudTextField>
-    <MudSelect T="string" @bind-Value="_model.BallotDesign" Label="Ballot" Placeholder="Please Select" Required="true">
-        <MudSelectItem T="string" Value="@("1-Approval")">1-Approval</MudSelectItem>
-        <MudSelectItem T="string" Value="@("3-Approval")">3-Approval</MudSelectItem>
-        <MudSelectItem T="string" Value="@("Cardinal")">Cardinal</MudSelectItem>
-    </MudSelect>
     <MudButton Class="full-width-btn" Style="background-color: rebeccapurple; color: wheat"
                ButtonType="ButtonType.Submit">Create Instance
     </MudButton>

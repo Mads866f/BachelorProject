@@ -74,8 +74,8 @@ public class PbEngineController(IElectionService _electionService,
     {
         var electionEntity = await _electionService.GetElectionAsync(id);
         var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
-        var method = 1; //TODO CHANGE IN DB TO STORE AS CONSTANTS FOR BETTER COMMUNICATION WITH PBENGIN
-        var ballotDesign = 1; //TODO SAME AS ABOVE
+        var method = Constants.rules_map[electionEntity!.Model];
+        var ballotDesign = 1; //Hardcoded for approval - more ballots have not been implemented
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
         
         var electionPython = await createPythonElection(electionEntity); 
@@ -97,7 +97,7 @@ public class PbEngineController(IElectionService _electionService,
             }).ToList();
         
         var electionResult = new ElectionResult()
-            {ElectionId = id, ElectedProjects = result_PythonProjects_project, UsedBallot = ballotDesign.ToString(), UsedMethod = method.ToString(),  SubmittedProjects = projects.ToList()};
+            {ElectionId = id, ElectedProjects = result_PythonProjects_project, UsedBallot = ballotDesign.ToString(), UsedMethod = Constants.rules_map.First(k => k.Value == method).Key,  SubmittedProjects = projects.ToList()};
         await _resultService.AddElectionResult(electionResult); 
        
         return result_PythonProjects_project;

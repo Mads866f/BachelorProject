@@ -23,4 +23,11 @@ public class Constants
         { "15", "Additive  Borda  Sat " },
         { "16", "Cost" }
     };
+
+    public static Dictionary<string, int> rules_map = new Dictionary<string, int>()
+    {
+        { "mes", 1 },
+        { "greedy", 2 },
+        { "seq", 4 }
+    };
 }

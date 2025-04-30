@@ -144,6 +144,7 @@ else if (_currentElectionResult is not null)
         analysisNumbers1 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats1);
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
         _isLoading = false;
+        reload = !reload;
     }
 
     public async void UpdateAnalNumbers(List<int> sats)
@@ -213,6 +214,7 @@ else if (_currentElectionResult is not null)
             }
             await InvokeAsync(StateHasChanged);
             Snackbar.Add("Coherrent groups fully added",Severity.Success);
+            reload = !reload;
         } 
     }
     
