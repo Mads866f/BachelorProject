@@ -40,7 +40,7 @@ else if (_currentElectionResult is not null)
                             <!-- Elected Project List View -->
                             <MudItem xs="7">
                                 <CoherentVotersForm Add="AddToCovote"/>
-                                <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()"/>
+                                <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()" TotalBudget="_currentElection!.TotalBudget"/>
                             </MudItem>
                             <MudItem xs="12">
                                 <MudText Typo="Typo.h4">Analysis Numbers</MudText>
