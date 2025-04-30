@@ -19,8 +19,19 @@ async def root(election:Election,method:int, ballot_type:int):
     try:
         method = int(method)
         ballot_type = int(ballot_type)
-        print(f"Method: {method}, Ballot Type: {ballot_type}")
         return pb.calculate_result(election,method,ballot_type)
+    except Exception as e:
+        print(e)
+        return{"error":str(e)}
+
+@app.post("/analyze/avgSatisfaction/groups")
+async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
+    try:
+        result = {}
+        for sat in satisfactions:
+            sat_map = pb.calculate_satisfaction_for_group(election,outcome,sat)
+            result[str(sat)] = sat_map
+        return result
     except Exception as e:
         print(e)
         return{"error":str(e)}
@@ -32,9 +43,8 @@ async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
         result = {}
         for sat in satisfactions:
             sat_number = pb.calculate_satisfaction(election,outcome,sat)
-            print(sat,":",sat_number)
+            (sat,":",sat_number)
             result[str(sat)] = sat_number
-        print(result)
         return {"result":result}
     except Exception as e:
         print(e)
@@ -73,7 +83,6 @@ async def root(election:Election,options:list[int]):
 async def root(file_name:str):
     #filepath = Path(__file__).resolve().parent.parent /"real-elections"/str(file_name) # Used when fastapi is alone
     filepath = "real-elections/"+str(file_name)
-    print("FILEPATH:",filepath)
     instance  = pb.real_election_converter(filepath)
     name_nice = file_name.replace("_"," ").replace(".pb","")
     instance.name = name_nice

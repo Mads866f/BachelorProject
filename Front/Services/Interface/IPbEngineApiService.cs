@@ -16,5 +16,5 @@ public interface IPbEngineApiService
 
 
     Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(List<CoherrentVoter> coherrents,
-        ElectionResult electionResult,int sat);
+        ElectionResult electionResult,List<int> sat);
 }

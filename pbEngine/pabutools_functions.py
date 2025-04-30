@@ -217,14 +217,22 @@ def calculate_satisfaction(election:Election,outcome:list[Project],satisfaction)
     sat = determine_satisfaction(satisfaction)
     voting_instance = instance_from_election_model(election)
     profile = profile_from_voter_list(election.votes,Ballot.Approval,election) #Change such that the ballot type is not hardcoded
-    for p in profile:
-        print(p)
     pabu_outcome = []
     for p in outcome:
         pabu_outcome.append(project_model_to_project_pabu(p))
     return float(pban.avg_satisfaction(voting_instance,profile,pabu_outcome,sat_class=sat))
 
-
+def calculate_satisfaction_for_group(election:Election,outcome:list[Project],satisfaction):
+    result = {}
+    for voter in election.votes:
+        adjusted_election = election.__copy__()
+        adjusted_election.votes = [voter]
+        sat = calculate_satisfaction(adjusted_election,outcome,satisfaction)
+        name = ""
+        for p in voter.selectedProjects:
+            name+=p+"***" 
+        result[name]=sat
+    return result
 
 def calculate_analyze_instance(election:Election,option:int):
     voter_instance = pbelec.Instance(map(project_model_to_project_pabu,election.projects),election.totalBudget)

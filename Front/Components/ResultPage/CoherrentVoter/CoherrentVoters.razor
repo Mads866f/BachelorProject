@@ -31,7 +31,6 @@
             <MudTd DataLabel="cohesive">
                 @if (((float)@context.fraction/100) * TotalBudget >= @context.projects.Sum(p => p.Cost))
                 {
-                    Console.WriteLine("Here"+((float)context.fraction/100) * TotalBudget);
                     <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"/>
                 }
                 else
@@ -103,6 +102,13 @@
     {
         coherrentVoters.Sort((a, b) => b.number_of_voters.CompareTo(a.number_of_voters)); 
         return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+
+        coherrentVoters.Sort((a, b) => b.number_of_voters.CompareTo(a.number_of_voters));
+        base.OnParametersSet();
     }
 
 }

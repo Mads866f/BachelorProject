@@ -25,6 +25,12 @@ public class PbEngineController(IElectionService _electionService,
     ) :Controller
 {
 
+    public class groupssatDto()
+    {
+        public List<CoherrentVoter> groups { get; set; }
+        public List<int> sats { get; set; }
+    }
+    
     private async Task<PythonElection> createPythonElection(Election election)
     {
         _electionService.EndElectionAsync(election.Id);
@@ -190,44 +196,54 @@ public class PbEngineController(IElectionService _electionService,
         return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
     }
 
-    [HttpPost("analyze/CoherrentGroups/{resultId}/{sat}")]
-    public async Task<Dictionary<Guid,Dictionary<string,float>>> GetGroupsAvgSat([FromBody]List<CoherrentVoter> groups,[FromRoute]Guid resultId,[FromRoute]int sat)
+    [HttpPost("analyze/CoherentGroups/{resultId}")]
+    public async Task<Dictionary<Guid, Dictionary<string, float>>> GetGroupsAvgSat([FromBody] groupssatDto load,
+        [FromRoute] Guid resultId)
     {
-        Console.WriteLine("HELLLO HELLO HELLO");
+        var groups = load.groups;
+        var sat = load.sats;
         var election = await _resultService.GetElectionResultByResultId(resultId);
-        var pythonProjectElected = election.ElectedProjects.Select(p => new PythonProject() {name = p.Name,cost = p.Cost,categories = p.Categories.Select(c => c.Name).ToList() ??[],target = p.Targets.Select(t => t.Name).ToList() ?? []}).ToList();
-    Console.WriteLine("Elected Python Projects size: " + pythonProjectElected.Count());
+        var pythonProjectElected = election.ElectedProjects.Select(p => new PythonProject()
+        {
+            name = p.Name, cost = p.Cost, categories = p.Categories.Select(c => c.Name).ToList() ?? [],
+            target = p.Targets.Select(t => t.Name).ToList() ?? []
+        }).ToList();
         var accSats = new Dictionary<Guid, Dictionary<string, float>>();
+        var pythonVoters = new List<PythonVoter>();
         foreach (var group in groups)
         {
             //Create the group as 1 voter
-            var pythonVoter = new List<PythonVoter>()
-            {
-                new PythonVoter()
+            pythonVoters.Add(new PythonVoter()
                 {
                     selectedProjects = group.projects.Select(p => p.Name).ToList(),
                     selectedDegree = group.projects.Select(_ => 1).ToList()
                 }
-            };
-            Console.WriteLine("Profile Backend: " + pythonVoter.First().selectedProjects.Count());
-            //Create the Election simulating only that group as voters
-            var pythonElection = new PythonElection()
-            {
-                ballot_type = election.UsedBallot,
-                method = election.UsedMethod,
-                name = "NOT NEEDED",
-                projects = election.SubmittedProjects.Select(p => new PythonProject()
-                    { cost = p.Cost, name = p.Name, categories = [], target = [] }).ToList(),
-                totalBudget = election.TotalBudget,
-                votes = pythonVoter
-            };
-            //Analyze avg satisfaction:
-            var groupSat = await _service.GetAnalysisNumbers(pythonElection,pythonProjectElected, [sat]);
-            ChangeKeysFromNumbersToReal(groupSat); 
-            accSats.Add(group.id, groupSat);
+            );
         }
-        return accSats; 
-        
+
+        //Create the Election simulating only that group as voters
+        var pythonElection = new PythonElection()
+        {
+            ballot_type = election.UsedBallot,
+            method = election.UsedMethod,
+            name = "NOT NEEDED",
+            projects = election.SubmittedProjects.Select(p => new PythonProject()
+                { cost = p.Cost, name = p.Name, categories = [], target = [] }).ToList(),
+            totalBudget = election.TotalBudget,
+            votes = pythonVoters
+        };
+        //Analyze avg satisfaction:
+        var groupSat = await _service.GetAnalysisNumbersGroups(pythonElection, pythonProjectElected, sat);
+        //Interpret result
+        foreach (var gr in groupSat)
+        {
+            var noOfProjects = gr.Key.selectedProjects.Count();
+            var chosenGuid = groups.Where(g=> g.projects.Count() == noOfProjects).First(g => g.projects.Select(p=> p.Name).ToList().TrueForAll(name => gr.Key.selectedProjects.Contains(name))).id;
+            ChangeKeysFromNumbersToReal(gr.Value);
+            accSats.Add(chosenGuid, gr.Value);
+        }
+
+        return accSats;
     }
     
     
@@ -245,7 +261,6 @@ public class PbEngineController(IElectionService _electionService,
             new PythonProject()
                 {name =p.Name, cost = p.Cost, 
                     categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
-        Console.WriteLine($"ElectedProjectListSize - Here: {electedProjects.Count()}");
        var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
        var votersPython = voters.Select(v => new PythonVoter
        {
@@ -274,7 +289,6 @@ public class PbEngineController(IElectionService _electionService,
 
         foreach (var (key, value) in dict.Reverse())
         {
-            Console.WriteLine($"{key}: {value}"); 
             if (Constants.sat_map.TryGetValue(key, out var newKey))
             {
                 updates.Add((key, newKey, value));

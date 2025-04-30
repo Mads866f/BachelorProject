@@ -85,6 +85,23 @@ else if (_currentElectionResult is not null)
                     </CascadingValue>
                 </MudTabPanel>
             }
+            <MudTabPanel Icon="@Icons.Material.Filled.Add">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.h3">Redo Election</MudText>
+                        <MudSelect T="string" @bind-Value="tmp" Label="Method" Placeholder="Please Select" Required="true">
+                            <MudSelectItem T="string" Value="@("mes")">Equal Shares</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("greedy")">Greedy Utilitarian</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("seq")">Sequential Phragmen</MudSelectItem>
+                        </MudSelect>
+                        <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!"
+                                      @bind-Value="tmp2"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton ButtonType="ButtonType.Button" Color="Color.Primary" Class="full-width-btn">Redo Election</MudButton>
+                    </MudItem>
+                </MudGrid>    
+            </MudTabPanel>
         </MudTabs>
     </MudContainer>
 }
@@ -115,6 +132,9 @@ else if (_currentElectionResult is not null)
     private bool _isLoading = true;
     private bool _hasError = false;
     private bool reload = false;
+
+    private string tmp = "";
+    private int  tmp2 = 0;
 
 
     protected override async Task OnInitializedAsync()
@@ -159,14 +179,12 @@ else if (_currentElectionResult is not null)
 
     public async void UpdateCoVotersSats()
     {
-        foreach (var sat in currentSats1)
-        {
-            var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, sat);
-            foreach (var (key, value)in newCoAnalNumbers)
+            var newCoAnalNumbers1 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, currentSats1);
+            foreach (var (key, value)in newCoAnalNumbers1)
             {
                 if (coVoteAnalNumbers1.ContainsKey(key))
                 {
-                    foreach (var dict in newCoAnalNumbers.Values)
+                    foreach (var dict in newCoAnalNumbers1.Values)
                     {
                         coVoteAnalNumbers1[key][dict.Keys.First()] = dict.Values.First();
                     }
@@ -175,16 +193,13 @@ else if (_currentElectionResult is not null)
                 {
                     coVoteAnalNumbers1[key] = value;
                 }
-            }
         }
-        foreach (var sat in currentSats2)
-        {
-            var newCoAnalNumbers = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, sat);
-            foreach (var (key, value)in newCoAnalNumbers)
+            var newCoAnalNumbers2 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, currentSats2);
+            foreach (var (key, value)in newCoAnalNumbers2)
             {
                 if (coVoteAnalNumbers2.ContainsKey(key))
                 {
-                    foreach (var dict in newCoAnalNumbers.Values)
+                    foreach (var dict in newCoAnalNumbers2.Values)
                     {
                         coVoteAnalNumbers2[key][dict.Keys.First()] = dict.Values.First();
                     }
@@ -193,14 +208,13 @@ else if (_currentElectionResult is not null)
                 {
                     coVoteAnalNumbers2[key] = value;
                 }
-            }
         }
-
         reload = !reload;
     }
     
     public async void AddToCovote((int,int) toBeAdded)
     {
+        reload = !reload;
         var newAdd = _wantedCoVoters.Add(toBeAdded);
         if (newAdd)
         {
@@ -219,7 +233,6 @@ else if (_currentElectionResult is not null)
             }
             await InvokeAsync(StateHasChanged);
             Snackbar.Add("Coherrent groups fully added",Severity.Success);
-            reload = !reload;
         } 
     }
     

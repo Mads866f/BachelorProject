@@ -172,14 +172,15 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }}
 
     public async Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(
-        List<CoherrentVoter> coherrents, ElectionResult electionResult,int sat)
+        List<CoherrentVoter> coherrents, ElectionResult electionResult,List<int> sat)
     {
         _logger.LogInformation("Getting Avg Satisfaction - For Coherent Groups");
-        var json = JsonSerializer.Serialize(coherrents);
+        var load = new {groups = coherrents , sats = sat};
+        var json = JsonSerializer.Serialize(load);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
-            var response = await _client.PostAsync( $"{url}/analyze/CoherrentGroups/{electionResult.Id}/{sat}", content);
+            var response = await _client.PostAsync( $"{url}/analyze/CoherentGroups/{electionResult.Id}", content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, Dictionary<string, float>>>();

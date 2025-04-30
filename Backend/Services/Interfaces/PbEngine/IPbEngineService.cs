@@ -13,5 +13,6 @@ public interface IPbEngineService
    Task<Stream> DownloadElection(PythonElection election);
 
    Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election, List<PythonProject> electedProjects, List<int> sats);
-   
+
+  Task<Dictionary<PythonVoter,Dictionary<string,float>>>  GetAnalysisNumbersGroups(PythonElection pythonElection, List<PythonProject> pythonProjectElected, List<int> sats);
 }

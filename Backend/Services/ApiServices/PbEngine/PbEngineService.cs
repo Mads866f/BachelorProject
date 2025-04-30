@@ -141,5 +141,62 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
             throw;
         }
     }
-    
+
+    public async Task<Dictionary<PythonVoter, Dictionary<string, float>>> GetAnalysisNumbersGroups(PythonElection pythonElection, List<PythonProject> pythonProjectElected, List<int> sats)
+    {
+        var url = "analyze/";
+        var load = new
+        {
+            election = pythonElection,
+            outcome = pythonProjectElected,
+            satisfactions = sats
+        };
+        var json = JsonSerializer.Serialize(load);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await _httpsClient.PostAsync(url + "avgSatisfaction/groups", content);
+            if (response.IsSuccessStatusCode)
+            {
+                // 1) Read as string-keyed dictionary
+                var raw = await response.Content
+                    .ReadFromJsonAsync<Dictionary<string, Dictionary<string, Dictionary<string, float>>>>();
+                if (raw == null)
+                    throw new Exception("Internal Server Error – GetAnalysisNumbersGroups");
+                
+                var actualContent = raw["result"];
+                var satisfactionsInDict= actualContent.Keys.ToList();
+                var groups = actualContent.Values.First().Keys.ToList();
+                var tmpVoter = new Dictionary<string, Dictionary<string, float>>();
+                groups.ForEach(g => tmpVoter.Add(g, new Dictionary<string, float>()));
+                foreach (var sat in satisfactionsInDict)
+                {
+                    var satBook = actualContent[sat];
+                    groups.ForEach(g => tmpVoter[g][sat]=satBook[g]);
+                }
+
+                var result = new Dictionary<PythonVoter, Dictionary<string, float>>(); 
+                foreach (var dict in tmpVoter)
+                {
+                    var projectNames = dict.Key.Split("***").ToList();
+                    projectNames.ForEach(p => p.Replace("***",""));
+                    projectNames.Remove(projectNames.Last());
+                    var toPythonVoter = new PythonVoter()
+                    {
+                        selectedProjects = projectNames,
+                        selectedDegree = projectNames.Select(_=>1).ToList()
+                    };
+                    result.Add(toPythonVoter, dict.Value);
+                }
+                return result;
+            }
+
+            throw new Exception("Internal Server Error");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }
