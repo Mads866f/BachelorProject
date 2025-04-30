@@ -68,9 +68,14 @@
    protected override void OnParametersSet()
    {
       _satPoints.Clear();
+      Func<float,float> scaler = ((e) => e);
+      if (Scale)
+      {
+         scaler = ((e) => (float) Math.Log2(e));
+      }
       foreach (var avgSat in avgNumbers)
       {
-         _satPoints.Add(new SatPoint(){Sat = avgSat.Key,Value = (float)Math.Log2(avgSat.Value), RealValue = avgSat.Value});
+         _satPoints.Add(new SatPoint(){Sat = avgSat.Key,Value = scaler(avgSat.Value), RealValue = avgSat.Value});
       }
 
       foreach (var covoter in coNumbers)
@@ -78,7 +83,7 @@
          var newCoSat = new List<SatPoint>();
          foreach (var coSat in covoter.Value)
          {
-            newCoSat.Add(new SatPoint(){Sat = coSat.Key, Value = (float)Math.Log2(coSat.Value), RealValue = coSat.Value});
+            newCoSat.Add(new SatPoint(){Sat = coSat.Key, Value = scaler(coSat.Value), RealValue = coSat.Value});
          }
          _coVotSatsList.Add((covoter.Key.ToString().Substring(0,5),newCoSat));
       }

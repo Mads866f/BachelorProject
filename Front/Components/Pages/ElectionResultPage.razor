@@ -142,6 +142,11 @@ else if (_currentElectionResult is not null)
         _currentElectionResult = _electionResults.FirstOrDefault();
         analysisNumbers2 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats2);
         analysisNumbers1 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats1);
+        Console.WriteLine("KEYS");
+        foreach (var keyValuePair in analysisNumbers1)
+        {
+            Console.WriteLine($"KEY:{keyValuePair.Key}:VALUE{keyValuePair.Value}");
+        }
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
         _isLoading = false;
         reload = !reload;
