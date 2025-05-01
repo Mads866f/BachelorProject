@@ -31,14 +31,13 @@ async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
         for sat in satisfactions:
             sat_map = pb.calculate_satisfaction_for_group(election,outcome,sat)
             result[str(sat)] = sat_map
-        return result
+        return {"result":result}
     except Exception as e:
         print(e)
         return{"error":str(e)}
 
 @app.post("/analyze/avgSatisfaction")
 async def root(election:Election,outcome:list[Project],satisfactions:list[int]):
-    
     try:
         result = {}
         for sat in satisfactions:

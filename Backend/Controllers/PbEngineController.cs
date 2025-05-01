@@ -303,4 +303,10 @@ public class PbEngineController(IElectionService _electionService,
         }
         
     }
+
+    [HttpPost("redoElection")]
+    public async Task<ElectionResult> RedoElection([FromBody]Election modifiedElection)
+    {
+        throw new NotImplementedException();
+    }
 }
