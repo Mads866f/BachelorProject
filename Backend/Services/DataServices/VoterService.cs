@@ -11,20 +11,17 @@ public class VoterService : IVotersService
 {
     private readonly IMapper _mapper;
     private readonly IVotersRepository _repository;
-    private readonly IScoresService _scoresService;
 
     public VoterService(IMapper mapper, IVotersRepository repository, IScoresService scoresService)
     {
         _mapper = mapper;
         _repository = repository;
-        _scoresService = scoresService;
     }
     public async Task<IEnumerable<Voter>> GetAllVotersAsync()
     {
         var result = await _repository.GetAllAsync();
         var voterDtos = result
             .Select(x => _mapper.Map<Voter>(x)).ToList();
-        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
         return voterDtos;
     }
 
@@ -32,7 +29,6 @@ public class VoterService : IVotersService
     {
         var result = await _repository.GetByElectionIdAsync(electionId);
         var voterDtos = result.Select(x => _mapper.Map<Voter>(x)).ToList();
-        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
         return voterDtos;
     }
 
@@ -56,7 +52,6 @@ public class VoterService : IVotersService
     {
         var voterEntity = await _repository.GetByIdAsync(id);
         var voterDto = _mapper.Map<Voter>(voterEntity);
-        await AddScores(voterDto);
         return voterDto;
     }
 
@@ -64,7 +59,6 @@ public class VoterService : IVotersService
     {
         var result = await _repository.GetVotersByProjectIdAsync(projectId);
         var voterDtos = result.Select(x => _mapper.Map<Voter>(x)).ToList();
-        await Task.WhenAll(voterDtos.Select(async x => await AddScores(x)));
         return voterDtos;
     }
 
@@ -85,11 +79,5 @@ public class VoterService : IVotersService
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         return await _repository.DeleteAsync(id);
-    }
-
-    private async Task AddScores(Voter voter)
-    {
-        var scores = await _scoresService.GetScoresForVoterIdAsync(voter.Id);
-        voter.Votes = scores.ToList();
     }
 }

@@ -8,7 +8,15 @@ public class ScoresProfile : Profile
 {
     public ScoresProfile()
     {
-        CreateMap<ScoresEntity, Scores>();
-        CreateMap<Scores, ScoresEntity>();
+        // Entity -> DTO
+        CreateMap<ScoresEntity, Scores>()
+            .ForMember(dest => dest.Project, 
+                opt => 
+                    opt.MapFrom(src => src.ProjectsEntity));
+        // DTO -> Entity
+        CreateMap<Scores, ScoresEntity>()
+            .ForMember(dest => dest.ProjectsEntity, 
+                opt => 
+                    opt.MapFrom(src => src.Project));
     }
 }

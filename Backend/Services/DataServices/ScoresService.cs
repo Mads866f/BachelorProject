@@ -45,7 +45,7 @@ public class ScoresService : IScoresService
             scoresDto = result
                 .Select(x => _mapper.Map<Scores>(x));
             //Add Projects
-            scoresDto.Select(async s => s.project = _mapper.Map<Project>(await _projectsRepository.GetByIdAsync(s.Project_Id)));
+            scoresDto.Select(async s => s.Project = _mapper.Map<Project>(await _projectsRepository.GetByIdAsync(s.ProjectId)));
         }
         finally
         {
@@ -65,8 +65,8 @@ public class ScoresService : IScoresService
 
     public async Task<Scores?> CreateVotersAsync(Scores voterModel)
     {
-        var voterExists = await _votersRepository.GetByIdAsync(voterModel.Voter_Id) is null;
-        var projectExists = await _projectsRepository.GetByIdAsync(voterModel.Project_Id) is null;
+        var voterExists = await _votersRepository.GetByIdAsync(voterModel.VoterId) is null;
+        var projectExists = await _projectsRepository.GetByIdAsync(voterModel.ProjectId) is null;
         if (voterExists || projectExists)
         {
             return null;

@@ -63,7 +63,7 @@ public class ScoresRepository(IDbConnectionFactory dbFactory) : IScoresRepositor
             VALUES (@Voter_Id, @Project_Id, @Grade)
             RETURNING voter_id AS Voter_Id , project_id AS Project_Id;
             """;
-        Console.WriteLine("SCORES CREATE: "+scores.Voter_Id+" : "+scores.Project_Id + " : " +  scores.Grade);
+        Console.WriteLine("SCORES CREATE: "+scores.VoterId+" : "+scores.ProjectId + " : " +  scores.Grade);
         var result = await db.QuerySingleAsync<ScoresEntity>(query, scores);
 
         return new ScoresEntity()

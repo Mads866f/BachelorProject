@@ -25,25 +25,14 @@ namespace Backend.Controllers.DataControllers
         public async Task<ActionResult<IEnumerable<Voter>>> GetAllAsync()
         {
             _logger.LogInformation("Fetching all voters.");
-
             try
             {
                 var result = await _voterService.GetAllVotersAsync();
-                var voterList = result.ToList();
-                if (voterList.Count != 0)
+                if (result.Any())
                 {
-                    _logger.LogInformation("Found {VoterCount} voters.", voterList.Count);
-                    foreach (var voter in voterList)
-                    {
-                        foreach (var score in voter.Votes)
-                        {
-                            var project = await _projectService.GetProjectByIdAsync(score.Project_Id);
-                            score.project = project;
-                        }
-                    }
+                    _logger.LogInformation("Found {VoterCount} voters.", result.Count());
                     return Ok(result);
                 }
-
                 _logger.LogWarning("No voters found.");
                 return NotFound();
             }
@@ -59,25 +48,13 @@ namespace Backend.Controllers.DataControllers
         {
             
             _logger.LogInformation($"Fetching all voters from election with id {Electionid}.");
-
             try
             {
                 var result = await _voterService.GetVotersByElectionId(Electionid);
-                var voterList = result.ToList();
-                if (voterList.Count != 0)
+                if (result.Any())
                 {
-                    _logger.LogInformation("Found {VoterCount} voters.", voterList.Count);
-                    foreach (var voter in voterList)
-                    {
-                        foreach (var score in voter.Votes)
-                        {
-                            var project = await _projectService.GetProjectByIdAsync(score.Project_Id); //TODO - Optimize this
-                            score.project = project;
-                        }
-                    }
                     return Ok(result);
                 }
-
                 _logger.LogWarning("No voters found.");
                 return NotFound();
             }

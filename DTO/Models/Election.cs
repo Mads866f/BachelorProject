@@ -20,6 +20,7 @@ public class Election
     public  required  int TotalBudget { get; set; }
     public required string Model { get; set; }
     public required string BallotDesign { get; set; }
+    
     public bool Ended { get; set; }
 
     public override string ToString()
