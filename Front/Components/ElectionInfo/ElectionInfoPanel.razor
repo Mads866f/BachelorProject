@@ -17,7 +17,7 @@
                     <MudText Typo="Typo.h6">Budget</MudText>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.body1">@Election.TotalBudget</MudText>
+                    <MudText Typo="Typo.body1">@TotalBudget</MudText>
                 </MudItem>
             </MudGrid>
         </MudPaper>
@@ -76,6 +76,7 @@
     [CascadingParameter] public required Election Election { get; set; }
     [Parameter] public string? NewBallotFormat { get; set; }
     [Parameter] public string? NewModelFormat { get; set; }
+    [Parameter] public int TotalBudget { get; set; }
     [Parameter] public int NoOfVoters { get; set; }
     [Parameter] public int NoOfProjects { get; set; }
 

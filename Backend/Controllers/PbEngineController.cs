@@ -22,7 +22,7 @@ public class PbEngineController(IElectionService _electionService,
     IPbEngineService _service,
     ElectionResultService _resultService,
     IScoresService _scoresService
-    ) :Controller
+) : Controller
 {
 
     public class groupssatDto()
@@ -30,27 +30,27 @@ public class PbEngineController(IElectionService _electionService,
         public List<CoherrentVoter> groups { get; set; }
         public List<int> sats { get; set; }
     }
-    
+
     private async Task<PythonElection> createPythonElection(Election election)
     {
         _electionService.EndElectionAsync(election.Id);
-        var electionId=election.Id;
+        var electionId = election.Id;
         var voters = await _votersService.GetVotersByElectionId(electionId);
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
-        
-        
-        var pythonProjects = projects.Select(p => 
-            new PythonProject(p.Id.ToString(),p.Cost,
-                p.Categories is not null? p.Categories.Select(c => c.Name).ToList():new List<string>(),
-                p.Targets is not null? p.Targets.Select(t => t.Name).ToList():new List<string>())).ToList();
+
+
+        var pythonProjects = projects.Select(p =>
+            new PythonProject(p.Id.ToString(), p.Cost,
+                p.Categories is not null ? p.Categories.Select(c => c.Name).ToList() : new List<string>(),
+                p.Targets is not null ? p.Targets.Select(t => t.Name).ToList() : new List<string>())).ToList();
 
         var pythonVoters = voters.Select(vot => new PythonVoter()
         {
             selectedProjects = vot.Votes.Select(v => v.ProjectId.ToString()).ToList(),
             selectedDegree = vot.Votes.Select(v => v.Grade).ToList(),
         }).ToList();
-        
-        
+
+
         var electionPython = new PythonElection
         {
             totalBudget = election.TotalBudget,
@@ -75,6 +75,7 @@ public class PbEngineController(IElectionService _electionService,
         };
     }
     
+    
     [HttpGet("{id}")]
     public async Task<List<Project>> CalculateElection(Guid id)
     {
@@ -83,31 +84,61 @@ public class PbEngineController(IElectionService _electionService,
         var method = Constants.rules_map[electionEntity!.Model];
         var ballotDesign = 1; //Hardcoded for approval - more ballots have not been implemented
         var projects = await _projectService.GetProjectsWithElectionId(electionId);
-        
-        var electionPython = await createPythonElection(electionEntity); 
 
-            
+        var electionPython = await createPythonElection(electionEntity);
 
-        var result = await _service.CalculateElection(electionPython,method,ballotDesign);
-        
-        var result_PythonProjects_project = result.Select(p =>
-            {
-                var new_p = new Project
-                {
-                    Id = Guid.Parse(p.Name),
-                    ElectionId = electionId,
-                    Name = projects.Where(proj => proj.Id.ToString() == p.Name).First().Name,
-                    Cost = p.Cost,
-                };
-                return new_p;
-            }).ToList();
-        
+
+
+        var resultPythonProjectsProject = await CalculateHelperResult(electionPython, method, ballotDesign, electionId, projects);
+
         var electionResult = new ElectionResult()
-            {ElectionId = id, ElectedProjects = result_PythonProjects_project, UsedBallot = ballotDesign.ToString(), UsedMethod = Constants.rules_map.First(k => k.Value == method).Key,  SubmittedProjects = projects.ToList()};
-        await _resultService.AddElectionResult(electionResult); 
-       
+        {
+            ElectionId = id, ElectedProjects = resultPythonProjectsProject, UsedBallot = ballotDesign.ToString(),
+            UsedMethod = Constants.rules_map.First(k => k.Value == method).Key, SubmittedProjects = projects.ToList(), TotalBudget = electionEntity.TotalBudget
+        };
+        await _resultService.AddElectionResult(electionResult);
+
+        return resultPythonProjectsProject;
+    }
+
+    private async Task<List<Project>> CalculateHelperResult(PythonElection electionPython, int method, int ballotDesign, Guid electionId,
+        IEnumerable<Project> projects)
+    {
+        var result = await _service.CalculateElection(electionPython, method, ballotDesign);
+
+        var result_PythonProjects_project = result.Select(p =>
+        {
+            var new_p = new Project
+            {
+                Id = Guid.Parse(p.Name),
+                ElectionId = electionId,
+                Name = projects.Where(proj => proj.Id.ToString() == p.Name).First().Name,
+                Cost = p.Cost,
+            };
+            return new_p;
+        }).ToList();
         return result_PythonProjects_project;
     }
+
+    [HttpPost("redoElection")]
+    public async Task<ElectionResult> RedoElection([FromBody] Election modifiedElection)
+    {
+        var pythonElection = await createPythonElection(modifiedElection);
+        var method = Constants.rules_map[modifiedElection.Model];
+        var ballotDesign = 1; // Hardcoded for approval
+        var electionId = modifiedElection.Id;
+        var projects = await _projectService.GetProjectsWithElectionId(electionId);
+        projects = projects.ToList();
+        var electedProjects = await CalculateHelperResult(pythonElection, method, ballotDesign, electionId, projects);
+        var electionResult = new ElectionResult()
+        {
+            ElectionId = electionId, ElectedProjects = electedProjects, UsedBallot = ballotDesign.ToString(),
+            UsedMethod = Constants.rules_map.First(k => k.Value == method).Key, SubmittedProjects = projects.ToList(), TotalBudget = modifiedElection.TotalBudget
+        };
+        await _resultService.AddElectionResult(electionResult); 
+        return electionResult;
+    }
+    
 
     /// <summary>
     ///  Simple method for getting list of files of elections within "real-elections" folder
@@ -133,11 +164,15 @@ public class PbEngineController(IElectionService _electionService,
         if (result is null)
         {
             Console.WriteLine(filename + " not found");
-        } 
-            
+        }
+
         //Adding the election to the database
-        var election = new CreateElectionModel(){Name = result.name,TotalBudget = result.totalBudget,BallotDesign = result.ballot_type, Model = result.method};
-        var election_created= await _electionService.CreateElectionAsync(election);
+        var election = new CreateElectionModel()
+        {
+            Name = result.name, TotalBudget = result.totalBudget, BallotDesign = result.ballot_type,
+            Model = result.method
+        };
+        var election_created = await _electionService.CreateElectionAsync(election);
         //Adding the projects
         var projects = result.projects;
         var projectToIdMap = new Dictionary<string, Guid>();
@@ -154,12 +189,13 @@ public class PbEngineController(IElectionService _electionService,
             var projectCreated = await _projectService.CreateProjectAsync(project);
             projectToIdMap.Add(pythonProject.name, projectCreated.Id);
         }
+
         //Adding voters and votes
         var voters = result.votes;
         foreach (var pythonVoter in voters)
         {
             //Adding Voter
-            var voter_model = new CreateVoter(){ElectionId = election_created.Id};
+            var voter_model = new CreateVoter() { ElectionId = election_created.Id };
             var createdVoter = await _votersService.CreateVoterAsync(voter_model);
             //Adding votes
             for (int i = 0; i < pythonVoter.selectedProjects.Count; i++)
@@ -184,6 +220,7 @@ public class PbEngineController(IElectionService _electionService,
             Console.WriteLine(id + " not found");
             throw new Exception("Election not found");
         }
+
         var pythonElection = await createPythonElection(election);
         var fileStream = await _service.DownloadElection(pythonElection);
         if (fileStream is null)
@@ -193,7 +230,7 @@ public class PbEngineController(IElectionService _electionService,
         }
         
 
-        return File(fileStream, "application/octet-stream",election.Name + "_custom.pb");
+        return File(fileStream, "application/octet-stream", election.Name + "_custom.pb");
     }
 
     [HttpPost("analyze/CoherentGroups/{resultId}")]
@@ -238,26 +275,30 @@ public class PbEngineController(IElectionService _electionService,
         foreach (var gr in groupSat)
         {
             var noOfProjects = gr.Key.selectedProjects.Count();
-            var chosenGuid = groups.Where(g=> g.projects.Count() == noOfProjects).First(g => g.projects.Select(p=> p.Name).ToList().TrueForAll(name => gr.Key.selectedProjects.Contains(name))).id;
+            var chosenGuid = groups.Where(g => g.projects.Count() == noOfProjects).First(g =>
+                g.projects.Select(p => p.Name).ToList().TrueForAll(name => gr.Key.selectedProjects.Contains(name))).id;
             ChangeKeysFromNumbersToReal(gr.Value);
             accSats.Add(chosenGuid, gr.Value);
         }
 
         return accSats;
     }
-    
-    
+
+
     [HttpPost("/analyze/avgSatisfaction/{resultId}")]
-    public async Task<Dictionary<string,float>> GetAverageSatisfaction(Guid resultId,[FromBody]List<int> sats)
+    public async Task<Dictionary<string, float>> GetAverageSatisfaction(Guid resultId, [FromBody] List<int> sats)
     {
         var election = await _resultService.GetElectionResultByResultId(resultId);
-        var submittedPythonProjects = election.SubmittedProjects.Select(p => 
+        var submittedPythonProjects = election.SubmittedProjects.Select(p =>
             new PythonProject()
-                {name =p.Name, cost = p.Cost, 
-                    categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
-        
-        
-        var electedProjects= election.ElectedProjects.Select(p => 
+            {
+                name = p.Name, cost = p.Cost,
+                categories = p.Categories?.Select(c => c.Name).ToList() ?? [],
+                target = p.Targets?.Select(t => t.Name).ToList() ?? []
+            }).ToList();
+
+
+        var electedProjects = election.ElectedProjects.Select(p =>
             new PythonProject()
                 {name =p.Name, cost = p.Cost, 
                     categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
@@ -278,12 +319,12 @@ public class PbEngineController(IElectionService _electionService,
         };
         
         var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects, sats);
-        ChangeKeysFromNumbersToReal(result); 
+        ChangeKeysFromNumbersToReal(result);
         return result;
 
     }
 
-    private void ChangeKeysFromNumbersToReal(Dictionary<string,float> dict)
+    private void ChangeKeysFromNumbersToReal(Dictionary<string, float> dict)
     {
         var updates = new List<(string OldKey, string NewKey, float Value)>();
 
@@ -301,12 +342,6 @@ public class PbEngineController(IElectionService _electionService,
             dict[newKey] = value;
             dict.Remove(oldKey);
         }
-        
-    }
 
-    [HttpPost("redoElection")]
-    public async Task<ElectionResult> RedoElection([FromBody]Election modifiedElection)
-    {
-        throw new NotImplementedException();
     }
 }

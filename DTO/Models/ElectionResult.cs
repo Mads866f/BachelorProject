@@ -15,13 +15,13 @@ public class ElectionResult
     public Guid ElectionId { get; set; }
     public List<Project> SubmittedProjects { get; set; } = [];
     public List<Project> ElectedProjects { get; set; } = [];
-    public string UsedMethod { get; set; } = "";
-    public string UsedBallot { get; set; } = "";
+    public string UsedMethod { get; set; }
+    public string UsedBallot { get; set; }
 
-    public int TotalBudget = 0;
+    public int TotalBudget  {get; set;} = 0;
     
     public override string ToString()
     {
-        return $"Id:{Id}\n ElectionId: {ElectionId}\n SubmittedProjects: {SubmittedProjects.Count}\n ElectedProjects: {ElectedProjects.Count} \n UsedMethod: {UsedMethod}\n UsedBallot: {UsedBallot}";
+        return $"Id:{Id}\n ElectionId: {ElectionId}\n SubmittedProjects: {SubmittedProjects.Count}\n ElectedProjects: {ElectedProjects.Count} \n UsedMethod: {UsedMethod}\n UsedBallot: {UsedBallot}\n TotalBudget: {TotalBudget}";
     }
 }

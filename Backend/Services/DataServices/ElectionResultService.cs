@@ -18,14 +18,16 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
            electionres.Id = electionResult.Id;
            electionres.ElectionId = electionResult.ElectionId;
            _logger.LogInformation("Constructing ElectionResult Dto with id: "+ electionres.Id + " Election Id: "+ electionResult.ElectionId);
-           electionres.UsedBallot = electionResult.BallotUsed;
-           electionres.UsedMethod = electionres.UsedMethod;
+           electionres.UsedBallot = electionResult.UsedBallot;
+           electionres.UsedMethod = electionResult.UsedMethod;
+           electionres.TotalBudget = electionResult.TotalBudget;
            var projects = await repository.GetProjectsByResultId(electionResult.Id);
            var projectsTransformed = projects.Select(p => mapper.Map<Project>(p)).ToList();
            electionres.ElectedProjects = projectsTransformed;
            //Getting Submitted Projects
            var projectsElected = await _projectService.GetProjectsWithElectionId(electionResult.ElectionId);
            electionres.SubmittedProjects = projectsElected.ToList();
+           Console.WriteLine("RESULT PRINTED BACKSERVERICE"+ electionres.ToString() + " eleale "+electionres.UsedMethod);
            result.Add(electionres);
         }
         return result;
@@ -50,8 +52,8 @@ public class ElectionResultService(IMapper mapper, IElectionResultRepository rep
         {
             Id = electionResult.Id,
             ElectionId = electionResult.ElectionId,
-            UsedBallot = electionResult.BallotUsed,
-            UsedMethod = electionResult.MethodUsed,
+            UsedBallot = electionResult.UsedBallot,
+            UsedMethod = electionResult.UsedMethod,
             ElectedProjects = electedProjects,
             SubmittedProjects = submittedProjects.ToList(),
             TotalBudget = electionResult.TotalBudget,
