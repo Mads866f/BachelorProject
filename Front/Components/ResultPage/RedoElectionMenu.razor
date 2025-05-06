@@ -1,0 +1,23 @@
+@rendermode InteractiveServer
+@using DTO.Models
+<MudTabPanel Icon="@Icons.Material.Filled.Add">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h3">Redo Election</MudText>
+            <MudSelect T="string" @bind-Value="election.Model" Label="Method" Placeholder="Please Select" Required="true">
+                <MudSelectItem T="string" Value="@("mes")">Equal Shares</MudSelectItem>
+                <MudSelectItem T="string" Value="@("greedy")">Greedy Utilitarian</MudSelectItem>
+                <MudSelectItem T="string" Value="@("seq")">Sequential Phragmen</MudSelectItem>
+            </MudSelect>
+            <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!"
+                          @bind-Value="election.TotalBudget"></MudTextField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton ButtonType="ButtonType.Button" Color="Color.Primary" Class="full-width-btn" OnClick="() => RedoCallback.InvokeAsync(election) ">Redo Election</MudButton>
+        </MudItem>
+    </MudGrid>    
+</MudTabPanel>
+@code {
+   [Parameter] public Election election { get; set; }
+   [Parameter] public EventCallback<Election> RedoCallback { get; set; }
+} 

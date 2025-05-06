@@ -78,7 +78,8 @@ public static class DatabaseConfigurationBuilder
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 election_id UUID REFERENCES elections_table(id),
                 method_used TEXT NOT NULL,
-                ballot_used TEXT NOT NULL
+                ballot_used TEXT NOT NULL,
+                budget_used integer NOT NULL
             )
             """,
             """

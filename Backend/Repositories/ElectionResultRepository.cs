@@ -14,7 +14,7 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
       _logger.LogInformation("Getting ElectionResults from database with Result Id: "+ resultId);
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
-                    SELECT result.id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed, e.total_budget as TotalBudget
+                    SELECT result.id as Id, election_id as ElectionId, method_used as UsedMethod, ballot_used as UsedBallot, budget_used as TotalBudget
                     FROM result_table as result
                     JOIN elections_table as e on result.election_id = e.id
                     WHERE result.id = @Id
@@ -44,12 +44,12 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
         _logger.LogInformation("Getting ElectionResults from database with election Id: "+ electionId);
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
-                    SELECT result.id as Id, election_id as ElectionId, method_used as MethodUsed, ballot_used as BallotUsed, e.total_budget as TotalBudget
+                    SELECT result.id as Id, election_id as ElectionId, method_used as UsedMethod, ballot_used as UsedBallot, budget_used as TotalBudget
                     FROM result_table as result
-                    JOIN elections_table as e on result.election_id = e.id
                     WHERE result.election_id = @electionId
                     """;
         var result = await db.QueryAsync<ElectionResultEntity>(query, new { electionId = electionId });
+        Console.WriteLine("THIS FUCKING SHIT!: "+result.First().ToString() + "THIS?" + result.First().UsedMethod);
         return result;
     }
 /// <summary>
@@ -99,8 +99,8 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
         //Add the result
         using var db = await dbFactory.CreateConnectionAsync();
         var query = """
-                    INSERT INTO result_table (election_id, method_used, ballot_used)
-                    VALUES (@ElectionId, @UsedMethod, @UsedBallot)
+                    INSERT INTO result_table (election_id, method_used, ballot_used,budget_used)
+                    VALUES (@ElectionId, @UsedMethod, @UsedBallot, @TotalBudget)
                     RETURNING id
                     """;
         var resultId = await db.QuerySingleAsync<Guid>(query,result);

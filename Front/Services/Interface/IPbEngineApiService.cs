@@ -17,4 +17,6 @@ public interface IPbEngineApiService
 
     Task<Dictionary<Guid, Dictionary<string, float>>> GetAvgSatisfactionCoherentGroups(List<CoherrentVoter> coherrents,
         ElectionResult electionResult,List<int> sat);
+    
+    Task<ElectionResult> RedoElection(Election election);
 }

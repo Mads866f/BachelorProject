@@ -28,6 +28,7 @@ public class Constants
     {
         { "mes", 1 },
         { "greedy", 2 },
-        { "seq", 4 }
+        { "seq", 4 },
+        {"unknown",2} //Assuming that all unknown have used a simple greedy
     };
 }

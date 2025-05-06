@@ -19,11 +19,12 @@ else if (_hasError)
 }
 else if (_currentElectionResult is not null)
 {
+    <MudText Typo="Typo.h1" Class="align-content-center" Align="Align.Center">@_currentElection.Name</MudText>
     <MudContainer>
         <MudTabs>
             @foreach (var result in _electionResults)
             {
-                <MudTabPanel Text="@result.Id.ToString()">
+                <MudTabPanel Text="@(result.UsedMethod + "-" + result.TotalBudget+"€")">
                     <CascadingValue Value="_currentElection">
                         <MudGrid>
                             <MudItem xs="12">
@@ -35,8 +36,9 @@ else if (_currentElectionResult is not null)
                             <ElectionInfoPanel
                                 NewBallotFormat="@result.UsedBallot"
                                 NewModelFormat="@result.UsedMethod"
-                                NoOfProjects="@_currentElectionResult.SubmittedProjects.Count()"
-                                NoOfVoters="@_voters.Count()"/>
+                                NoOfProjects="@result.SubmittedProjects.Count()"
+                                NoOfVoters="@_voters.Count()"
+                                TotalBudget="result.TotalBudget"/>
                             <!-- Elected Project List View -->
                             <MudItem xs="7">
                                 <CoherentVotersForm Add="AddToCovote"/>
@@ -70,11 +72,11 @@ else if (_currentElectionResult is not null)
                             <!-- Elected Project List View -->
                             <MudItem xs="6">
                                 <MudText Typo="Typo.h4" Align="Align.Center">Elected Projects</MudText>
-                                <ProjectListView Projects="_currentElectionResult.ElectedProjects"/>
+                                <ProjectListView Projects="result.ElectedProjects"/>
                                 <MudDivider/>
                             </MudItem>
                             <MudItem xs="6" Class="align-content-center" Style="height: max-content; width: max-content">
-                                <SpendageChart electedProjects="_currentElectionResult.ElectedProjects" totalBudget="_currentElection.TotalBudget"/>
+                                <SpendageChart electedProjects="result.ElectedProjects" totalBudget="result.TotalBudget"/>
                             </MudItem>
                             <!-- Submitted Project List View -->
                             <MudItem>
@@ -85,23 +87,7 @@ else if (_currentElectionResult is not null)
                     </CascadingValue>
                 </MudTabPanel>
             }
-            <MudTabPanel Icon="@Icons.Material.Filled.Add">
-                <MudGrid>
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.h3">Redo Election</MudText>
-                        <MudSelect T="string" @bind-Value="tmp" Label="Method" Placeholder="Please Select" Required="true">
-                            <MudSelectItem T="string" Value="@("mes")">Equal Shares</MudSelectItem>
-                            <MudSelectItem T="string" Value="@("greedy")">Greedy Utilitarian</MudSelectItem>
-                            <MudSelectItem T="string" Value="@("seq")">Sequential Phragmen</MudSelectItem>
-                        </MudSelect>
-                        <MudTextField T="int" Label="Budget" Required="true" RequiredError="Must Give Budget!"
-                                      @bind-Value="tmp2"></MudTextField>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudButton ButtonType="ButtonType.Button" Color="Color.Primary" Class="full-width-btn">Redo Election</MudButton>
-                    </MudItem>
-                </MudGrid>    
-            </MudTabPanel>
+            <RedoElectionMenu election="_currentElection" RedoCallback="RedoElection"/>
         </MudTabs>
     </MudContainer>
 }
@@ -122,8 +108,8 @@ else if (_currentElectionResult is not null)
     private List<Voter> _voters;
     private HashSet<CoherrentVoter> _coherrentVoters = [];
     private HashSet<(int, int)> _wantedCoVoters = new HashSet<(int, int)>();
-    private Dictionary<string, float> analysisNumbers1 = new Dictionary<string, float>();
-    private Dictionary<string, float> analysisNumbers2 = new Dictionary<string, float>();
+    private Dictionary<string, float> analysisNumbers1 = new Dictionary<string, float>(); 
+    private Dictionary<string, float> analysisNumbers2 = new Dictionary<string, float>(); 
     private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers1 = new Dictionary<Guid, Dictionary<string, float>>();
     private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers2 = new Dictionary<Guid, Dictionary<string, float>>();
     private List<int> currentSats1 = [5,1,10,14,3];
@@ -132,10 +118,7 @@ else if (_currentElectionResult is not null)
     private bool _isLoading = true;
     private bool _hasError = false;
     private bool reload = false;
-
-    private string tmp = "";
-    private int  tmp2 = 0;
-
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -235,7 +218,12 @@ else if (_currentElectionResult is not null)
             Snackbar.Add("Coherrent groups fully added",Severity.Success);
         } 
     }
-    
+
+    public void RedoElection(Election election)
+    {
+        PbEngineApiService!.RedoElection(election);
+        StateHasChanged();
+    }
     
     
 

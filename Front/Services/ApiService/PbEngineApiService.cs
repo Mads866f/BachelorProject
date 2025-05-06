@@ -197,6 +197,28 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }
 
     }
-    
-    
+
+    public async Task<ElectionResult> RedoElection(Election election)
+    {
+        _logger.LogInformation("Redo Election");
+        var json = JsonSerializer.Serialize(election);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+           var response = await _client.PostAsync($"{url}/redoElection", content);
+           if (response.IsSuccessStatusCode)
+           {
+               var result = await response.Content.ReadFromJsonAsync<ElectionResult>();
+               return result ?? throw new Exception("Internal Server Error - RedoElection");
+           }
+           var error =  new InternalServerErrorException("Internal Server Error - RedoElection");
+           _logger.LogError(error,error.Message);
+           throw error;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }
