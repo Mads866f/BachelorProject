@@ -45,18 +45,18 @@ public class ScoresController(IScoresService service, ILogger<ScoresController> 
             }
             foreach (var score in prevVotes)
             {
-                var deletion = await _service.DeleteByIdAsync(voterId, score.ProjectId);
+                var deletion = await _service.DeleteByIdAsync(voterId, score.Project_Id);
                 if (deletion) continue;
                 //Deletion were unsuccessful 
                 _logger.LogError("Failed to delete Scores for voter with id: {id}", voterId);
-                return StatusCode(500, ("No deletion found for voter with id: {voterId} and projectId {score.Project_Id}", voterId, score.ProjectId));
+                return StatusCode(500, ("No deletion found for voter with id: {voterId} and projectId {score.Project_Id}", voterId, score.Project_Id));
             }
 
             //Add new votes
             foreach (var project in projectsId)
             {
                 var score = new Scores()
-                    { Grade = scores[project], VoterId = voterId, ProjectId = Guid.ParseExact(project, "D") };
+                    { Grade = scores[project], Voter_Id = voterId, Project_Id = Guid.ParseExact(project, "D") };
                 var created = await _service.CreateVotersAsync(score);
                 var createdSuccess = created is not null;//created is not null;
                 if (!createdSuccess)

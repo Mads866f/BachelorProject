@@ -46,7 +46,7 @@ public class PbEngineController(IElectionService _electionService,
 
         var pythonVoters = voters.Select(vot => new PythonVoter()
         {
-            selectedProjects = vot.Votes.Select(v => v.ProjectId.ToString()).ToList(),
+            selectedProjects = vot.Votes.Select(v => v.Project_Id.ToString()).ToList(),
             selectedDegree = vot.Votes.Select(v => v.Grade).ToList(),
         }).ToList();
 
@@ -203,7 +203,7 @@ public class PbEngineController(IElectionService _electionService,
                 var project = pythonVoter.selectedProjects[i];
                 var degree = pythonVoter.selectedDegree[i];
                 //Adding Score to database
-                var score = new Scores(){Grade = degree,  VoterId = createdVoter.Id, ProjectId = projectToIdMap[project]};
+                var score = new Scores(){Grade = degree,  Voter_Id = createdVoter.Id, Project_Id = projectToIdMap[project]};
                 await _scoresService.CreateVotersAsync(score);
             }
         }
@@ -305,7 +305,7 @@ public class PbEngineController(IElectionService _electionService,
        var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
        var votersPython = voters.Select(v => new PythonVoter
        {
-           selectedProjects = election.SubmittedProjects.Where(p => v.Votes.Select(r => r.ProjectId).ToList().ToList().Contains(p.Id)).ToList().ToList().Select(n => n.Name).ToList(),
+           selectedProjects = election.SubmittedProjects.Where(p => v.Votes.Select(r => r.Project_Id).ToList().ToList().Contains(p.Id)).ToList().ToList().Select(n => n.Name).ToList(),
            selectedDegree = v.Votes.Select(d => d.Grade).ToList()
        }).ToList();
         var pythonElection = new PythonElection()

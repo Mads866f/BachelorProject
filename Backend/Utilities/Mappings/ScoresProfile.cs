@@ -10,13 +10,13 @@ public class ScoresProfile : Profile
     {
         // Entity -> DTO
         CreateMap<ScoresEntity, Scores>()
-            .ForMember(dest => dest.Project, 
+            .ForMember(dest => dest.project, 
                 opt => 
                     opt.MapFrom(src => src.ProjectsEntity));
         // DTO -> Entity
         CreateMap<Scores, ScoresEntity>()
             .ForMember(dest => dest.ProjectsEntity, 
                 opt => 
-                    opt.MapFrom(src => src.Project));
+                    opt.MapFrom(src => src.project));
     }
 }
