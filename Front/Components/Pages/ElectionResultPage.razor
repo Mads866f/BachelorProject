@@ -51,23 +51,23 @@ else if (_currentElectionResult is not null)
                                 {
                                     <MudGrid>
                                         <MudItem xs="6">
-                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers1" coNumbers="coVoteAnalNumbers1" Scale = "false"/>
+                                            <AnalysisNumberDisplay avgNumbersFunction="@(() => GetAnalNumbers(result,currentSats1))" coNumbersFunction="@(() =>GetCoVotersSats(result,currentSats1))" Scale = "false"/>
                                         </MudItem>
                                         <MudItem xs="6">
-                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers2" coNumbers="coVoteAnalNumbers2" Scale = "true"/>
+                                            <AnalysisNumberDisplay avgNumbersFunction="@(() => GetAnalNumbers(result,currentSats2))" coNumbersFunction="@(() =>GetCoVotersSats(result,currentSats2))" Scale = "false"/>
                                         </MudItem>
                                     </MudGrid>
                                 }
                                 else{
                                     <MudGrid>
                                         <MudItem xs="6">
-                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers1" coNumbers="coVoteAnalNumbers1" Scale = "false"/>
+                                            <AnalysisNumberDisplay avgNumbersFunction="@(() => GetAnalNumbers(result,currentSats1))" coNumbersFunction="@(() =>GetCoVotersSats(result,currentSats1))" Scale = "false"/>
                                         </MudItem>
                                         <MudItem xs="6">
-                                            <AnalysisNumberDisplay avgNumbers="analysisNumbers2" coNumbers="coVoteAnalNumbers2" Scale = "true"/>
+                                            <AnalysisNumberDisplay avgNumbersFunction="@(() => GetAnalNumbers(result,currentSats2))" coNumbersFunction="@(() =>GetCoVotersSats(result,currentSats2))" Scale = "false"/>
                                         </MudItem>
                                     </MudGrid>
-                                }
+                                }>
                             </MudItem>
                             <!-- Elected Project List View -->
                             <MudItem xs="6">
@@ -143,59 +143,29 @@ else if (_currentElectionResult is not null)
 
         _electionResults = await ResultsApiService.GetResultsByElectionId(electionGuid) ?? [];
         _currentElectionResult = _electionResults.FirstOrDefault();
-        analysisNumbers2 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats2);
-        analysisNumbers1 = await PbEngineApiService.GetAvgSatisfactions(_currentElectionResult, currentSats1);
-        Console.WriteLine("KEYS");
-        foreach (var keyValuePair in analysisNumbers1)
-        {
-            Console.WriteLine($"KEY:{keyValuePair.Key}:VALUE{keyValuePair.Value}");
-        }
         _voters = await VotersApiService.GetVotersByElectionId(electionGuid);
         _isLoading = false;
         reload = !reload;
     }
 
-    public async void UpdateAnalNumbers(List<int> sats)
+    public async Task<Dictionary<string, float>> GetAnalNumbers(ElectionResult result, List<int> sats)
     {
-        UpdateCoVotersSats();
+        if (!_voters.Any()) // Not correct - check if nobody has voted
+        {
+            return new Dictionary<string, float>();
+        }
+        var response = await PbEngineApiService.GetAvgSatisfactions(result, sats);
+        return response;
     }
 
-    public async void UpdateCoVotersSats()
+    public async Task<Dictionary<Guid,Dictionary<string,float>>> GetCoVotersSats(ElectionResult result, List<int> sats)
     {
-            var newCoAnalNumbers1 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, currentSats1);
-            foreach (var (key, value)in newCoAnalNumbers1)
-            {
-                if (coVoteAnalNumbers1.ContainsKey(key))
-                {
-                    foreach (var dict in newCoAnalNumbers1.Values)
-                    {
-                        coVoteAnalNumbers1[key][dict.Keys.First()] = dict.Values.First();
-                    }
-                }
-                else
-                {
-                    coVoteAnalNumbers1[key] = value;
-                }
-        }
-            var newCoAnalNumbers2 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), _currentElectionResult, currentSats2);
-            foreach (var (key, value)in newCoAnalNumbers2)
-            {
-                if (coVoteAnalNumbers2.ContainsKey(key))
-                {
-                    foreach (var dict in newCoAnalNumbers2.Values)
-                    {
-                        coVoteAnalNumbers2[key][dict.Keys.First()] = dict.Values.First();
-                    }
-                }
-                else
-                {
-                    coVoteAnalNumbers2[key] = value;
-                }
-        }
-        reload = !reload;
+        var coAnalNumbers1 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), result, sats);
+        return coAnalNumbers1;
+            reload = !reload;
     }
-    
-    public async void AddToCovote((int,int) toBeAdded)
+
+    public async void AddToCovote((int, int) toBeAdded)
     {
         reload = !reload;
         var newAdd = _wantedCoVoters.Add(toBeAdded);
@@ -212,9 +182,9 @@ else if (_currentElectionResult is not null)
                 {
                     _coherrentVoters.Add(covot);
                 }
-                UpdateCoVotersSats();
             }
             await InvokeAsync(StateHasChanged);
+            reload = !reload;
             Snackbar.Add("Coherrent groups fully added",Severity.Success);
         } 
     }
