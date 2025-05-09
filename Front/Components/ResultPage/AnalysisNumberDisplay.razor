@@ -4,41 +4,66 @@
 @using ApexCharts.Internal
 @rendermode InteractiveServer
 
-<MudPaper>
-   <ApexChart TItem="SatPoint"
-              Title="Order  Value"
-              Options="options"
-              Width="600"
-              Height="600">
-      <ApexPointSeries TItem="SatPoint"
-                       Items="_satPoints"
-                       Name="Average Value"
-                       SeriesType="SeriesType.Radar"
-                       XValue="@(e => e.Sat)"
-                       YValue="@((e => (decimal)e.Value))"
-                       OrderByDescending="e => e.X"/>
-      @foreach (var covote in _coVotSatsList)
-      {
-      <ApexPointSeries TItem="SatPoint"
-                       Items="covote.Item2"
-                       Name="@covote.Item1"
-                       SeriesType="SeriesType.Radar"
-                       XValue="@(e => e.Sat)"
-                       YValue="@((e => (decimal)e.Value))"
-                       OrderByDescending="e => e.X"/>
-      }
-   </ApexChart>
-</MudPaper>
+@if (loading)
+{
+   <MudText Typo="Typo.h1">LOADING</MudText>
+}
+else
+{
+   <MudPaper>
+      <ApexChart TItem="SatPoint"
+                 Title="Order  Value"
+                 Options="options"
+                 Width="600"
+                 Height="600">
+         <ApexPointSeries TItem="SatPoint"
+                          Items="_satPoints"
+                          Name="Average Value"
+                          SeriesType="SeriesType.Radar"
+                          XValue="@(e => e.Sat)"
+                          YValue="@((e => (decimal)e.Value))"
+                          OrderByDescending="e => e.X"/>
+         @foreach (var covote in _coVotSatsList)
+         {
+            <ApexPointSeries TItem="SatPoint"
+                             Items="covote.Item2"
+                             Name="@covote.Item1"
+                             SeriesType="SeriesType.Radar"
+                             XValue="@(e => e.Sat)"
+                             YValue="@((e => (decimal)e.Value))"
+                             OrderByDescending="e => e.X"/>
+         }
+      </ApexChart>
+   </MudPaper>
+}
 
 @code {
-   [Parameter] public required Dictionary<string,float> avgNumbers { get; set; }
-   [Parameter] public required Dictionary<Guid,Dictionary<string ,float>> coNumbers {get; set; }
+   [Parameter] public required Func<Task<Dictionary<string,float>>> avgNumbersFunction { get; set; }
+   [Parameter] public required Func<Task<Dictionary<Guid,Dictionary<string,float>>>> coNumbersFunction {get; set; }
    [Parameter] public required bool Scale { get; set; }
+   private Dictionary<string, float> avgNumbers = new Dictionary<string, float>();
+   private Dictionary<Guid, Dictionary<string, float>> coNumbers = new Dictionary<Guid, Dictionary<string, float>>();
    private List<SatPoint> _satPoints = [];
    private List<(string, List<SatPoint>)> _coVotSatsList = [];
    private ApexChartOptions<SatPoint> options = new ApexChartOptions<SatPoint>();
+   private bool loading = true;
 
-   protected override Task OnInitializedAsync()
+   protected override async Task OnInitializedAsync()
+   {
+      SetScaleGraphic();
+
+      var avgNumbersTask = avgNumbersFunction();
+      var coNumbersTask = coNumbersFunction();
+      await Task.WhenAll(avgNumbersTask,coNumbersTask);{
+         avgNumbers = avgNumbersTask.Result;
+         coNumbers = coNumbersTask.Result;
+         loading = false;
+      }
+      await base.OnInitializedAsync();
+
+   }
+   
+   private void SetScaleGraphic()
    {
       if (Scale)
       {
@@ -53,10 +78,8 @@
             }
          };
       }
-
-      return base.OnInitializedAsync();
    }
-
+   
    public class SatPoint
    {
       public string Sat { get; set; }
