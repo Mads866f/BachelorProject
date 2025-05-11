@@ -42,7 +42,11 @@ else if (_currentElectionResult is not null)
                             <!-- Elected Project List View -->
                             <MudItem xs="7">
                                 <CoherentVotersForm Add="AddToCovote"/>
-                                <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()" TotalBudget="_currentElection!.TotalBudget"/>
+                                <CoherrentVoters coherrentVoters="_coherrentVoters.ToList()"
+                                                 TotalBudget="_currentElection!.TotalBudget"
+                                                 AddToAnalysisFunction="AddToAnalysis"
+                                                 RemoveFromAnalysisFunction="RemoveFromAnalysis"
+                                                 InAnalysisFunction="IsInAnalysis"/>
                             </MudItem>
                             <MudItem xs="12">
                                 <MudText Typo="Typo.h4">Analysis Numbers</MudText>
@@ -114,6 +118,7 @@ else if (_currentElectionResult is not null)
     private Dictionary<Guid, Dictionary<string, float>> coVoteAnalNumbers2 = new Dictionary<Guid, Dictionary<string, float>>();
     private List<int> currentSats1 = [5,1,10,14,3];
     private List<int> currentSats2 = [2,7,16];
+    private List<CoherrentVoter> ToAnalyze = [];
 
     private bool _isLoading = true;
     private bool _hasError = false;
@@ -148,6 +153,23 @@ else if (_currentElectionResult is not null)
         reload = !reload;
     }
 
+    public void RemoveFromAnalysis(CoherrentVoter group)
+    {
+        ToAnalyze.Remove(group);
+        reload = !reload;
+    }
+    
+    public void AddToAnalysis(CoherrentVoter group)
+    {
+        ToAnalyze.Add(group);
+        reload = !reload;
+    }
+
+    public bool IsInAnalysis(CoherrentVoter group)
+    {
+        return ToAnalyze.Contains(group);
+    }
+
     public async Task<Dictionary<string, float>> GetAnalNumbers(ElectionResult result, List<int> sats)
     {
         if (!_voters.Any()) // Not correct - check if nobody has voted
@@ -160,7 +182,7 @@ else if (_currentElectionResult is not null)
 
     public async Task<Dictionary<Guid,Dictionary<string,float>>> GetCoVotersSats(ElectionResult result, List<int> sats)
     {
-        var coAnalNumbers1 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(_coherrentVoters.ToList(), result, sats);
+        var coAnalNumbers1 = await PbEngineApiService.GetAvgSatisfactionCoherentGroups(ToAnalyze.ToList(), result, sats);
         return coAnalNumbers1;
             reload = !reload;
     }

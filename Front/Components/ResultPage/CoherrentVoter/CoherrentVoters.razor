@@ -13,6 +13,7 @@
             <col style="width:100px;" />
             <col style="width:100px;" />
             <col style="width:100px;" />
+            <col style="width:100px;" />
         </ColGroup>
         <HeaderContent>
             <MudTh>Members</MudTh>
@@ -21,6 +22,7 @@
             <MudTh></MudTh>
             <MudTh>Id</MudTh>
             <MudTh>Cohesive</MudTh>
+            <MudTh>See Analysis Number</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="members">@context.number_of_voters</MudTd>
@@ -38,7 +40,16 @@
                     <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error"/> 
                 }
             </MudTd>
-            <!--<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>-->
+            <MudTd>
+                @if (InAnalysisFunction(context))
+                {
+                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Medium" OnClick="() => RemoveFromAnalysisFunction.InvokeAsync(context)">Remove From Analysis</MudButton>
+                }
+                else
+                {
+                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Medium" OnClick="() => AddToAnalysisFunction.InvokeAsync(context)">Add To Analysis</MudButton>
+                }
+            </MudTd>
         </RowTemplate>
         <ChildRowContent>
             @if (context.ShowDetails)
@@ -79,6 +90,9 @@
 @code {
     [Parameter] public required List<CoherrentVoter> coherrentVoters { get; set; }
     [Parameter] public required int TotalBudget { get; set; }
+    [Parameter] public EventCallback<CoherrentVoter> AddToAnalysisFunction { get; set; }
+    [Parameter] public EventCallback<CoherrentVoter> RemoveFromAnalysisFunction { get; set; }
+    [Parameter] public Func<CoherrentVoter,bool> InAnalysisFunction { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
     
 
