@@ -21,7 +21,11 @@ else
                           Name="Average Value"
                           SeriesType="SeriesType.Radar"
                           XValue="@(e => e.Sat)"
-                          YValue="@((e => (decimal)e.Value))"
+                          YValue="@((e => 
+                                     (e.Value is float d && d >= (double)decimal.MinValue && d <= (double)decimal.MaxValue) 
+                                        ? (decimal)d 
+                                        : 0m))"
+
                           OrderByDescending="e => e.X"/>
          @foreach (var covote in _coVotSatsList)
          {
@@ -30,7 +34,10 @@ else
                              Name="@covote.Item1"
                              SeriesType="SeriesType.Radar"
                              XValue="@(e => e.Sat)"
-                             YValue="@((e => (decimal)e.Value))"
+                             YValue="@((e => 
+                                        (e.Value is float d && d >= (double)decimal.MinValue && d <= (double)decimal.MaxValue) 
+                                           ? (decimal)d 
+                                           : 0m))"
                              OrderByDescending="e => e.X"/>
          }
       </ApexChart>
