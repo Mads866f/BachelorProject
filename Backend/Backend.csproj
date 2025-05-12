@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <Folder Include="custom-elections\" />
+      <Folder Include="keys\" />
       <Folder Include="real-elections\" />
     </ItemGroup>
 

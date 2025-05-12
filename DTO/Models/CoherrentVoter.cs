@@ -6,7 +6,9 @@ public class CoherrentVoter
 {
     public Guid id { get; set; }
     public int number_of_voters {get; set; }
-    public int voters {get; set; }
+    public int No_In_Group{get; set; }
+    
+    public List<Voter>  voters { get; set; }
     public int fraction {get; set; }
     public List<Project> projects {get; set; }
     
@@ -38,7 +40,7 @@ public class CoherrentVoter
             }
         }
         increase_no_of_voters(1);
-        fraction = (int)((((double)number_of_voters) / voters)*100);
+        fraction = (int)((((double)number_of_voters) / No_In_Group)*100);
         
         return true;
     }

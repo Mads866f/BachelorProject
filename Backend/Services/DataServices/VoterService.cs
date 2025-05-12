@@ -37,15 +37,23 @@ public class VoterService : IVotersService
         var result = await _repository.GetKSizeCoherentVotersFromElection(electionId, projectCount,lowerbound);
         var votersInElection = await _repository.GetByElectionIdAsync(electionId);
         var noOfVotersInElection = votersInElection.Count();
-        var coheretDtos = result.Select(c => new CoherrentVoter()
+
+        var transformedResult = result.Select(async pair =>
         {
-            fraction = (int)(((float)c.Item2/noOfVotersInElection)*100),
-            id = Guid.NewGuid(),
-            number_of_voters = c.Item2,
-            ShowDetails = false,
-            projects = c.Item1.Select(p => _mapper.Map<Project>(p)).ToList()
+            var voterList = await _repository.GetVotersWithIdListAsync(pair.Value);
+            return new CoherrentVoter()
+            {
+                fraction = (int)((float)pair.Value.Count() / noOfVotersInElection),
+                id = Guid.NewGuid(),
+                number_of_voters = noOfVotersInElection,
+                ShowDetails = false,
+                projects = pair.Key,
+                voters = _mapper.Map<List<Voter>>(voterList),
+
+            };
         });
-        return coheretDtos;
+        var coherentVoters = await Task.WhenAll(transformedResult);
+        return coherentVoters;
     }
 
     public async Task<Voter?> GetVoterAsync(Guid id)

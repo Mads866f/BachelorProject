@@ -19,7 +19,9 @@ public interface IVotersRepository
 
 
     Task<IEnumerable<VoteEntity>> GetVotersByProjectIdAsync(int projectId);
+
+    Task<IEnumerable<VoteEntity>> GetVotersWithIdListAsync(List<Guid> votersIdList);
     
-    Task<IEnumerable<(IEnumerable<ProjectsEntity> Projects, int VoterCount)>> GetKSizeCoherentVotersFromElection(Guid electionId, int noOfProjectsInGroup, int lowerbound);
+    Task<Dictionary<List<Project>, List<Guid>>> GetKSizeCoherentVotersFromElection(Guid electionId, int noOfProjectsInGroup, int lowerbound);
     
 }
