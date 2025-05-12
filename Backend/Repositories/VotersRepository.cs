@@ -313,7 +313,7 @@ WITH voter_projects AS (
         //    project1_name, project1_cost, ..., projectN_name, projectN_cost, voter_count
         var rows = await db.QueryAsync<dynamic>(sql, new { ElectionId = electionId });
         
-        var result =  new Dictionary<List<Project>, List<Guid>>(new ListKey<Project>());
+        var result =  new Dictionary<string, List<Guid>>();
         foreach (var row in rows)
         {
             var projectList = new  List<Project>();
@@ -328,8 +328,9 @@ WITH voter_projects AS (
                     new Project(){Categories = [], Cost = cost, Name = name, ElectionId = electionId, Id = Guid.Empty, Targets = [], votes = 0}
                     );
             }
+            projectList.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
             var voterId = (Guid)((IDictionary<string,object>) row)["voter_id"];
-            var projectKey = projectList.OrderBy(p => p.Name).ToList();
+            var projectKey = projectList.Select(p => $"{p.Name}:{p.Cost}").Aggregate((i, j) => $"{i}|{j}");
             if (!result.TryGetValue(projectKey, out var voterList))
             {
                 voterList = new List<Guid>();
@@ -337,7 +338,19 @@ WITH voter_projects AS (
             }
             voterList.Add(voterId);
         }
-        return result;
+        var resultDict = new Dictionary<List<Project>, List<Guid>>();
+        foreach (var kvp in result)
+        {
+            var key = kvp.Key;
+            var keyTransformed = key.Split('|').Select(p => p.Replace("|","")).ToList();
+            var projectKey = keyTransformed.Select(p=> p.Split(":").Select(k => k.Replace(":",""))
+            
+            ).Select(q => 
+                    new Project(){Categories = [], Cost = int.Parse(q.Last()), Name =q.First() , ElectionId = electionId, Id = Guid.Empty, Targets = [], votes = 0}
+                ).ToList(); 
+            resultDict.Add(projectKey,kvp.Value);
+        };
+        return resultDict;
     }
 
 

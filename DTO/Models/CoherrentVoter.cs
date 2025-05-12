@@ -78,4 +78,16 @@ public class CoherrentVoter
             return hash;
         }
     }
+
+    public override string ToString()
+    {
+        return $"CoherrentVoter: " +
+               $"Id={id}, " +
+               $"NoOfVotersInElection={number_of_voters}, " +
+               $"GroupSize={No_In_Group}, " +
+               $"Fraction={fraction}, " +
+               $"VoterCount={voters?.Count ?? 0}, " +
+               $"ProjectNames=[{string.Join(", ", projects?.Select(p => p.Name) ?? Enumerable.Empty<string>())}], " +
+               $"ShowDetails={ShowDetails}";
+    }
 }

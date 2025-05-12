@@ -41,15 +41,17 @@ public class VoterService : IVotersService
         var transformedResult = result.Select(async pair =>
         {
             var voterList = await _repository.GetVotersWithIdListAsync(pair.Value);
+            var voteEntities = voterList.ToList();
+            Console.WriteLine("VOTER LIST SIZE:" + pair.Value.Count() + "FROM REPOSITORY TRANSFORMATION" + voteEntities.Count());
             return new CoherrentVoter()
             {
-                fraction = (int)((float)pair.Value.Count() / noOfVotersInElection),
+                fraction = (int)(((float)pair.Value.Count()/noOfVotersInElection)*100.0),
                 id = Guid.NewGuid(),
                 number_of_voters = noOfVotersInElection,
                 ShowDetails = false,
                 projects = pair.Key,
                 voters = _mapper.Map<List<Voter>>(voterList),
-
+                No_In_Group = voteEntities.Count()
             };
         });
         var coherentVoters = await Task.WhenAll(transformedResult);

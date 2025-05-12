@@ -25,7 +25,7 @@
             <MudTh>See Analysis Number</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="members">@context.number_of_voters</MudTd>
+            <MudTd DataLabel="members">@context.No_In_Group</MudTd>
             <MudTd DataLabel="percentage">@context.fraction</MudTd>
             <MudTd DataLabel="numberOfProjects">@context.projects.Count</MudTd>
             <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" ButtonType="ButtonType.Button" OnClick="@(() => ShowBtnPress(context))">@((context.ShowDetails == true)? "Hide" : "Show") Projects</MudButton></MudTd>
@@ -98,6 +98,7 @@
 
     private void ShowBtnPress(CoherrentVoter coVoter)
     {
+        Console.WriteLine("COHERENT VOTER:" + coVoter.ToString());
         coVoter.ShowDetails = !coVoter.ShowDetails;
     } 
     
