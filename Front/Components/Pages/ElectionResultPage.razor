@@ -102,6 +102,7 @@ else if (_currentElectionResult is not null)
     [Inject] public required IVotersApiService VotersApiService { get; set;}
     [Inject] public required IPbEngineApiService PbEngineApiService { get; set; }
     [Inject] public required IDialogService DialogService { get; set; }
+    [Inject] public required NavigationManager NavigationManager { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
 
     [Parameter] public string? ElectionId { get; set; }
@@ -213,9 +214,8 @@ else if (_currentElectionResult is not null)
 
     public void RedoElection(Election election)
     {
-        PbEngineApiService!.RedoElection(election);
-        StateHasChanged();
-    }
+        PbEngineApiService.RedoElection(election);
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);    }
     
     
 
