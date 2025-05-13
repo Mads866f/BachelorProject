@@ -15,4 +15,6 @@ public interface IPbEngineService
    Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election, List<PythonProject> electedProjects, List<int> sats);
 
   Task<Dictionary<PythonVoter,Dictionary<string,float>>>  GetAnalysisNumbersGroups(PythonElection pythonElection, List<PythonProject> pythonProjectElected, List<int> sats);
+
+  Task<Dictionary<string, int>> GetPostAnalysisNumber(PythonElection election, List<PythonProject> pythonProjectElected);
 }

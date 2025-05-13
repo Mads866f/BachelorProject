@@ -97,8 +97,6 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
     public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects, List<int> sats)
     {
         var url = "analyze/";
-        Console.WriteLine($"BUDGET BACKEND: {election.totalBudget}");
-        Console.WriteLine($"NUMBER OF ELECTED PROJECTS: {electedProjects.Count()}");
         var load = new
         {
             election = election,
@@ -191,6 +189,46 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
                 return result;
             }
 
+            throw new Exception("Internal Server Error");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<Dictionary<string, int>> GetPostAnalysisNumber(PythonElection election, List<PythonProject> pythonProjectElected)
+    {
+        var url = "analyze/result";
+        var load = new
+        {
+            election = election,
+            outcome = pythonProjectElected
+        };
+        var json = JsonSerializer.Serialize(load);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await _httpsClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+            {
+             var jsonString = await response.Content.ReadAsStringAsync();
+             var map = new Dictionary<string, int>();
+             using var doc = JsonDocument.Parse(jsonString);
+             if (doc.RootElement.TryGetProperty("result", out var resultElement))
+             {
+                 foreach (var prop in resultElement.EnumerateObject())
+                 {
+                     if (prop.Value.ValueKind == JsonValueKind.Number
+                         && prop.Value.TryGetSingle(out var f))
+                     {
+                         map[prop.Name] = (int)f;
+                     }
+                 }
+             }
+             return map;
+            } 
             throw new Exception("Internal Server Error");
         }
         catch (Exception e)

@@ -96,3 +96,8 @@ async def root(instance:Election):
         filename=file_name+"_custom.pb",
         media_type="application/octet-stream"
     )
+
+@app.post("/analyze/result")
+async def root(election:Election, outcome:list[Project]):
+    result =pb.make_post_analysis(election,outcome)
+    return {"result":result}

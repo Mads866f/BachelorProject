@@ -2,6 +2,7 @@ import collections as cl
 import pabutools.election as pbelec
 import pabutools.rules as pbrule
 import pabutools.analysis as pban
+import pabutools.analysis.justifiedrepresentation as pbanr
 from typing import List, Tuple
 from Models import Election, Voter, Project
 import random
@@ -339,3 +340,38 @@ def election_to_file(election:Election, file_name):
 
     pbelec.write_pabulib(instance,profile,filepath)
     return filepath
+
+def make_post_analysis(election:Election,outcome:list[Project]):
+    instance = instance_from_election_model(election)
+    profile = profile_from_voter_list(election.votes,Ballot.Approval,election)
+    pabu_outcome = []
+    for p in outcome:
+        pabu_outcome.append(project_model_to_project_pabu(p))
+    result = {
+        #"Cc-EJR any": int(pbanr.is_EJR_any_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-EJR any": int(pbanr.is_EJR_any_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Card-EJR any": int(pbanr.is_EJR_any_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Cc-EJR": int(pbanr.is_EJR_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-EJR": int(pbanr.is_EJR_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        "Card-EJR": int(pbanr.is_EJR_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Cc-EJR-1": int(pbanr.is_EJR_one_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-EJR-1": int(pbanr.is_EJR_one_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Card-EJR-1": int(pbanr.is_EJR_one_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Cc-PJR any": int(pbanr.is_PJR_any_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-PJR any": int(pbanr.is_PJR_any_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Card-PJR any": int(pbanr.is_PJR_any_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Cc-PJR": int(pbanr.is_PJR_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-PJR": int(pbanr.is_PJR_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Card-PJR": int(pbanr.is_PJR_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Cc-PJR-1": int(pbanr.is_PJR_one_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Cost-PJR-1": int(pbanr.is_PJR_one_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Card-PJR-1": int(pbanr.is_PJR_one_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        #"Is in Core (Cc-sat)": int(pbanr.is_in_core(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation=pabu_outcome)),
+        #"Is in Core (Cost-sat)": int(pbanr.is_in_core(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation=pabu_outcome)),
+        #"Is in Core (Card-sat)": int(pbanr.is_in_core(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation=pabu_outcome)),
+        #"Strong-EJR (Cc-Sat)": int(pbanr.is_strong_EJR_approval(instance,profile,sat_class = pbelec.CC_Sat,budget_allocation = pabu_outcome)),
+        #"Strong-EJR (Cost-Sat)": int(pbanr.is_strong_EJR_approval(instance,profile,sat_class = pbelec.Cost_Sat,budget_allocation = pabu_outcome)),
+        #"Strong-EJR (Card-Sat)": int(pbanr.is_strong_EJR_approval(instance,profile,sat_class = pbelec.Cardinality_Sat,budget_allocation = pabu_outcome)),
+        "Percent Non Empty Handed": int(pban.percent_non_empty_handed(instance,profile,budget_allocation=pabu_outcome))
+    }
+    return result

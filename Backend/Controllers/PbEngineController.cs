@@ -275,6 +275,16 @@ public class PbEngineController(IElectionService _electionService,
     [HttpPost("/analyze/avgSatisfaction/{resultId}")]
     public async Task<Dictionary<string, float>> GetAverageSatisfaction(Guid resultId, [FromBody] List<int> sats)
     {
+        var (electedProjects, pythonElection) = await ConvertResultIdToPythonElection(resultId);
+
+        var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects, sats);
+        ChangeKeysFromNumbersToReal(result);
+        return result;
+
+    }
+
+    private async Task<(List<PythonProject> electedProjects, PythonElection pythonElection)> ConvertResultIdToPythonElection(Guid resultId)
+    {
         var election = await _resultService.GetElectionResultByResultId(resultId);
         var submittedPythonProjects = election.SubmittedProjects.Select(p =>
             new PythonProject()
@@ -287,14 +297,14 @@ public class PbEngineController(IElectionService _electionService,
 
         var electedProjects = election.ElectedProjects.Select(p =>
             new PythonProject()
-                {name =p.Name, cost = p.Cost, 
-                    categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
-       var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
-       var votersPython = voters.Select(v => new PythonVoter
-       {
-           selectedProjects = election.SubmittedProjects.Where(p => v.Votes.Select(r => r.Project_Id).ToList().ToList().Contains(p.Id)).ToList().ToList().Select(n => n.Name).ToList(),
-           selectedDegree = v.Votes.Select(d => d.Grade).ToList()
-       }).ToList();
+            {name =p.Name, cost = p.Cost, 
+                categories = p.Categories?.Select(c => c.Name).ToList() ?? [], target = p.Targets?.Select(t => t.Name).ToList() ??[]}).ToList();
+        var voters = await _votersService.GetVotersByElectionId(election.ElectionId);
+        var votersPython = voters.Select(v => new PythonVoter
+        {
+            selectedProjects = election.SubmittedProjects.Where(p => v.Votes.Select(r => r.Project_Id).ToList().ToList().Contains(p.Id)).ToList().ToList().Select(n => n.Name).ToList(),
+            selectedDegree = v.Votes.Select(d => d.Grade).ToList()
+        }).ToList();
         var pythonElection = new PythonElection()
         {
             ballot_type = election.UsedBallot,
@@ -304,11 +314,7 @@ public class PbEngineController(IElectionService _electionService,
             votes = votersPython,
             totalBudget = election.TotalBudget
         };
-        
-        var result = await _service.GetAnalysisNumbers(pythonElection, electedProjects, sats);
-        ChangeKeysFromNumbersToReal(result);
-        return result;
-
+        return (electedProjects, pythonElection);
     }
 
     private void ChangeKeysFromNumbersToReal(Dictionary<string, float> dict)
@@ -331,4 +337,14 @@ public class PbEngineController(IElectionService _electionService,
         }
 
     }
+
+    [HttpPost("/analyze/postAnalysis/{resultId}")]
+    public async Task<Dictionary<string, int>> PostAnalysis(Guid resultId)
+    {
+        var (electedProjects, pythonElection) = await ConvertResultIdToPythonElection(resultId);
+        var result = await _service.GetPostAnalysisNumber(pythonElection, electedProjects);
+        return result;
+    }
+    
+    
 }
