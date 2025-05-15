@@ -8,7 +8,7 @@ public interface IProjectsRepository
 { 
    Task<IEnumerable<ProjectsEntity>> GetByElectionID(Guid electionID);
    
-   Task<Project> CreateAsync(ProjectsEntity project);
+   Task<ProjectsEntity> CreateAsync(ProjectsEntity project);
 
    Task<IEnumerable<ProjectsEntity>> UpdateAsync(ProjectsEntity project);
 

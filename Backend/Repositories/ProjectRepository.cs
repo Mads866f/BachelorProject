@@ -35,7 +35,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
       return query;
    }
 
-   public async Task<Project> CreateAsync(ProjectsEntity project)
+   public async Task<ProjectsEntity> CreateAsync(ProjectsEntity project)
    {
       using var db = await dbFactory.CreateConnectionAsync();
       const string query = """
@@ -44,14 +44,12 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
                            RETURNING id
                            """;
       var projectId = await db.QuerySingleAsync<Guid>(query, project);
-      var toReturn =  new Project
+      var toReturn =  new ProjectsEntity
       {
          Id = projectId,
          ElectionId = project.ElectionId,
          Name = project.Name,
          Cost = project.Cost,
-         Categories = [],
-         Targets = []
       };
       return toReturn;
    }
