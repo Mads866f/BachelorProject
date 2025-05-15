@@ -27,7 +27,7 @@ public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<Elect
         _logger.LogInformation("Creating Election with id: {id}", election.Id);
         try
         {
-            election.Id = Guid.NewGuid(); //TODO CHECK IF THIS IS NEEDED
+            election.Id = Guid.NewGuid();
             var response = await _client.PostAsJsonAsync(url, election);
             if (response.IsSuccessStatusCode)
             {
@@ -85,7 +85,6 @@ public class ElectionsApiService(IHttpClientFactory clientFactory, ILogger<Elect
             };
 
             var response = await _client.GetAsync(requestUrl);
-            Console.WriteLine(("Got Response From Backend" + response.StatusCode));
             if (response.IsSuccessStatusCode)
             {
                 var elections = await response.Content.ReadFromJsonAsync<List<Election>>();

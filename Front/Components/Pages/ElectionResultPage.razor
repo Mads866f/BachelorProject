@@ -200,7 +200,6 @@ else if (_currentElectionResult is not null)
                 var alreadyIn = _coherrentVoters.Where(x => x.number_of_voters == covot.number_of_voters && 
                    x.projects.Select(p=>p.Name).ToList().All(covot.projects.Select(p => p.Name).ToList().Contains) 
                     );
-                Console.WriteLine("Covot:" + covot.projects.Count());
                 if (!alreadyIn.Any())
                 {
                     _coherrentVoters.Add(covot);

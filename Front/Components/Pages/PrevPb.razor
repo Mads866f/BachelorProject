@@ -51,8 +51,6 @@
     protected override async Task OnInitializedAsync()
     {
         elections = await ElectionsApiService.GetElections("Ended");
-        Console.WriteLine("Elections loaded: " + elections?.Count);
-        Console.WriteLine("First Election: "+ elections?.First());
         var election_names =  await _pbEngineApiService.GetRealElectionsNames();
         _realElectionNames = election_names.Select(x => x.Replace("_", " ").Replace(".pb","").Replace("real-elections/","").Replace("../real-elections/","")).ToList();
         StateHasChanged();
@@ -69,7 +67,6 @@
         var file_name = electionName.Replace(" ", "_") + ".pb";
         var election = await _pbEngineApiService.DownloadRealElection(file_name);
         Snackbar.Add("Election " + election.Name + " has been downloaded",Severity.Success);
-        Console.WriteLine("Election Downloaded");
         elections = await ElectionsApiService.GetElections();
     }
 

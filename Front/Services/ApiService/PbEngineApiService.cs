@@ -64,13 +64,10 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         _logger.LogInformation("Getting real elections names");
         try
         {
-            Console.WriteLine(url+"/realElections");
             var response = await _client.GetAsync("/realElections");
-            Console.WriteLine("RESPONSE: " + response);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<List<string>>();
-                Console.WriteLine(result);
                 return result ?? new List<string>();
             }  
             else
@@ -138,7 +135,7 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }
@@ -148,11 +145,9 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         _logger.LogInformation("Getting Avg Satisfaction");
         try
         {
-            Console.WriteLine(url+"/analyze/avgSatisfaction");
             var json = JsonSerializer.Serialize(sats);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync($"/analyze/avgSatisfaction/{electionResult.Id}",content);
-            Console.WriteLine("RESPONSE: " + response);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<Dictionary<string, float>>();
@@ -217,7 +212,7 @@ public class PbEngineApiService(IHttpClientFactory clientFactory, ILogger<PbEngi
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }

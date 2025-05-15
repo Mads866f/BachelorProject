@@ -21,7 +21,8 @@ public class PbEngineController(IElectionService _electionService,
     IVotersService _votersService,
     IPbEngineService _service,
     ElectionResultService _resultService,
-    IScoresService _scoresService
+    IScoresService _scoresService,
+    ILogger<PbEngineController> _logger
 ) : Controller
 {
 
@@ -79,6 +80,7 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("{id}")]
     public async Task<List<Project>> CalculateElection(Guid id)
     {
+        _logger.LogInformation($"Calculating election with id:{id}");
         var electionEntity = await _electionService.GetElectionAsync(id);
         var electionId = electionEntity is not null ? electionEntity.Id : Guid.Empty;
         var method = Constants.rules_map[electionEntity!.Model];
@@ -123,6 +125,7 @@ public class PbEngineController(IElectionService _electionService,
     [HttpPost("redoElection")]
     public async Task<ElectionResult> RedoElection([FromBody] Election modifiedElection)
     {
+        _logger.LogInformation("Redoing Election");
         var pythonElection = await createPythonElection(modifiedElection);
         var method = Constants.rules_map[modifiedElection.Model];
         var ballotDesign = 1; // Hardcoded for approval
@@ -149,10 +152,9 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("/realElections")]
     public List<string> GetRealElections()
     {
-        Console.WriteLine("Real Elections Was Requested");
+        _logger.LogInformation("Real Elections names Was Requested");
         var folder = "real-elections";
         string[] files = Directory.GetFiles(folder);
-        Console.WriteLine(files[0]);
         var result = files.ToList();
         return result;
     }
@@ -160,10 +162,11 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("/realElections/{filename}")]
     public async Task<Election> GetRealElections(string filename)
     {
+        _logger.LogInformation("Getting Election File");
         var result = await _service.convert_real_election(filename);
         if (result is null)
         {
-            Console.WriteLine(filename + " not found");
+            _logger.LogError(filename + " not found");
         }
 
         //Adding the election to the database
@@ -214,10 +217,11 @@ public class PbEngineController(IElectionService _electionService,
     [HttpGet("/download/{id}")]
     public async Task<IActionResult> DownloadElection(Guid id)
     {
+        _logger.LogInformation("Downloading Election");
         var election = await _electionService.GetElectionAsync(id);
         if (election is null)
         {
-            Console.WriteLine(id + " not found");
+            _logger.LogError(id + " not found");
             throw new Exception("Election not found");
         }
 
@@ -225,7 +229,7 @@ public class PbEngineController(IElectionService _electionService,
         var fileStream = await _service.DownloadElection(pythonElection);
         if (fileStream is null)
         {
-            Console.WriteLine(id + " not found");
+            _logger.LogError(id + " not found");
             throw new Exception("Election not found");
         }
         
@@ -237,6 +241,7 @@ public class PbEngineController(IElectionService _electionService,
     public async Task<Dictionary<Guid, Dictionary<string, float>>> GetGroupsAvgSat([FromBody] groupssatDto load,
         [FromRoute] Guid resultId)
     {
+        _logger.LogInformation("Getting groups avg sat");
         var groups = load.groups;
         var sat = load.sats;
         var election = await _resultService.GetElectionResultByResultId(resultId);
@@ -275,6 +280,7 @@ public class PbEngineController(IElectionService _electionService,
     [HttpPost("/analyze/avgSatisfaction/{resultId}")]
     public async Task<Dictionary<string, float>> GetAverageSatisfaction(Guid resultId, [FromBody] List<int> sats)
     {
+        _logger.LogInformation("Getting avg satisfaction");
         var election = await _resultService.GetElectionResultByResultId(resultId);
         var submittedPythonProjects = election.SubmittedProjects.Select(p =>
             new PythonProject()

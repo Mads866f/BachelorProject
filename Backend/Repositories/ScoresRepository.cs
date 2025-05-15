@@ -6,7 +6,7 @@ using DTO.Models;
 
 namespace Backend.Repositories.Interfaces;
 
-public class ScoresRepository(IDbConnectionFactory dbFactory) : IScoresRepository
+public class ScoresRepository(IDbConnectionFactory dbFactory, ILogger<ScoresRepository> _logger) : IScoresRepository
 {
     public async Task<IEnumerable<ScoresEntity>> GetScoreForVoter(Guid voterId)
     {
@@ -19,10 +19,6 @@ public class ScoresRepository(IDbConnectionFactory dbFactory) : IScoresRepositor
             """, new { idToLookUp = voterId }
             );
 
-        foreach (var res in result)
-        {
-            Console.WriteLine("Pulled from da data base" + res.Project_Id + " : " +  res.Voter_Id);
-        }
         return result;
     }
 
@@ -63,7 +59,6 @@ public class ScoresRepository(IDbConnectionFactory dbFactory) : IScoresRepositor
             VALUES (@Voter_Id, @Project_Id, @Grade)
             RETURNING voter_id AS Voter_Id , project_id AS Project_Id;
             """;
-        Console.WriteLine("SCORES CREATE: "+scores.Voter_Id+" : "+scores.Project_Id + " : " +  scores.Grade);
         var result = await db.QuerySingleAsync<ScoresEntity>(query, scores);
 
         return new ScoresEntity()
@@ -98,7 +93,7 @@ public class ScoresRepository(IDbConnectionFactory dbFactory) : IScoresRepositor
             WHERE voter_id = @VoterId AND project_id = @Project_Id
             """, new {VoterId = voterId, Project_Id = projectId});
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing score with voterId: {voterId} and project id: {projectId}", voterId, projectId);
+        _logger.LogInformation($"Warning: Attempted to delete non-existing score with voterId: {voterId} and project id: {projectId}", voterId, projectId);
         return false;
     }
 }

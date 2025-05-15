@@ -41,7 +41,6 @@ public static class ConfigurationBuilder
 
     private static void SetupServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<IInitialtest, Initialtest>();
         builder.Services.AddScoped<IElectionService, ElectionService>();
         builder.Services.AddScoped<IVotersService, VoterService>();
         builder.Services.AddScoped<IScoresService, ScoresService>();

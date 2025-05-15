@@ -8,7 +8,7 @@ using DTO.Models;
 
 namespace Backend.Repositories;
 
-public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepository
+public class ElectionRepository(IDbConnectionFactory dbFactory, ILogger<ElectionRepository> _logger) : IElectionRepository
 {
     public async Task<IEnumerable<ElectionEntity>> GetAllAsync()
     {
@@ -122,7 +122,7 @@ public class ElectionRepository(IDbConnectionFactory dbFactory) : IElectionRepos
             """,
             new { Id = id });
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing election with Voter_Id {id}", id);
+        _logger.LogInformation($"Warning: Attempted to delete non-existing election with Voter_Id {id}", id);
         return false;
     }
 }

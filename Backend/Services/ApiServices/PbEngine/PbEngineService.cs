@@ -9,24 +9,23 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Backend.Services.ApiServices.PbEngine;
 
-public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineService
+public class PbEngineService(IHttpClientFactory clientFactory, ILogger<PbEngineService> _logger) : IPbEngineService
 {
     private readonly HttpClient _httpsClient = clientFactory.CreateClient(Constants.PbEngine);
         
     public async Task<List<PythonProjects>> CalculateElection(PythonElection election,int method,int ballotType)
     {
+        _logger.LogInformation("Calculating election");
         var url  = "/getResult/?method="+method+"&ballot_type="+ballotType;
         try
         {
             var json = JsonSerializer.Serialize(election);
-            Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpsClient.PostAsync(url, content);
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("RESPONSE:\n" + jsonString);
 
                 var projects = JsonSerializer.Deserialize<List<PythonProjects>>(jsonString, new JsonSerializerOptions
                 {
@@ -34,23 +33,23 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
                 }) ?? new List<PythonProjects>();
 
                 // Print received projects
-                projects.ForEach(x => Console.WriteLine($"Project: {x.Name}, Cost: {x.Cost}"));
 
                 return projects;
             }
 
-            Console.WriteLine($"Error: {response.StatusCode}");
+            _logger.LogError($"Error: {response.StatusCode}");
             return new List<PythonProjects>();
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error: {e.Message}");
+            _logger.LogError($"Error: {e.Message}");
             throw;
         }
     }
 
     public async Task<PythonElection?> convert_real_election(string fileName)
     {
+        _logger.LogInformation("Converting real-election");
         var url = "realElections?file_name="+fileName;
         try
         {
@@ -59,13 +58,14 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }
 
     public async Task<Stream> DownloadElection(PythonElection election)
     {
+        _logger.LogInformation("Downloading election");
         var url = "downloads/";
         try
         {
@@ -89,16 +89,15 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }
 
     public async Task<Dictionary<string, float>> GetAnalysisNumbers(PythonElection election,List<PythonProject> electedProjects, List<int> sats)
     {
+        _logger.LogInformation("Getting analysis numbers");
         var url = "analyze/";
-        Console.WriteLine($"BUDGET BACKEND: {election.totalBudget}");
-        Console.WriteLine($"NUMBER OF ELECTED PROJECTS: {electedProjects.Count()}");
         var load = new
         {
             election = election,
@@ -137,13 +136,14 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }
 
     public async Task<Dictionary<PythonVoter, Dictionary<string, float>>> GetAnalysisNumbersGroups(PythonElection pythonElection, List<PythonProject> pythonProjectElected, List<int> sats)
     {
+        _logger.LogInformation("Getting analysis numbers");
         var url = "analyze/";
         var load = new
         {
@@ -195,7 +195,7 @@ public class PbEngineService(IHttpClientFactory clientFactory) : IPbEngineServic
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e,e.Message);
             throw;
         }
     }

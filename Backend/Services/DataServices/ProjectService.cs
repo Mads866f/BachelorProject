@@ -25,6 +25,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper, ILog
     /// <returns>A collection of project DTOs associated with the election.</returns>
     public async Task<IEnumerable<Project>> GetProjectsWithElectionId(Guid id)
     {
+        _logger.LogInformation($"Getting project with Election id {id}");
         var result = await _repository.GetByElectionID(id);
         return result.Select(x => _mapper.Map<Project>(x));
     }
@@ -36,6 +37,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper, ILog
     /// <returns>The project DTO if found; otherwise, null.</returns>
     public async Task<Project?> GetProjectByIdAsync(Guid id)
     {
+        _logger.LogInformation($"Getting project with id {id}");
         var result = await _repository.GetByIdAsync(id);
         return _mapper.Map<Project>(result);
     }
@@ -47,6 +49,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper, ILog
     /// <returns>The created project mapped as a DTO.</returns>
     public async Task<Project?> CreateProjectAsync(CreateProjectModel createProjectModel)
     {
+        _logger.LogInformation("Creating Project");
         var project = _mapper.Map<ProjectsEntity>(createProjectModel);
         var projectEntity = await _repository.CreateAsync(project);
         return _mapper.Map<Project>(projectEntity);
@@ -58,6 +61,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper, ILog
     /// <param name="project">The project entity containing updated values.</param>
     public async Task UpdateProjectAsync(ProjectsEntity project)
     {
+        _logger.LogInformation("Updating Project");
         await _repository.UpdateAsync(project);
     }
 
@@ -67,6 +71,7 @@ public class ProjectService(IProjectsRepository repository, IMapper mapper, ILog
     /// <param name="projectId">The ID of the project to delete.</param>
     public async Task DeleteProjectAsync(Guid projectId)
     {
+        _logger.LogInformation("Deleting Project");
         await _repository.DeleteAsync(projectId);
     }
 }

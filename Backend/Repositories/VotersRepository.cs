@@ -9,7 +9,7 @@ using DTO.Models;
 
 namespace Backend.Repositories;
 
-public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepository
+public class VotersRepository(IDbConnectionFactory dbFactory, ILogger<VotersRepository> _logger) : IVotersRepository
 {
     public async Task<IEnumerable<VoteEntity>> GetAllAsync()
     {
@@ -60,7 +60,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<IEnumerable<VoteEntity>> GetVotersWithIdListAsync(List<Guid> votersIdList)
     {
-        Console.WriteLine("Getting List of Voters with Ids");
+        _logger.LogInformation("Getting List of Voters with Ids");
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                                  SELECT 
@@ -107,7 +107,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
     
     public async Task<VoteEntity?> GetByIdAsync(Guid id)
     {
-        Console.WriteLine("Getting Voter with id:" + id);
+        _logger.LogInformation("Getting Voter with id:" + id);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              SELECT id AS Id, election_id AS ElectionId
@@ -117,7 +117,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
         var result = db.QuerySingleOrDefault<VoteEntity>(query, new { idToFind = id });
         if (result is not null)
         {
-            Console.WriteLine("Found a result with id:" + result.Id);
+            _logger.LogInformation("Found a result with id:" + result.Id);
         }
 
         return result;
@@ -125,7 +125,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<VoteEntity> CreateAsync(CreateVoter voter)
     {
-        Console.WriteLine("Creating voter for election: " + voter.ElectionId);
+        _logger.LogInformation("Creating voter for election: " + voter.ElectionId);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              INSERT INTO voters_table (election_id)
@@ -143,7 +143,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<VoteEntity?> UpdateAsync(VoteEntity voter)
     {
-        Console.WriteLine("Updating voter: " + voter.Id);
+        _logger.LogInformation("Updating voter: " + voter.Id);
         using var db = await dbFactory.CreateConnectionAsync();
 
         const string query = """
@@ -158,7 +158,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        Console.WriteLine("Deleting voter: " + id);
+        _logger.LogInformation("Deleting voter: " + id);
         using var db = await dbFactory.CreateConnectionAsync();
         const string query = """
                              DELETE FROM voters_table
@@ -166,7 +166,7 @@ public class VotersRepository(IDbConnectionFactory dbFactory) : IVotersRepositor
                              """;
         var rowsAffected = await db.ExecuteAsync(query, new { Id = id });
         if (rowsAffected != 0) return true;
-        Console.WriteLine($"Warning: Attempted to delete non-existing voter with Voter_Id {id}", id);
+            _logger.LogInformation($"Warning: Attempted to delete non-existing voter with Voter_Id {id}", id);
         return false;
     }
 
@@ -296,8 +296,6 @@ WITH voter_projects AS (
         sql.AppendLine("ORDER BY " + string.Join(", ", Enumerable.Range(1, projectCount).Select(i => $"pr{i}.name")) +
                        ", cv.voter_id;");
 
-        Console.WriteLine("SQL QUERY BUILD:\n" +  sql.ToString());
-        Console.WriteLine();
         return sql.ToString();
     }
 

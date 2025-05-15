@@ -211,7 +211,7 @@ namespace Backend.Controllers.DataControllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e,e.Message);
                 throw;
             }
         }

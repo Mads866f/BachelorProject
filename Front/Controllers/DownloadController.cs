@@ -10,7 +10,6 @@ public class DownloadController : Controller
     {
         var fileStream = new FileStream(filePath, FileMode.Open);
         var fileName = Path.GetFileName(filePath);
-        Console.WriteLine("Download Has Started");
         return File(fileStream, "application/octet-stream",fileName);
     }
 }

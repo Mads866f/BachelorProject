@@ -38,7 +38,6 @@
         var voter = await _votersApiService.GetVoterById(Guid.Parse(JoinCode));
         if (voter.ElectionId == Guid.Empty)
         {
-            Console.WriteLine("NO VOTER WITH ID:"+ JoinCode);
             return;
         }
         var electionId = voter.ElectionId;
@@ -55,15 +54,12 @@
     private async void SubmitVotes()
     {
         //COLLECT VOTE LIST AND SUBMIT TO DB
-        Console.WriteLine("JOINCODE"+JoinCode);
         await _scoresApiService.UpdateScores(Guid.Parse(JoinCode), _votes); 
-        Console.WriteLine("Submitted Votes");
     }
 
     public void AddProjectToVotesApproval(Project project)
     {
         
-        Console.WriteLine("PROJECT ID TO ADD: "+ project.Id +  " : "+project.Name);
         _votes.Add(project.Id.ToString(),1);
     }
 

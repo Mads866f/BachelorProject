@@ -49,7 +49,6 @@ public class ElectionResultRepository(IDbConnectionFactory dbFactory, ILogger<El
                     WHERE result.election_id = @electionId
                     """;
         var result = await db.QueryAsync<ElectionResultEntity>(query, new { electionId = electionId });
-        Console.WriteLine("THIS FUCKING SHIT!: "+result.First().ToString() + "THIS?" + result.First().UsedMethod);
         return result;
     }
 /// <summary>

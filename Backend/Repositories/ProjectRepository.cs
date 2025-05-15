@@ -53,14 +53,13 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
          Categories = [],
          Targets = []
       };
-      Console.WriteLine(toReturn.Name);
       return toReturn;
    }
 
 
    public async Task<IEnumerable<ProjectsEntity>> UpdateAsync(ProjectsEntity project)
    {
-      Console.WriteLine("Updating Projects - Backend(Database)");
+      _logger.LogInformation("Updating Projects - Backend(Database)");
      using var db = await dbFactory.CreateConnectionAsync(); 
      await  db.ExecuteAsync("""
                      UPDATE projects_table
@@ -73,7 +72,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
 
    public async Task<bool> DeleteAsync(Guid projectId)
    {
-      Console.WriteLine("Deleting Projects - Backend(Database)");
+      _logger.LogInformation("Deleting Projects - Backend(Database)");
       using var db = await dbFactory.CreateConnectionAsync();
       var query = await db.ExecuteAsync("""
                                         DELETE FROM projects_table
@@ -81,7 +80,7 @@ public class ProjectRepository(IDbConnectionFactory dbFactory ,ILogger<ProjectRe
                                         """,new {project_id = projectId});
       if (query != 0)
       {
-         Console.WriteLine("Nothing was deleted");
+         _logger.LogInformation("Nothing was deleted");
          return false;
       }
       return true;

@@ -20,7 +20,8 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     /// </summary>
     /// <returns>A collection of mapped election DTOs.</returns>
     public async Task<IEnumerable<Election>> GetAllElectionsAsync()
-    {
+    { 
+        _logger.LogInformation("Getting all elections");
     var result = await repository.GetAllAsync();
     return result
         .Select(mapper.Map<Election>); 
@@ -28,6 +29,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
 
     public async Task<IEnumerable<Election>> GetEndedElectionsAsync()
     {
+        _logger.LogInformation("Getting ended elections");
         var result = await repository.GetAllEndedAsync();
         return result
             .Select(mapper.Map<Election>);
@@ -35,6 +37,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     
     public async Task<IEnumerable<Election>> GetOpenElectionsAsync()
     {
+        _logger.LogInformation("Getting open elections");
         var result = await repository.GetAllOpenAsync();
         return result
             .Select(mapper.Map<Election>);
@@ -47,6 +50,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     /// <returns>The mapped election DTO if found; otherwise, null.</returns>
     public async Task<Election?> GetElectionAsync(Guid id)
     {
+        _logger.LogInformation($"Getting election with id {id}");
         var electionEntity = await repository.GetByIdAsync(id);
         if (electionEntity is null)
         {
@@ -58,6 +62,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
 
     public void EndElectionAsync(Guid id)
     {
+        _logger.LogInformation($"Ending election with id {id}");
         repository.EndElectionAsync(id);
     }
 
@@ -68,6 +73,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     /// <returns>The newly created election mapped as a DTO.</returns>
     public async Task<Election> CreateElectionAsync(CreateElectionModel election)
     {
+        _logger.LogInformation("Creating election");
         var electionEntity = await repository.CreateAsync(election);
         var electionDto = mapper.Map<Election>(electionEntity);
         return electionDto;
@@ -80,6 +86,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     /// <returns>The updated election mapped as a DTO, or null if the update failed.</returns>
     public async Task<Election?> UpdateElectionAsync(Election electionModel)
     {
+        _logger.LogInformation("Updating election");
         var electionEntity = mapper.Map<ElectionEntity>(electionModel);
         var updated = await repository.UpdateAsync(electionEntity);
         if (updated is null)
@@ -97,6 +104,7 @@ public class ElectionService(IMapper mapper, IElectionRepository repository, ILo
     /// <returns>True if deletion was successful; otherwise, false.</returns>
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
+        _logger.LogInformation($"Deleting election with id {id}");
         var success = await repository.DeleteAsync(id);
         if (success is false)
         {

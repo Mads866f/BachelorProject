@@ -73,7 +73,6 @@ public class VotersApiService(IHttpClientFactory clientFactory, ILogger<VotersAp
     /// <exception cref="InternalServerErrorException"></exception>
     public async Task<List<Voter>> GetVotersByElectionId(Guid electionId)
     {
-        // TODO NEED TO MODIFY CONTROLLER FOR EASIER ACCESS TO SPECIFIC VOTER GROUPS
         _logger.LogInformation($"Getting voters by election id {electionId}");
         try
         {
