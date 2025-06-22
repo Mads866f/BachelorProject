@@ -2,57 +2,27 @@
 @rendermode InteractiveServer
 <MudPaper>
     <MudGrid Spacing="2" >
-        <MudItem xs = "3">
+        <MudItem xs = "4">
             <MudText Typo="Typo.h5"> Election Name</MudText>
         </MudItem>
-        <MudItem xs = "3">
-            <MudText Typo="Typo.h5">Budget</MudText>
-        </MudItem>
-        <MudItem xs = "3">
-            <MudText Typo="Typo.h5">Participants</MudText>
-        </MudItem>
-        <MudItem xs = "3">
-            <MudText Typo="Typo.h5">Projects</MudText>
-        </MudItem>
-        
-        <MudDivider />
-        
-        <MudItem xs = "3">
-            <MudText Typo="Typo.h6">@election.Name</MudText>
-        </MudItem>
-
-        <MudItem xs = "3">
-            <MudText Typo="Typo.h6">@election.TotalBudget</MudText>
-        </MudItem>
-
-        <MudItem xs="3">
-            <MudText Typo="Typo.h6">N/A</MudText>
-        </MudItem>
-
-        <MudItem xs="3">
-            <MudText Typo="Typo.h6">N/A</MudText>
-        </MudItem>
-
-        <MudDivider />
         <MudItem xs = "4">
-            <MudText Typo="Typo.h5">Ended</MudText>
+            <MudText Typo="Typo.h5">Budget</MudText>
         </MudItem>
         <MudItem xs = "4">
             <MudText Typo="Typo.h5">Method</MudText>
         </MudItem>
+        <MudDivider />
+        
         <MudItem xs = "4">
-            <MudText Typo="Typo.h5">Ballot Design</MudText>
+            <MudText Typo="Typo.h6">@election.Name</MudText>
         </MudItem>
+
         <MudItem xs = "4">
-            <MudText Typo="Typo.h5">N/A</MudText>
+            <MudText Typo="Typo.h6">@election.TotalBudget</MudText>
         </MudItem>
         <MudItem xs = "4">
             <MudText Typo="Typo.h5">@election.Model</MudText>
         </MudItem>
-        <MudItem xs = "4">
-            <MudText Typo="Typo.h5">@election.BallotDesign</MudText>
-        </MudItem>
-        <MudDivider />
         <MudItem xs = "12">
             <MudButton Style = "background-color: rebeccapurple; color: wheat" Class="full-width-btn" OnClick="NavigateToResultsPage">Read More</MudButton>
         </MudItem>

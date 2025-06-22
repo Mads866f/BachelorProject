@@ -218,32 +218,82 @@ public class VotersRepository(IDbConnectionFactory dbFactory, ILogger<VotersRepo
         return voterDict.Values;
     }
 
+    
+    
+    
     private static string BuildCoherentVoterQuery(int projectCount, int lowerBound)
     {
         if (projectCount < 2)
             throw new ArgumentException("Project count must be at least 2.");
-
         var sql = new StringBuilder();
+        VotesProjectPairsInElection(sql);
+        var fromJoins = HandleProjectGroups(projectCount, out var selectFields, out var groupByFields);
+        CountNumberOfVotersInGroup(sql, groupByFields, selectFields, fromJoins);
+        FilterLowerBound(lowerBound, sql, groupByFields, selectFields, fromJoins);
+        SelectProjectInformationInGroup(projectCount, sql);
+        JoinTables(projectCount, sql);
+        var resultingQuery = sql.ToString();
+        Console.WriteLine("QUERY:\n"+resultingQuery+"\n");
+        return resultingQuery;
+    }
 
-        // 1) Base CTE: voter-project assignments for this election
-        sql.AppendLine(@"
-WITH voter_projects AS (
-    SELECT s.voter_id, s.project_id
-    FROM scores_table s
-    JOIN voters_table v ON s.voter_id = v.id
-    WHERE v.election_id = @ElectionId
-),");
+    private static void JoinTables(int projectCount, StringBuilder sql)
+    {
+        for (int i = 1; i <= projectCount; i++)
+        {
+            sql.AppendLine($"JOIN projects_table pr{i} ON pr{i}.id = cv.p{i}");
+        }
 
-        // 2) Build inner grouping CTE ("grouped")
+        sql.AppendLine("ORDER BY " + string.Join(", ", Enumerable.Range(1, projectCount).Select(i => $"pr{i}.name")) +
+                       ", cv.voter_id;");
+    }
+
+    private static void SelectProjectInformationInGroup(int projectCount, StringBuilder sql)
+    {
+        sql.AppendLine("SELECT");
+        for (int i = 1; i <= projectCount; i++)
+        {
+            sql.AppendLine($"    pr{i}.name AS project{i}_name, pr{i}.cost AS project{i}_cost,");
+        }
+        sql.AppendLine("    cv.voter_id");
+        sql.AppendLine("FROM coherent_voters cv");
+    }
+
+    private static void FilterLowerBound(int lowerBound, StringBuilder sql, List<string> groupByFields, List<string> selectFields,
+        List<string> fromJoins)
+    {
+        sql.AppendLine("coherent_voters AS (");
+        sql.AppendLine("    SELECT sub.voter_id, " + string.Join(", ", groupByFields.Select(p => "sub."+p)));
+        sql.AppendLine("    FROM (");
+        sql.AppendLine("        SELECT vp1.voter_id, " + string.Join(", ", selectFields));
+        sql.AppendLine("        FROM " + string.Join("\n        ", fromJoins));
+        sql.AppendLine("    ) sub");
+        sql.AppendLine("    JOIN grouped g ON " + string.Join(" AND ", groupByFields.Select(p => $"sub.{p} = g.{p}")));
+        sql.AppendLine($"    WHERE g.voter_count > {lowerBound}");
+        sql.AppendLine(")");
+    }
+
+    private static void CountNumberOfVotersInGroup(StringBuilder sql, List<string> groupByFields, List<string> selectFields, List<string> fromJoins)
+    {
+        sql.AppendLine("grouped AS (");
+        sql.AppendLine($"    SELECT {string.Join(", ", groupByFields)}, COUNT(DISTINCT voter_id) AS voter_count");
+        sql.AppendLine("    FROM (");
+        sql.AppendLine("        SELECT vp1.voter_id, " + string.Join(", ", selectFields));
+        sql.AppendLine("        FROM " + string.Join("\n        ", fromJoins));
+        sql.AppendLine("    ) sub");
+        sql.AppendLine("    GROUP BY " + string.Join(", ", groupByFields));
+        sql.AppendLine("),");
+    }
+
+    private static List<string> HandleProjectGroups(int projectCount, out List<string> selectFields, out List<string> groupByFields)
+    {
         var fromJoins = new List<string>();
-        var selectFields = new List<string>();
-        var groupByFields = new List<string>();
+        selectFields = new List<string>();
+        groupByFields = new List<string>();
         var joinProjects = new List<string>();
-
         for (int i = 1; i <= projectCount; i++)
         {
             selectFields.Add($"vp{i}.project_id AS p{i}");
-
             if (i == 1)
                 fromJoins.Add("voter_projects vp1");
             else
@@ -256,47 +306,18 @@ WITH voter_projects AS (
     ON pr{i}.id = p{i}");
         }
 
-        // 2e) grouped CTE
-        sql.AppendLine("grouped AS (");
-        sql.AppendLine($"    SELECT {string.Join(", ", groupByFields)}, COUNT(DISTINCT voter_id) AS voter_count");
-        sql.AppendLine("    FROM (");
-        sql.AppendLine("        SELECT vp1.voter_id, " + string.Join(", ", selectFields));
-        sql.AppendLine("        FROM " + string.Join("\n        ", fromJoins));
-        sql.AppendLine("    ) sub");
-        sql.AppendLine("    GROUP BY " + string.Join(", ", groupByFields));
-        sql.AppendLine("),");
+        return fromJoins;
+    }
 
-        // 3) coherent_voters CTE
-        sql.AppendLine("coherent_voters AS (");
-        sql.AppendLine("    SELECT sub.voter_id, " + string.Join(", ", groupByFields.Select(p => "sub."+p)));
-        sql.AppendLine("    FROM (");
-        sql.AppendLine("        SELECT vp1.voter_id, " + string.Join(", ", selectFields));
-        sql.AppendLine("        FROM " + string.Join("\n        ", fromJoins));
-        sql.AppendLine("    ) sub");
-        sql.AppendLine("    JOIN grouped g ON " + string.Join(" AND ", groupByFields.Select(p => $"sub.{p} = g.{p}")));
-        sql.AppendLine($"    WHERE g.voter_count > {lowerBound}");
-        sql.AppendLine(")");
-
-        // 4) Final SELECT
-        sql.AppendLine("SELECT");
-        for (int i = 1; i <= projectCount; i++)
-        {
-            sql.AppendLine($"    pr{i}.name AS project{i}_name, pr{i}.cost AS project{i}_cost,");
-        }
-
-        sql.AppendLine("    cv.voter_id");
-        sql.AppendLine("FROM coherent_voters cv");
-
-        // 5) Join to projects_table
-        for (int i = 1; i <= projectCount; i++)
-        {
-            sql.AppendLine($"JOIN projects_table pr{i} ON pr{i}.id = cv.p{i}");
-        }
-
-        sql.AppendLine("ORDER BY " + string.Join(", ", Enumerable.Range(1, projectCount).Select(i => $"pr{i}.name")) +
-                       ", cv.voter_id;");
-
-        return sql.ToString();
+    private static void VotesProjectPairsInElection(StringBuilder sql)
+    {
+        sql.AppendLine(@"
+WITH voter_projects AS (
+    SELECT s.voter_id, s.project_id
+    FROM scores_table s
+    JOIN voters_table v ON s.voter_id = v.id
+    WHERE v.election_id = @ElectionId
+),");
     }
 
 

@@ -151,6 +151,11 @@ Database - Creates new electionresult
 
 %% Responds back to frontend with electionresultid
 
+
+## Loading the result page
+
+
+
 %Frontend - navigates to result page
 
 Frontend - ElectionApiService - requests electionresult from database
